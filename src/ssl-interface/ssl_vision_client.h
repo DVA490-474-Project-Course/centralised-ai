@@ -1,54 +1,57 @@
 // ssl_vision_client.cc
 //==============================================================================
-// Author: Aaiza A. Khan \and Shruthi Puthiya Kunnon
+// Author: Aaiza A. Khan and Shruthi Puthiya Kunnon
 // Creation date: 2024-09-20
-// Last modified: 2024-09-23
-// Description: A simple client receiving ball and robots positions and other information from grSim
+// Last modified: 2024-09-24 by Emil Åberg
+// Description: A simple client receiving ball and robots positions from ssl-vision
 // License: See LICENSE file for license details.
 //==============================================================================
-#ifndef SSLVISIONCLIENT_H
-#define SSLVISIONCLIENT_H
+#ifndef CENTRALIZEDAI_SSLVISIONCLIENT_H_
+#define CENTRALIZEDAI_SSLVISIONCLIENT_H_
 
-#include "netraw.h"
-#include <string>
+// C system headers
+#include <arpa/inet.h>
+
+// C++ standard library headers
+#include <string> 
+
+// Project .h files
 #include "messages_robocup_ssl_detection.pb.h"
-#include "messages_robocup_ssl_geometry.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
-using namespace std;
+#define TEAM_SIZE 6
 
+struct PositionData
+{
+  struct RobotPosition
+  {
+    float x = 0.0F;
+    float y = 0.0F;
+    float orientation = 0.0F;
+  };
 
-// SSLVisionClient class declaration
-class SSLVisionClient {
-protected:
-    static const int MaxDataGramSize = 65536;
-    char * in_buffer;
-    Net::UDP mc; // multicast client
-    int _port;
-    string _net_address;
-    string _net_interface;
+  struct BallPosition
+  {
+    float x = 0.0F;
+    float y = 0.0F;
+  };
 
-public:
-    SSLVisionClient(int port = 10020,
-                    string net_ref_address = "127.0.0.1",
-                    string net_ref_interface = "");
-
-    ~SSLVisionClient();
-    bool open(bool blocking = false);
-    void close();
-    bool receive(SSL_WrapperPacket & packet);
+  struct RobotPosition blue_robot_position[TEAM_SIZE];
+  struct RobotPosition yellow_robot_position[TEAM_SIZE];
+  struct BallPosition ball_position;
 };
 
-// Function to print robot info
-void printRobotInfo(const SSL_DetectionRobot & robot);
+class VisionClient
+{
+public:
+  VisionClient(std::string ip, int port);
+  void ReceivePacket(struct PositionData* position_data);
+  void PrintPositionData(struct PositionData position_data);
+private:
+  sockaddr_in client_address;
+  int socket;
+  static const int max_datagram_size = 65536;
+  socklen_t address_length;
+};
 
-// Function to handle detection data
-void handleDetectionData(const SSL_WrapperPacket &packet);
-
-// Function to handle geometry data
-void handleGeometryData(const SSL_WrapperPacket &packet);
-
-// Function to receive and process SSL packets
-void processSSLPackets();
-
-#endif // SSLVISIONCLIENT_H
+#endif // CENTRALIZEDAI_SSLVISIONCLIENT_H_
