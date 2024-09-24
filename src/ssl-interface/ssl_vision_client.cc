@@ -21,6 +21,7 @@
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
+// Constructor
 VisionClient::VisionClient(std::string ip, int port)
 { 
     // Define client address
@@ -38,6 +39,7 @@ VisionClient::VisionClient(std::string ip, int port)
   address_length = sizeof(client_address);
 }
 
+// Receive one UDP packet and write the data to the output parameter
 void VisionClient::ReceivePacket(struct PositionData* position_data)
 {
   SSL_WrapperPacket packet;
