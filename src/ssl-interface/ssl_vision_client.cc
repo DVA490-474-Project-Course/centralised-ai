@@ -1,11 +1,14 @@
 // ssl_vision_client.h
 //==============================================================================
-// Author: Aaiza A. Khan and Shruthi Puthiya Kunnon
+// Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
 // Creation date: 2024-09-20
 // Last modified: 2024-09-24 by Emil Åberg
 // Description: A simple client receiving ball and robots positions from ssl-vision
 // License: See LICENSE file for license details.
 //==============================================================================
+
+// Related .h files
+#include "ssl_vision_client.h"
 
 // C system headers
 #include "ssl_vision_client.h"

@@ -1,6 +1,6 @@
 // ssl_vision_client.cc
 //==============================================================================
-// Author: Aaiza A. Khan and Shruthi Puthiya Kunnon
+// Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
 // Creation date: 2024-09-20
 // Last modified: 2024-09-24 by Emil Åberg
 // Description: A simple client receiving ball and robots positions from ssl-vision
