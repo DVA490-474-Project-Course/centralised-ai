@@ -49,9 +49,8 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
   SSL_DetectionRobot robot;
   SSL_DetectionBall ball;
   int id;
-    int n;
-    char buffer[max_datagram_size];
-  struct PositionData data;
+  int n;
+  char buffer[max_datagram_size];
 
   // Receive raw packet
     n = recvfrom(socket, (char *)buffer, max_datagram_size,  
