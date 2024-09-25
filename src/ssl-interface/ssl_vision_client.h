@@ -1,4 +1,4 @@
-// ssl_vision_client.cc
+// ssl_vision_client.h
 //==============================================================================
 // Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
 // Creation date: 2024-09-20
@@ -47,7 +47,7 @@ public:
   VisionClient(std::string ip, int port);
   void ReceivePacket(struct PositionData* position_data);
   void PrintPositionData(struct PositionData position_data);
-private:
+
   sockaddr_in client_address;
   int socket;
   static const int max_datagram_size = 65536;
