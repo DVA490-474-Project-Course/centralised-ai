@@ -9,7 +9,7 @@ add_subdirectory(src)
 
 # add .cc files to executable
 file(GLOB_RECURSE SRC_FILES src/ssl-interface/*.cc)
-add_executable(ssl_vision_client_demo ${SRC_FILES} src/main.cc)
+add_executable(ssl_vision_client_demo ${SRC_FILES} src/ssl-interface/ssl_vision_client_demo.cc)
 
 # include header files
 target_include_directories(ssl_vision_client_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl-interface)
