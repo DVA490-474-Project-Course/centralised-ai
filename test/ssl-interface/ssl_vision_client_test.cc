@@ -11,21 +11,31 @@
 #include <gtest/gtest.h>
 #include "ssl_vision_client.h"
 
+class VisionClientDerived : public VisionClient
+{
+public:
+  using VisionClient::VisionClient;
+  sockaddr_in& get_client_address() {return client_address;}
+  int& get_socket() {return socket;}
+  static const int& get_max_datagram_size() {return max_datagram_size;}
+  socklen_t& get_address_length() {return address_length;}
+};
+
 // Test case 1: Initialization
 TEST(VisionClientTest, InitializesCorrectly) {
 
-    VisionClient client("127.0.0.1", 10006);
+    VisionClientDerived client("127.0.0.1", 10006);
 
-    EXPECT_EQ(client.client_address.sin_family, AF_INET);
-    EXPECT_EQ(ntohs(client.client_address.sin_port), 10006);
-    EXPECT_EQ(client.client_address.sin_addr.s_addr, inet_addr("127.0.0.1"));
-    EXPECT_GE(client.socket, 0);  // socket should be valid (>= 0)
+    EXPECT_EQ(client.get_client_address().sin_family, AF_INET);
+    EXPECT_EQ(ntohs(client.get_client_address().sin_port), 10006);
+    EXPECT_EQ(client.get_client_address().sin_addr.s_addr, inet_addr("127.0.0.1"));
+    EXPECT_GE(client.get_socket(), 0);  // socket should be valid (>= 0)
 
 }
 
 // Test case 2: Receives and parses packet
 TEST(VisionClientTest, ReceivesAndParsesPacket) {
-    VisionClient client("127.0.0.1", 10006);
+    VisionClientDerived client("127.0.0.1", 10006);
     PositionData position_data;
 
     // Mock SSL_WrapperPacket

@@ -48,6 +48,7 @@ public:
   void ReceivePacket(struct PositionData* position_data);
   void PrintPositionData(struct PositionData position_data);
 
+protected:
   sockaddr_in client_address;
   int socket;
   static const int max_datagram_size = 65536;
