@@ -2,8 +2,8 @@
 //==============================================================================
 // Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
 // Creation date: 2024-09-20
-// Last modified: 2024-09-25 by Emil Åberg
-// Description: A simple client receiving ball and robots positions from ssl-vision
+// Last modified: 2024-10-01 by Shruthi Puthiya Kunnon
+// Description: Added virtual to Receivepacket function for test suite no.3.
 // License: See LICENSE file for license details.
 //==============================================================================
 #ifndef CENTRALIZEDAI_SSLVISIONCLIENT_H_
@@ -45,7 +45,7 @@ class VisionClient
 {
 public:
   VisionClient(std::string ip, int port);
-  void ReceivePacket(struct PositionData* position_data);
+  virtual void ReceivePacket(struct PositionData* position_data);
   void PrintPositionData(struct PositionData position_data);
 
 protected:

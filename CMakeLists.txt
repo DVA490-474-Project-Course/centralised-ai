@@ -49,7 +49,7 @@ target_include_directories(ssl_vision_client_test PRIVATE
 target_include_directories(ssl_vision_client_test PUBLIC src/ssl-interface/generated src/ssl-interface/)
 
 # Link GoogleTest and GoogleTest main library
-target_link_libraries(ssl_vision_client_test gtest_main vision_client_lib)
+target_link_libraries(ssl_vision_client_test gtest_main gmock vision_client_lib)
 # Enable testing
 enable_testing()
 
