@@ -1,4 +1,4 @@
-# Install script for directory: /home/jacob/centralised-ai/tests
+# Install script for directory: /home/jacob/centralised-ai
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,9 +43,13 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for each subdirectory.
-  include("/home/jacob/centralised-ai/build/_deps/pybind11-build/cmake_install.cmake")
+  # Include the install script for the subdirectory.
+  include("/home/jacob/centralised-ai/build/src/cmake_install.cmake")
+endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/jacob/centralised-ai/build/test/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

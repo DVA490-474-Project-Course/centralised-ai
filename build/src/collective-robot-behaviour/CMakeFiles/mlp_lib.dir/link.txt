@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmlp_lib.a CMakeFiles/mlp_lib.dir/mlp.cc.o
+/usr/bin/ranlib libmlp_lib.a

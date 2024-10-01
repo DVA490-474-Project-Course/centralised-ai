@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/collective_robot_behaviour_test.dir/test/collective-robot-behaviour-test/mlp_test.cc.o CMakeFiles/collective_robot_behaviour_test.dir/test/collective-robot-behaviour-test/world_test.cc.o -o ../bin/collective_robot_behaviour_test 

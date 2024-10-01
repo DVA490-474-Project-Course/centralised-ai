@@ -1,0 +1,2 @@
+/usr/bin/ar qc libworld_lib.a CMakeFiles/world_lib.dir/world.cc.o
+/usr/bin/ranlib libworld_lib.a

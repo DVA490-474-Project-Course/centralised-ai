@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/main_exe.dir/main.cc.o -o ../../bin/main_exe  collective-robot-behaviour/libworld_lib.a collective-robot-behaviour/libmlp_lib.a 

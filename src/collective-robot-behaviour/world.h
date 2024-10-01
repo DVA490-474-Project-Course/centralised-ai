@@ -1,3 +1,11 @@
+//==============================================================================
+// Author: Jacob Johansson
+// Creation date: 2024-10-01
+// Last modified: 2024-10-01 by Jacob Johansson
+// Description: Headers for world.cc.
+// License: See LICENSE file for license details.
+//==============================================================================
+
 #ifndef WORLD_H
 #define WORLD_H
 
