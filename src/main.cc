@@ -10,6 +10,12 @@
 #include "collective-robot-behaviour/world.h"
 #include "collective-robot-behaviour/mlp.h"
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 int main(int argc, char **argv){
     return 0;
 }
+
+} // namespace centralised_ai
+} // namespace collective_robot_behaviour

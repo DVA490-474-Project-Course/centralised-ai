@@ -6,6 +6,9 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 struct Robot{
 	float position_x;
 	float position_y;
@@ -13,3 +16,6 @@ struct Robot{
 	float velocity_y;
 	float orientation;
 };
+
+} // namespace centralised_ai
+} // namespace collective_robot_behaviour

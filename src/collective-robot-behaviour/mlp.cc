@@ -7,7 +7,10 @@
 //==============================================================================
 
 #include "mlp.h"
-#include <algorithm> // for std::max, etc
+#include <algorithm>
+
+namespace centralised_ai{
+namespace collective_robot_behaviour{
 
 // Implementation of ReLU for a single value
 double relu(double x){
@@ -24,3 +27,6 @@ std::vector<double> relu(const std::vector<double>& x){
 
 	return result;
 }
+
+	} // namespace collective_robot_behaviour
+} // namespace centralised_ai

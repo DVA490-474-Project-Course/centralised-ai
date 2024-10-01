@@ -1,3 +1,11 @@
+#==============================================================================
+# Author: Jacob Johansson
+# Creation date: 2024-10-01
+# Last modified: 2024-10-01 by Jacob Johansson
+# Description: Setup for binding python with c++.
+# License: See LICENSE file for license details.
+#==============================================================================
+
 from setuptools import setup, Extension
 import pybind11
 

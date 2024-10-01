@@ -11,6 +11,9 @@
 
 #include <vector>
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 // Definition of the representation of the state of each individual robot.
 struct Robot {
   float position_x;
@@ -47,5 +50,8 @@ struct World {
   Field field;
   GameState state;
 };
+
+} // namespace collective_robot_behaviour
+} // namespace centralised_ai
 
 #endif  // WORLD_H
