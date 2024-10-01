@@ -39,6 +39,7 @@ class FootballEnv(gymnasium.Env):
         self.action_space = spaces.Discrete(6)
         # Actions: 0 = stay, 1 = move left, 2 = move right, 3 = move up, 4 = move down, 5 = shoot, 6 = pass
         self.num_agents = self.num_players_per_team # Adjust accordingly
+        
         # Observation space: Positions of all players and ball on the field
         # Each player has an (x, y) position, and the ball has an (x, y) position
         self.observation_spaces = {
@@ -49,6 +50,7 @@ class FootballEnv(gymnasium.Env):
         self.device = "cpu"
         self.memory ={agent_name: [] for agent_name in self.possible_agents}
         self.observation_space = spaces.Box(low=0, high=100, shape=(self.num_players_per_team * 2 * 2 + 2,), dtype=np.float32)
+        self.all_position = [0,0]
         # Define shared observation space for all agents
         self.shared_observation_spaces = spaces.Box(
             low=-np.inf,
@@ -144,6 +146,7 @@ class FootballEnv(gymnasium.Env):
         pass
 
     def execute_action(self, action, player):
+        
         if action == 0:  # Move right
             player.move(player.position + [1, 0], self.ball_position)
         elif action == 1:  # Move left
@@ -161,6 +164,7 @@ class FootballEnv(gymnasium.Env):
 class PolicyNetwork(MultiCategoricalMixin, Model):
     def __init__(self, observation_space, action_space, device, unnormalized_log_prob=True, reduction="sum",
                  num_envs=1, num_layers=1, hidden_size=27, sequence_length=1):
+    
         Model.__init__(self, observation_space, action_space, device)
         MultiCategoricalMixin.__init__(self, unnormalized_log_prob, reduction)
 
@@ -228,7 +232,7 @@ class ValueNetwork(DeterministicMixin, Model):
                  num_envs=1, num_layers=1, hidden_size=64, sequence_length=10):
         Model.__init__(self, observation_space, action_space, device)
         DeterministicMixin.__init__(self, clip_actions)
-
+        
         self.num_envs = num_envs
         self.num_layers = num_layers
         self.hidden_size = hidden_size  # Hout

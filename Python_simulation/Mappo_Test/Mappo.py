@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import matplotlib.patches as patches
 import torch
+
 # import the agent and its default configuration
 from skrl.multi_agents.torch.mappo import MAPPO, MAPPO_DEFAULT_CONFIG
 from skrl.memories.torch import RandomMemory
@@ -22,10 +23,10 @@ FIELD_WIDTH = 80    # Width in arbitrary units
 GOAL_WIDTH = 10     # Width of the goal area
 
 def setup_agent():
-    envF = FootballEnv()
+    env = FootballEnv()
+    print(type(env)) 
+    envF = Wrapper(env)
     print(type(envF)) 
-    #envF = Wrapper(env)
-    #print(type(env)) 
 
     # instantiate the agent's models
     models = {}
@@ -60,7 +61,7 @@ def setup_agent():
     memory = RandomMemory(memory_size=20000, num_envs=envF.num_envs, device=device, replacement=False)
 
     # instantiate the agent
-    agent = MAPPO(possible_agents=envF.possible_agents,
+    agentMappo = MAPPO(possible_agents=envF.possible_agents,
                 models=models,
                 memories=memory,  # only required during training
                 cfg=cfg_agent,
@@ -69,12 +70,18 @@ def setup_agent():
                 device=envF.device,
                 shared_observation_spaces=envF.shared_observation_spaces)
     
+    SEQUENTIAL_TRAINER_DEFAULT_CONFIG = {
+    "timesteps": 100000,            # number of timesteps to train for
+    "headless": False,              # whether to use headless mode (no rendering)
+    "disable_progressbar": False,   # whether to disable the progressbar. If None, disable on non-TTY
+    "close_environment_at_exit": True,   # whether to close the environment on normal program termination
+    }
     
-    cfg_trainer = {"timesteps": 1000, "headless": False}
-    trainer = SequentialTrainer(env = envF, agents=agent,cfg=cfg_trainer)
-        
-    # train the agent(s)
+    cfg_trainer = SEQUENTIAL_TRAINER_DEFAULT_CONFIG
+    trainer = SequentialTrainer(env = envF, agents=agentMappo,cfg=cfg_trainer)
+
     trainer.train()
+
 
 
     return envF

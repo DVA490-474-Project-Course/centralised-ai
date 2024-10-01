@@ -1,6 +1,6 @@
 
 import numpy as np
-
+import math
 FIELD_LENGTH = 120  # Length in arbitrary units
 FIELD_WIDTH = 80    # Width in arbitrary units
 GOAL_WIDTH = 10     # Width of the goal area
@@ -13,7 +13,7 @@ class Player:
         self.team = team
         self.start_position = np.array(position, dtype=float)  # Save the starting position
 
-    def move(self, direction,ball_position): 
+    def move(self, direction, ball_position): 
         # Move to the starting position
         distance = direction- self.position
 

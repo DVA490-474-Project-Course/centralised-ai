@@ -5,126 +5,22 @@ import matplotlib.patches as patches
 import random
 import math
 
-from Ai_model import ai_model  # Import AI model
+from EnvFootball import FootballEnv
+from Player_class import Player
+from Ai_model import FootballNN  # Import AI model
+import EnvFootball
+#from EnvFootball import PolicyNetwork
+#from EnvFootball import ValueNetwork
+
+from skrl.multi_agents.torch.mappo import MAPPO, MAPPO_DEFAULT_CONFIG
+from skrl.memories.torch import RandomMemory
 # Initialize field dimensions
 FIELD_LENGTH = 120  # Length in arbitrary units
 FIELD_WIDTH = 80    # Width in arbitrary units
 GOAL_WIDTH = 10     # Width of the goal area
 
 # Define a class for Player
-class Player:
-    def __init__(self, index, position, role, haveball, team):
-        self.index = index
-        self.position = np.array(position, dtype=float)
-        self.role = role
-        self.haveball = haveball
-        self.team = team
-        self.start_position = np.array(position, dtype=float)  # Save the starting position
-
-    def move(self, direction,ball_position): 
-        # Move to the starting position
-        distance = direction- self.position
-
-        if np.linalg.norm(distance) > 0:
-            direction_to_target = distance / np.linalg.norm(distance)
-            self.position += direction_to_target * 1
-            self.position = np.clip(self.position, [0, 0], [FIELD_LENGTH-10, FIELD_WIDTH])
-            self.position = np.clip(self.position, [10, 0], [FIELD_LENGTH-10, FIELD_WIDTH])
-        
-        
-        #if touched ball    
-        distance_to_ball = np.linalg.norm(self.position - ball_position)
-        if distance_to_ball < 1: 
-            direction = ball_position- self.position
-            # Normalize the direction vector manually
-            norm = np.linalg.norm(direction)
-            if norm != 0:
-                # If norm is zero, the player and ball are at the same position, so no movement needed
-                direction = direction / norm
-            
-            # Move the ball along this direction vector to keep it close to the player
-            ball_position += direction * 1
-        ball_position = self.check_out_ball(ball_position)
-
-    def pass_ball(self, ball_position, players):
-        distance_to_ball = np.linalg.norm(self.position - ball_position)
-        if distance_to_ball < 2:
-            # Calculate distances to all players except the current player
-            distances = [np.linalg.norm(np.array(player.position) - np.array(ball_position)) for player in players if player != self]
-            
-            # Find the index of the nearest player
-            nearest_player_index = np.argmin(distances)
-            
-            # Get the nearest player (excluding self)
-            nearest_player = players[nearest_player_index if self.index < nearest_player_index else nearest_player_index + 1]
-            
-            # Calculate the direction vector to the nearest player
-            direction = np.array(nearest_player.position) - np.array(ball_position)
-            distance_to_nearest_player = np.linalg.norm(direction)
-            
-            if distance_to_nearest_player > 0:
-                # Normalize the direction vector
-                direction /= distance_to_nearest_player
-                
-                # Move the ball towards the nearest player by a fixed step size
-                ball_position += direction * 10  # Move the ball towards the target player
-                
-                # Ensure the ball stays within the field boundaries
-                ball_position = np.clip(ball_position, [0, 0], [FIELD_LENGTH, FIELD_WIDTH])
-            
-        return ball_position
-
-    def shoot(self, ball_position):
-        distance_to_ball = np.linalg.norm(self.position - ball_position)
-        goal_pos = [110,40]
-        if distance_to_ball < 2:  # Check if the player is close enough to shoot
-            # Calculate the vector pointing from the player to the ball's current direction
-            distance = goal_pos - self.position
-
-            # Calculate the norm (magnitude) of the direction vector
-            norm = np.linalg.norm(distance)
-
-            # Check if norm is zero to avoid division by zero
-            if norm == 0:
-                # If norm is zero, the player and ball are at the same position, so no movement needed
-                return ball_position
-            
-            # Normalize the direction vector manually
-            direction = distance / norm
-
-            # Move the ball along this direction vector
-            ball_position += direction * 10  # Scale to control shot power
-
-            # Ensure the ball stays within the field boundaries
-            ball_position = np.clip(ball_position, [0, 0], [FIELD_LENGTH, FIELD_WIDTH])
-            
-        return ball_position
-          
-    def check_out_ball(self, ball_position):
-        if check_goal:
-            return
-        
-        #Y-axis
-        if ball_position[0] <= 10:
-            ball_position[0] = 11 
-        if ball_position[0] >= 110:
-            ball_position[0] = 109 
-        
-        #X_axis
-        if ball_position[1] <= 0:
-            ball_position[1] = 1 
-        if ball_position[1] >= 80:
-            ball_position[1] = 79 
-        return ball_position
-
-    def check_who_has_ball(self,ball_position):
-        distance_to_ball = math.dist(self.position,ball_position)
-        if distance_to_ball < 3:  # Check if the player is close enough to shoot
-            self.haveball = True
-            print("Team: " +str(self.team) + " Player: " + str(self.index + 1) +" have ball!")
-        else:
-            self.haveball = False
-      
+    
 def reset_game():
     global players, ball_position
 
@@ -171,62 +67,32 @@ def draw_field(ax):
     ax.set_ylabel('Field Width')
     ax.grid(True)
 
-# Function to execute action
-def execute_action(action, player):
-    if action == 'forward':
-        direction = player.position + [10,0]
-        player.move(direction,ball_position)
-
-    elif action == 'reverse':
-        direction = player.position + [-10,0]
-        player.move(direction,ball_position)
-
-    elif action == 'right':
-        direction = player.position + [0,-10]
-        player.move(direction,ball_position)
-
-    elif action == 'left':
-        direction = player.position + [0,10]
-        player.move(direction,ball_position)
-
-    elif action == 'pass':
-        ball_position[:] = player.pass_ball(ball_position, players)
-
-    elif action == 'shoot':
-        ball_position[:] = player.shoot(ball_position)
-
-    elif action == 'move_to_ball':
-        player.move_to_ball(ball_position)
-
-    elif action == 'go_to_position':
-        player.go_to_position()
-
 ## Function to update the animation
 def update(frame):
-    # Check which player has the ball
 
-    # Iterate through the strategy buffer and execute actions for each player
-    for player in players:
-
-        haveball = player.check_who_has_ball(ball_position)
-
-        # Get the strategy buffer, which should contain actions for specific players
-        action = ai_model.get_action(player, players, ball_position,haveball)
-
-        # Execute the action for the corresponding player
-        execute_action(action, player)
-        
-        # Check if a goal is scored
-        if check_goal(ball_position):
-            print("Goal! Resetting game.")
-            reset_game()
-            break  # Exit the loop if a goal is scored
     
+    action = 1#Mappo_act()
+    
+    #action = agent.act(env.state,0,0)
+    agent.models['agent_0']['policy'].compute(env.state)
+
+    Train_network()
+
+    player = env.players[0]
+    env.execute_action(action, player)
+    
+    
+    # Check if a goal is scored
+    #if check_goal(ball_position):
+    #    print("Goal! Resetting game.")
+    #    reset_game()
+        
+
     # Draw the field
     draw_field(ax)
     
     # Plot players
-    for player in players:
+    for player in env.players:
         if player.team == 1:
             ax.plot(player.position[0], player.position[1], 'bo', markersize=10)
             ax.text(player.position[0], player.position[1] + 2, f'Player {player.index + 1}', color='blue', fontsize=9)
@@ -236,19 +102,69 @@ def update(frame):
     
     # Plot ball
     
-    ax.plot(ball_position[0], ball_position[1], 'ro', markersize=8, label='Ball')
+    ax.plot(env.ball_position[0], env.ball_position[1], 'ro', markersize=8, label='Ball')
     ax.legend()
 
-#train AI_model
-def Train_Model():
+#Create network, policy and actor, envirionemnt
+def Create_networks(env):
+    models = {}
+    
+    for agent_name in env.possible_agents:
+        models[agent_name] = {}
+        models[agent_name]["policy"] = EnvFootball.PolicyNetwork(observation_space=env.observation_space,
+             action_space=env.action_space,
+             device=env.device,
+             unnormalized_log_prob=True,
+             reduction="sum",
+             num_envs=env.num_envs,
+             num_layers=1,
+             hidden_size=64,
+             sequence_length=10) #input, output
+    
+        #One value network!
+        models[agent_name]["value"] = EnvFootball.ValueNetwork(observation_space=env.observation_space,
+            action_space=env.action_space,
+            device=env.device,
+            clip_actions=False,
+            num_envs=env.num_envs,
+            num_layers=1,
+            hidden_size=64,
+            sequence_length=10)
+    
+    
+
+    memory = RandomMemory(memory_size=20000, num_envs=env.num_envs, device=env.device, replacement=False)
+    cfg_agent = MAPPO_DEFAULT_CONFIG.copy()
+    cfg_agent["rollouts"] = 1000  # adjust rollout timesteps as needed
+    cfg_agent["learning_rate"] = 0.0003  # typical learning rate for PPO
+    cfg_agent["entropy_coefficient"] = 0.01  # encourage exploration
+
+    # instantiate the agent
+    agentMappo = MAPPO(possible_agents=env.possible_agents,
+                models=models,
+                memories=memory,  # only required during training
+                cfg=cfg_agent,
+                observation_spaces=env.observation_spaces,
+                action_spaces=env.action_space,
+                device=env.device,
+                shared_observation_spaces=env.shared_observation_spaces)
+    
+    return agentMappo
+    
+#Train networks, loss function and global buffer
+def Train_network():
     None
+
+env = FootballEnv()
+
+agent = Create_networks(env)
 
 # Set up the plot
 fig, ax = plt.subplots(figsize=(10, 6))
 draw_field(ax)
 
 # Initialize the game
-reset_game()
+env.reset()
 
 # Create the animation
 ani = FuncAnimation(fig, update, frames=range(1000), repeat=True, interval=100)
