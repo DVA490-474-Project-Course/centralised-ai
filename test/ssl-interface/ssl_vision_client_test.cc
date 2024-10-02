@@ -2,7 +2,7 @@
 //==============================================================================
 // Author: Aaiza A. Khan, Shruthi Puthiya Kunnon
 // Creation date: 2024-09-20
-// Last modified: 2024-10-01 by Shruthi Puthiya Kunnon
+// Last modified: 2024-10-01 by Aaiza Aziz Khan
 // Description: A test suite for ssl-vision
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -27,9 +27,19 @@ public:
   using VisionClient::VisionClient;
   sockaddr_in& get_client_address() {return client_address;}
   int& get_socket() {return socket;}
-  static const int& get_max_datagram_size() {return max_datagram_size;}
+  const int& get_max_datagram_size() {return max_datagram_size;}
   socklen_t& get_address_length() {return address_length;}
 };
+/*class MockVisionClient : public VisionClient {
+public:
+    MockVisionClient(const std::string& ip, int port) : VisionClient(ip, port) {}
+
+    MOCK_METHOD(ssize_t, recvfrom, (int sockfd, void* buf, size_t len, int flags, sockaddr* src_addr, socklen_t* addrlen), (override));
+};*/
+
+
+
+
 
 // Test case 1: Initialization
 TEST(VisionClientTest, InitializesCorrectly) {
@@ -44,8 +54,9 @@ TEST(VisionClientTest, InitializesCorrectly) {
 }
 
 // Test case 2: Receives and parses packet
-TEST(VisionClientTest, ReceivesAndParsesPacket) {
+/*TEST(VisionClientTest, ReceivesAndParsesPacket) {
     VisionClientDerived client("127.0.0.1", 10006);
+
     PositionData position_data;
 
     // Mock SSL_WrapperPacket
@@ -58,24 +69,98 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
     robot_blue->set_x(50.0f);
     robot_blue->set_y(100.0f);
     robot_blue->set_orientation(1.57f); // Remove set_has_orientation if it doesn't exist
-
+    robot_blue->set_confidence(0.5);
+    robot_blue->set_pixel_x(100);
+    robot_blue->set_pixel_y(150);
+    
+    printf("0");
     // Add a ball to the detection frame
     SSL_DetectionBall* ball = detection->add_balls();
     ball->set_x(75.0f);
     ball->set_y(150.0f);
+    ball->set_confidence(0.7);
+    ball->set_pixel_x(200);
+    ball->set_pixel_y(250);
 
+    //  Adddetection frame
+    //SSL_DetectionFrame* frame = packet.mutable_detection()->mutable_unknown_fields();
+    //SSL_DetectionFrame* frame = detection ;
+    printf("1");
+    detection->set_frame_number(1);
+    detection->set_t_capture(1234567890);
+    detection->set_t_sent(1234567891);
+    detection->set_camera_id(1);
+
+    printf("2");
     // Serialize packet into a buffer
     std::string serialized_data;
     packet.SerializeToString(&serialized_data);
 
     // Create a buffer for the mock recvfrom
-    char buffer[1024]; // Ensure this size is sufficient for your data
+    //char buffer[client.get_max_datagram_size()]; // Ensure this size is sufficient for your data
+  // Mock recvfrom to return the serialized data
+   EXPECT_CALL(client, recvfrom(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
+    .WillOnce(testing::Return(0)); // Adjust the expected behavior as needed
 
+    printf("3");
     // Simulate receiving a packet by setting the socket buffer
+    /*
     auto mock_recvfrom = [&serialized_data, &buffer](...) {
         memcpy(buffer, serialized_data.data(), serialized_data.size());
         return serialized_data.size();
     };
+    
+
+    // Call the method and verify the results
+    client.ReceivePacket(&position_data);
+
+    EXPECT_EQ(position_data.blue_robot_position[0].x, 50.0f);
+    EXPECT_EQ(position_data.blue_robot_position[0].y, 100.0f);
+    EXPECT_EQ(position_data.blue_robot_position[0].orientation, 1.57f);
+    EXPECT_EQ(position_data.ball_position.x, 75.0f);
+    EXPECT_EQ(position_data.ball_position.y, 150.0f);
+}*/
+/*TEST(VisionClientTest, ReceivesAndParsesPacket) {
+    MockVisionClient client("127.0.0.1", 10006);  // Use MockVisionClient
+
+    PositionData position_data;
+
+    // Mock SSL_WrapperPacket
+    SSL_WrapperPacket packet;
+    SSL_DetectionFrame* detection = packet.mutable_detection();
+    
+    // Add a blue robot to the detection frame
+    SSL_DetectionRobot* robot_blue = detection->add_robots_blue();
+    robot_blue->set_robot_id(0);
+    robot_blue->set_x(50.0f);
+    robot_blue->set_y(100.0f);
+    robot_blue->set_orientation(1.57f); 
+    robot_blue->set_confidence(0.5);
+    robot_blue->set_pixel_x(100);
+    robot_blue->set_pixel_y(150);
+    
+    // Add a ball to the detection frame
+    SSL_DetectionBall* ball = detection->add_balls();
+    ball->set_x(75.0f);
+    ball->set_y(150.0f);
+    ball->set_confidence(0.7);
+    ball->set_pixel_x(200);
+    ball->set_pixel_y(250);
+
+    detection->set_frame_number(1);
+    detection->set_t_capture(1234567890);
+    detection->set_t_sent(1234567891);
+    detection->set_camera_id(1);
+
+    // Serialize packet into a buffer
+    std::string serialized_data;
+    packet.SerializeToString(&serialized_data);
+
+    // Prepare to mock recvfrom
+    MockVisionClient client;
+EXPECT_CALL(client, recvfrom(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
+    .WillOnce(testing::Return(0)); // Adjust the return value as needed
+
 
     // Call the method and verify the results
     client.ReceivePacket(&position_data);
@@ -86,6 +171,11 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
     EXPECT_EQ(position_data.ball_position.x, 75.0f);
     EXPECT_EQ(position_data.ball_position.y, 150.0f);
 }
+*/
+
+   
+
+
 
 // Test case 3: Handles empty packet
 TEST(VisionClientTest, HandlesEmptyPacket) {

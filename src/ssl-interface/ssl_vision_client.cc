@@ -23,6 +23,7 @@
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
+//const int VisionClient::max_datagram_size = 65536;
 // Constructor
 VisionClient::VisionClient(std::string ip, int port)
 { 
