@@ -2,7 +2,7 @@
 //==============================================================================
 // Author: Emil Åberg
 // Creation date: 2024-10-01
-// Last modified: 2024-10-02 by Emil Åberg
+// Last modified: 2024-10-02 by Aaiza Aziz Khan
 // Description: A client for receiveing game state from ssl game controller
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -69,10 +69,35 @@ struct GameStateData GameControllerClient::ReadGameStateData(Referee packet)
   return game_state_data_local;
 }
 
+std::string CommandToString(Referee::Command command) {
+    switch (command) {
+
+        case Referee::HALT: return "HALT";
+        case Referee::STOP: return "STOP";
+        case Referee::NORMAL_START: return "NORMAL_START";
+        case Referee::FORCE_START: return "FORCE_START";
+        case Referee::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
+        case Referee::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
+        case Referee::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
+        case Referee::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
+        case Referee::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
+        case Referee::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
+        case Referee::INDIRECT_FREE_YELLOW: return "INDIRECT_FREE_YELLOW"; // Deprecated
+        case Referee::INDIRECT_FREE_BLUE: return "INDIRECT_FREE_BLUE";     // Deprecated
+        case Referee::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
+        case Referee::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
+        case Referee::GOAL_YELLOW: return "GOAL_YELLOW"; // Deprecated
+        case Referee::GOAL_BLUE: return "GOAL_BLUE";     // Deprecated
+        case Referee::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
+        case Referee::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
+        default: return "UNKNOWN_COMMAND";
+        }
+}
+
 // Method to print the game state, used for debugging/demo
 void GameControllerClient::Print()
 {
-  printf("referee command:<%i> score: <%i, %i>\n",
-    (int)game_state_data.referee_command, game_state_data.blue_team_score,
+  printf("referee command:<%s> score: <%i, %i>\n",
+    CommandToString(game_state_data.referee_command).c_str(), game_state_data.blue_team_score,
     game_state_data.yellow_team_score);
 }
