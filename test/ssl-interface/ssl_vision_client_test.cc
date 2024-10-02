@@ -190,6 +190,12 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     SSL_WrapperPacket packet;
     SSL_DetectionFrame* detection = packet.mutable_detection();
 
+    // Set required fields for the detection frame
+    detection->set_frame_number(1);         // Required frame number
+    detection->set_t_capture(1000.0);       // Capture time (in seconds, for example)
+    detection->set_t_sent(1000.1);          // Sent time (slightly after capture)
+    detection->set_camera_id(0);            // Camera ID (assuming single camera)
+
     // Add blue robots with different positions and orientations
     for (int i = 0; i < 6; ++i) {
         SSL_DetectionRobot* robot_blue = detection->add_robots_blue();
@@ -206,6 +212,9 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     SSL_DetectionBall* ball_1 = detection->add_balls();
     ball_1->set_x(75.0f);  // Set ball x position
     ball_1->set_y(150.0f); // Set ball y position
+    ball_1->set_confidence(1.0f); // Required confidence for the ball
+    ball_1->set_pixel_x(640);     // Required pixel x position for the ball
+    ball_1->set_pixel_y(480);     // Required pixel y position for the ball
 
     // Serialize packet into a buffer
     std::string serialized_data;
