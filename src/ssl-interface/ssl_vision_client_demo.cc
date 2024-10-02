@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
   // Demo the sslvision client
-  VisionClient vision_client("127.0.0.1", 10006);
+  VisionClient vision_client("224.5.23.1", 10003);
   struct PositionData position_data;
   while (true)
   {

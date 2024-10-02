@@ -8,14 +8,16 @@ project(centralized_ai)
 add_subdirectory(src)
 
 # add .cc files to executable
-file(GLOB_RECURSE SRC_FILES src/ssl-interface/*.cc)
-add_executable(ssl_vision_client_demo ${SRC_FILES} src/ssl-interface/ssl_vision_client_demo.cc)
+add_executable(ssl_vision_client_demo src/ssl-interface/ssl_vision_client_demo.cc)
+add_executable(ssl_game_controller_client_demo src/ssl-interface/ssl_game_controller_client_demo.cc)
 
 # include header files
 target_include_directories(ssl_vision_client_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl-interface)
+target_include_directories(ssl_game_controller_client_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/ssl-interface)
 
 # link libraries
-target_link_libraries(ssl_vision_client_demo vision_client_lib)
+target_link_libraries(ssl_vision_client_demo ssl_interface_lib)
+target_link_libraries(ssl_game_controller_client_demo ssl_interface_lib)
 
 #____________________________________________________________
 #googleTest
@@ -49,7 +51,7 @@ target_include_directories(ssl_vision_client_test PRIVATE
 target_include_directories(ssl_vision_client_test PUBLIC src/ssl-interface/generated src/ssl-interface/)
 
 # Link GoogleTest and GoogleTest main library
-target_link_libraries(ssl_vision_client_test gtest_main gmock vision_client_lib)
+target_link_libraries(ssl_vision_client_test gtest_main gmock ssl_interface_lib)
 # Enable testing
 enable_testing()
 
