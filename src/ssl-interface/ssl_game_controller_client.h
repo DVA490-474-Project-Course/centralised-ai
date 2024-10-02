@@ -39,6 +39,7 @@ public:
   void Print();
 
 protected:
+  std::string CommandToString(Referee::Command command);
   struct GameStateData ReadGameStateData(Referee packet);
   sockaddr_in client_address;
   int socket;

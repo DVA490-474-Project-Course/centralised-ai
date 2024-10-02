@@ -74,7 +74,8 @@ struct GameStateData GameControllerClient::ReadGameStateData(Referee packet)
   return game_state_data_local;
 }
 
-std::string CommandToString(Referee::Command command) {
+// Translate command enumerator to string
+std::string GameControllerClient::CommandToString(Referee::Command command) {
     switch (command) {
 
         case Referee::HALT: return "HALT";
