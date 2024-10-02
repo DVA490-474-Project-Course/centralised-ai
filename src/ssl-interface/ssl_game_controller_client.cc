@@ -1,8 +1,8 @@
 // ssl_game_controller_client.cc
 //==============================================================================
-// Author: Emil Åberg
+// Author: Emil Åberg, Aaiza A. Khan
 // Creation date: 2024-10-01
-// Last modified: 2024-10-02 by Aaiza Aziz Khan
+// Last modified: 2024-10-02 by Emil Åberg
 // Description: A client for receiveing game state from ssl game controller
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -18,6 +18,11 @@
 
 // Project .h files
 #include "ssl_gc_referee_message.pb.h"
+
+namespace centralized_ai
+{
+namespace ssl_interface
+{
 
 // Constructor
 GameControllerClient::GameControllerClient(std::string ip, int port)
@@ -101,3 +106,6 @@ void GameControllerClient::Print()
     CommandToString(game_state_data.referee_command).c_str(), game_state_data.blue_team_score,
     game_state_data.yellow_team_score);
 }
+
+} // namespace ssl_interface
+} // namesapce centralized_ai

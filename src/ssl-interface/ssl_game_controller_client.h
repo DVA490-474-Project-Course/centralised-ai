@@ -1,6 +1,6 @@
 // ssl_game_controller_client.h
 //==============================================================================
-// Author: Emil Åberg
+// Author: Emil Åberg, Aaiza A. Khan
 // Creation date: 2024-10-01
 // Last modified: 2024-10-02 by Emil Åberg
 // Description: A client for receiveing game state from ssl game controller
@@ -18,6 +18,11 @@
 
 // Project .h files
 #include "ssl_gc_referee_message.pb.h"
+
+namespace centralized_ai
+{
+namespace ssl_interface
+{
 
 struct GameStateData
 {
@@ -40,5 +45,8 @@ protected:
   const int max_datagram_size = 65536;
   struct GameStateData game_state_data;
 };
+
+} // namespace ssl_interface
+} // namesapce centralized_ai
 
 #endif // CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_

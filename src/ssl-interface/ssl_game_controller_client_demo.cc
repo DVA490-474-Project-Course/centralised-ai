@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
   // Demo the game controller client
-  GameControllerClient game_controller_client("127.0.0.1", 10003);
+  centralized_ai::ssl_interface::GameControllerClient game_controller_client("127.0.0.1", 10003);
   while (true)
   {
     game_controller_client.ReceivePacket();
