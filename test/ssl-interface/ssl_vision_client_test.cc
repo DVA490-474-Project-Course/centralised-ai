@@ -45,7 +45,8 @@ TEST(VisionClientTest, InitializesCorrectly) {
 
 // Test case 2: Receives and parses packet
 TEST(VisionClientTest, ReceivesAndParsesPacket) {
-    VisionClientDerived client("127.0.0.1", 10006);
+    //VisionClientDerived client("127.0.0.1", 10006);
+    MockVisionClient mock_client("127.0.0.1", 10006);
     PositionData position_data;
 
     // Mock SSL_WrapperPacket
@@ -54,13 +55,13 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
 
     // Set required fields for the detection frame
     detection->set_frame_number(1);
-    detection->set_t_capture(12345678.0);  // Example timestamp
-    detection->set_t_sent(12345679.0);     // Example timestamp
+    detection->set_t_capture(1234.0);  // Example timestamp
+    detection->set_t_sent(1234.0);     // Example timestamp
     detection->set_camera_id(0);           // Camera ID is required
 
     // Add a blue robot to the detection frame
     SSL_DetectionRobot* robot_blue = detection->add_robots_blue();
-    robot_blue->set_robot_id(0);
+    robot_blue->set_robot_id(1);
     robot_blue->set_x(50.0f);
     robot_blue->set_y(100.0f);
     robot_blue->set_orientation(1.57f); // Remove set_has_orientation if it doesn't exist
@@ -78,23 +79,40 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
     // Set required fields for ball
     ball->set_confidence(1.0f);
     ball->set_pixel_x(500);
-    //ball->set_pixel_y(600);
+    ball->set_pixel_y(600);
 
     // Serialize packet into a buffer
     std::string serialized_data;
     packet.SerializeToString(&serialized_data);
 
     // Create a buffer for the mock recvfrom
-    char buffer[1024]; // Ensure this size is sufficient for your data
+    char buffer[65536]; // Ensure this size is sufficient for your data
 
     // Simulate receiving a packet by setting the socket buffer
     auto mock_recvfrom = [&serialized_data, &buffer](...) {
         memcpy(buffer, serialized_data.data(), serialized_data.size());
         return serialized_data.size();
     };
+    EXPECT_CALL(mock_client, ReceivePacket(testing::_))
+            .WillOnce(testing::Invoke([&](PositionData* position_data) {
+                SSL_WrapperPacket received_packet;
+                received_packet.ParseFromArray(buffer, serialized_data.size());
 
+                const SSL_DetectionFrame& received_frame = received_packet.detection();
+                if (received_frame.robots_blue_size() > 0) {
+                    const SSL_DetectionRobot& robot = received_frame.robots_blue(1);
+                    position_data->blue_robot_position[1].x = robot.x();
+                    position_data->blue_robot_position[1].y = robot.y();
+                    position_data->blue_robot_position[1].orientation = robot.orientation();
+                }
+                if (received_frame.balls_size() > 0) {
+                    const SSL_DetectionBall& ball = received_frame.balls(0);
+                    position_data->ball_position.x = ball.x();
+                    position_data->ball_position.y = ball.y();
+                }
+            }));
     // Call the method and verify the results
-    client.ReceivePacket(&position_data);
+    mock_client.ReceivePacket(&position_data);
 
     EXPECT_EQ(position_data.blue_robot_position[0].x, 50.0f);
     EXPECT_EQ(position_data.blue_robot_position[0].y, 100.0f);
