@@ -75,29 +75,30 @@ struct GameStateData GameControllerClient::ReadGameStateData(Referee packet)
 }
 
 // Translate command enumerator to string
-std::string GameControllerClient::CommandToString(Referee::Command command) {
-    switch (command) {
-
-        case Referee::HALT: return "HALT";
-        case Referee::STOP: return "STOP";
-        case Referee::NORMAL_START: return "NORMAL_START";
-        case Referee::FORCE_START: return "FORCE_START";
-        case Referee::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
-        case Referee::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
-        case Referee::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
-        case Referee::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
-        case Referee::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
-        case Referee::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
-        case Referee::INDIRECT_FREE_YELLOW: return "INDIRECT_FREE_YELLOW"; // Deprecated
-        case Referee::INDIRECT_FREE_BLUE: return "INDIRECT_FREE_BLUE";     // Deprecated
-        case Referee::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
-        case Referee::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
-        case Referee::GOAL_YELLOW: return "GOAL_YELLOW"; // Deprecated
-        case Referee::GOAL_BLUE: return "GOAL_BLUE";     // Deprecated
-        case Referee::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
-        case Referee::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
-        default: return "UNKNOWN_COMMAND";
-        }
+std::string GameControllerClient::CommandToString(Referee::Command command)
+{
+  switch (command)
+  {
+    case Referee::HALT: return "HALT";
+    case Referee::STOP: return "STOP";
+    case Referee::NORMAL_START: return "NORMAL_START";
+    case Referee::FORCE_START: return "FORCE_START";
+    case Referee::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
+    case Referee::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
+    case Referee::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
+    case Referee::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
+    case Referee::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
+    case Referee::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
+    case Referee::INDIRECT_FREE_YELLOW: return "INDIRECT_FREE_YELLOW"; // Deprecated
+    case Referee::INDIRECT_FREE_BLUE: return "INDIRECT_FREE_BLUE";     // Deprecated
+    case Referee::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
+    case Referee::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
+    case Referee::GOAL_YELLOW: return "GOAL_YELLOW"; // Deprecated
+    case Referee::GOAL_BLUE: return "GOAL_BLUE";     // Deprecated
+    case Referee::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
+    case Referee::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
+    default: return "UNKNOWN_COMMAND";
+  }
 }
 
 // Method to print the game state, used for debugging/demo
