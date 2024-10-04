@@ -29,6 +29,7 @@ namespace centralized_ai
 namespace ssl_interface
 {
 
+//const int VisionClient::max_datagram_size = 65536;
 // Constructor
 VisionClient::VisionClient(std::string ip, int port)
 { 

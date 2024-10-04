@@ -53,10 +53,16 @@ public:
   VisionClient(std::string ip, int port);
   virtual void ReceivePacket(struct PositionData* position_data);
   void PrintPositionData(struct PositionData position_data);
-
+ 
 protected:
   sockaddr_in client_address;
   int socket;
+<<<<<<< Updated upstream
+=======
+  static const int max_datagram_size = 65536;
+
+  //static const int max_datagram_size;
+>>>>>>> Stashed changes
   socklen_t address_length;
 };
 

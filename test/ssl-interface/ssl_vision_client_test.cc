@@ -28,9 +28,23 @@ public:
   using VisionClient::VisionClient;
   sockaddr_in& get_client_address() {return client_address;}
   int& get_socket() {return socket;}
+<<<<<<< Updated upstream
   static const int& get_max_datagram_size() {return centralized_ai::ssl_interface::max_datagram_size;}
+=======
+  const int& get_max_datagram_size() {return max_datagram_size;}
+>>>>>>> Stashed changes
   socklen_t& get_address_length() {return address_length;}
 };
+/*class MockVisionClient : public VisionClient {
+public:
+    MockVisionClient(const std::string& ip, int port) : VisionClient(ip, port) {}
+
+    MOCK_METHOD(ssize_t, recvfrom, (int sockfd, void* buf, size_t len, int flags, sockaddr* src_addr, socklen_t* addrlen), (override));
+};*/
+
+
+
+
 
 // Test case 1: Initialization
 TEST(VisionClientTest, InitializesCorrectly) {
@@ -89,7 +103,9 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
     // Create a buffer for the mock recvfrom
     char buffer[65536]; // Ensure this size is sufficient for your data
 
+    printf("3");
     // Simulate receiving a packet by setting the socket buffer
+   
     auto mock_recvfrom = [&serialized_data, &buffer](...) {
         memcpy(buffer, serialized_data.data(), serialized_data.size());
         return serialized_data.size();
@@ -121,6 +137,11 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
     EXPECT_EQ(position_data.ball_position.x, 75.0f);
     EXPECT_EQ(position_data.ball_position.y, 150.0f);
 }
+
+
+   
+
+
 
 // Test case 3: Handles empty packet
 TEST(VisionClientTest, HandlesEmptyPacket) {
@@ -269,7 +290,3 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     EXPECT_EQ(position_data.ball_position.y, 150.0f);
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

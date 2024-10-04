@@ -16,8 +16,12 @@ add_executable(ssl_game_controller_client_demo ssl_game_controller_client_demo.c
 
 # include header directories
 target_include_directories(ssl_interface_lib PUBLIC ${PROTO_GENERATED_DIR})
+<<<<<<< Updated upstream
 target_include_directories(ssl_vision_client_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(ssl_game_controller_client_demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+=======
+target_include_directories(ssl_interface_lib PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+>>>>>>> Stashed changes
 
 # link libraries
 target_link_libraries(ssl_interface_lib ${Protobuf_LIBRARIES})

@@ -1,12 +1,16 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED_ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 project(centralized_ai)
 
+#find_package(GTest REQUIRED)#new
 add_subdirectory(src)
+add_subdirectory(test)
+#new
 
+<<<<<<< Updated upstream
 #____________________________________________________________
 #googleTest
 #_____________________________________________________________
@@ -45,3 +49,5 @@ enable_testing()
 
 # Add a test to be run with `ctest`
 add_test(NAME ssl_vision_client_ctest COMMAND ssl_vision_client_test)
+=======
+>>>>>>> Stashed changes
