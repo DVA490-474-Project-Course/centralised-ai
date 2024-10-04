@@ -12,12 +12,12 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-// Implementation of ReLU for a single value
+/* Implementation of ReLU for a single value */
 double relu(double x){
 	return std::max(0.0, x);
 }
 
-// Implementation of ReLU for a vector of values
+/* Implementation of ReLU for a vector of values */
 std::vector<double> relu(const std::vector<double>& x){
 	std::vector<double> result;
 
@@ -28,5 +28,5 @@ std::vector<double> relu(const std::vector<double>& x){
 	return result;
 }
 
-	} // namespace collective_robot_behaviour
-} // namespace centralised_ai
+	} /* namespace collective_robot_behaviour */
+} /* namespace centralised_ai */

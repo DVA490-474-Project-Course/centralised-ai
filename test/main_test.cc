@@ -8,7 +8,7 @@
 
 #include "gtest/gtest.h"
 
-// Main
+/* Main function for calling all tests.*/
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

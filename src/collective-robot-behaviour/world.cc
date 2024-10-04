@@ -17,5 +17,5 @@ struct Robot{
 	float orientation;
 };
 
-} // namespace centralised_ai
-} // namespace collective_robot_behaviour
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */

@@ -6,7 +6,7 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-// Project .h files
+/* Project .h files */
 #include "collective-robot-behaviour/world.h"
 #include "collective-robot-behaviour/mlp.h"
 
@@ -17,5 +17,5 @@ int main(int argc, char **argv){
     return 0;
 }
 
-} // namespace centralised_ai
-} // namespace collective_robot_behaviour
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */

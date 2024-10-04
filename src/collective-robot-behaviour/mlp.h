@@ -14,13 +14,13 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-// Declaration of ReLU for a single value
+/* Declaration of ReLU for a single value */
 double relu(double x);
 
-// Declaration of ReLU for a vector of values
+/* Declaration of ReLU for a vector of values */
 std::vector<double> relu(const std::vector<double>& x);
 
-} // namespace centralised_ai
-} // namespace collective_robot_behaviour
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */
 
-#endif // MLP_H
+#endif /* MLP_H */

@@ -14,7 +14,7 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-// Definition of the representation of the state of each individual robot.
+/* Definition of the representation of the state of each individual robot. */
 struct Robot {
   float position_x;
   float position_y;
@@ -23,7 +23,7 @@ struct Robot {
   float orientation;
 };
 
-// Definition of the representation of the state of the ball.
+/* Definition of the representation of the state of the ball. */
 struct Ball {
   float position_x;
   float position_y;
@@ -31,19 +31,19 @@ struct Ball {
   float velocity_y;
 };
 
-// Definition of the representation of the physical field being played on.
+/* Definition of the representation of the physical field being played on. */
 struct Field {
   float width;
   float height;
 };
 
-// Definition of the representation of the state of the game, given by the game controller.
+/* Definition of the representation of the state of the game, given by the game controller. */
 enum class GameState {
   kHalted,
   kPlaying,
 };
 
-// Definition of the representation of the state of the world at any given time.
+/* Definition of the representation of the state of the world at any given time. */
 struct World {
   std::vector<Robot> robots;
   Ball ball;
@@ -51,7 +51,7 @@ struct World {
   GameState state;
 };
 
-} // namespace collective_robot_behaviour
-} // namespace centralised_ai
+} /* namespace collective_robot_behaviour */
+} /* namespace centralised_ai */
 
-#endif  // WORLD_H
+#endif  /* WORLD_H */
