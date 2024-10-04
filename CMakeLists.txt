@@ -4,10 +4,17 @@ project(example-app)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_executable(example-app src/centralised-ai/main.cc)
+add_executable(example-app src/centralised-ai/main.cc
+        src/centralised-ai/networks.h
+        src/centralised-ai/Communication.h)
 target_link_libraries(example-app "${TORCH_LIBRARIES}")
 set_property(TARGET example-app PROPERTY CXX_STANDARD 17)
-
+# Include source files
+target_sources(example-app PRIVATE
+        src/centralised-ai/main.cc
+        src/centralised-ai/Communication.h
+        src/centralised-ai/networks.h
+)
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
 # the DLLs need to be copied to avoid memory errors.
