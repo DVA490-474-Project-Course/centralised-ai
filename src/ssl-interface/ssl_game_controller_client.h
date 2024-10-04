@@ -24,6 +24,8 @@ namespace centralized_ai
 namespace ssl_interface
 {
 
+const int max_datagram_size = 65536;
+
 struct GameStateData
 {
   enum Referee_Command referee_command;
@@ -43,7 +45,6 @@ protected:
   struct GameStateData ReadGameStateData(Referee packet);
   sockaddr_in client_address;
   int socket;
-  const int max_datagram_size = 65536;
   struct GameStateData game_state_data;
 };
 

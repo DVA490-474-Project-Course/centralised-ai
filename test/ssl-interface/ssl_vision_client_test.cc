@@ -11,23 +11,24 @@
 #include <gtest/gtest.h>
 #include "ssl_vision_client.h"
 #include <gmock/gmock.h>
+#include "../../src/common_types.h"
 
 // Mock VisionClient class
-class MockVisionClient : public VisionClient {
+class MockVisionClient : public centralized_ai::ssl_interface::VisionClient {
 public:
     MockVisionClient(std::string ip, int port) : VisionClient(ip, port) {}
 
     // Correctly mock the ReceivePacket method
-    MOCK_METHOD(void, ReceivePacket, (PositionData* position_data), (override));
+    MOCK_METHOD(void, ReceivePacket, (centralized_ai::ssl_interface::PositionData* position_data), (override));
 };
 
-class VisionClientDerived : public VisionClient
+class VisionClientDerived : public centralized_ai::ssl_interface::VisionClient
 {
 public:
   using VisionClient::VisionClient;
   sockaddr_in& get_client_address() {return client_address;}
   int& get_socket() {return socket;}
-  static const int& get_max_datagram_size() {return max_datagram_size;}
+  static const int& get_max_datagram_size() {return centralized_ai::ssl_interface::max_datagram_size;}
   socklen_t& get_address_length() {return address_length;}
 };
 
@@ -47,7 +48,7 @@ TEST(VisionClientTest, InitializesCorrectly) {
 TEST(VisionClientTest, ReceivesAndParsesPacket) {
     //VisionClientDerived client("127.0.0.1", 10006);
     MockVisionClient mock_client("127.0.0.1", 10006);
-    PositionData position_data;
+    centralized_ai::ssl_interface::PositionData position_data;
 
     // Mock SSL_WrapperPacket
     SSL_WrapperPacket packet;
@@ -94,7 +95,7 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
         return serialized_data.size();
     };
     EXPECT_CALL(mock_client, ReceivePacket(testing::_))
-            .WillOnce(testing::Invoke([&](PositionData* position_data) {
+            .WillOnce(testing::Invoke([&](centralized_ai::ssl_interface::PositionData* position_data) {
                 SSL_WrapperPacket received_packet;
                 received_packet.ParseFromArray(buffer, serialized_data.size());
 
@@ -124,7 +125,7 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
 // Test case 3: Handles empty packet
 TEST(VisionClientTest, HandlesEmptyPacket) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    PositionData position_data;
+    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create an empty packet
     SSL_WrapperPacket empty_packet;
@@ -135,7 +136,7 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
 
     // Mock the behavior of ReceivePacket to simulate receiving an empty packet
     EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data](PositionData* data) {
+        .WillOnce(testing::Invoke([&position_data](centralized_ai::ssl_interface::PositionData* data) {
             // Simulate the outcome of processing an empty packet
             data->blue_robot_position[0] = {}; // Clear position
             data->ball_position = {}; // Clear ball position
@@ -154,7 +155,7 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
 // Test case 4: Handles missing orientation
 TEST(VisionClientTest, HandlesMissingRobotOrientation) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    PositionData position_data;
+    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create a packet with a robot without orientation
     SSL_WrapperPacket packet;
@@ -183,7 +184,7 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
 
     // Mock the behavior of ReceivePacket
     EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data, &serialized_data](PositionData* data) {
+        .WillOnce(testing::Invoke([&position_data, &serialized_data](centralized_ai::ssl_interface::PositionData* data) {
             // Simulate processing the packet, leaving orientation as zero
             data->blue_robot_position[0].x = 50.0f;
             data->blue_robot_position[0].y = 100.0f;
@@ -202,7 +203,7 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
 // Test case 5: Handles multiple robots and a ball
 TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    PositionData position_data;
+    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create a packet with multiple robots and a ball
     SSL_WrapperPacket packet;
@@ -240,7 +241,7 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
 
     // Mock the behavior of ReceivePacket
     EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data](PositionData* data) {
+        .WillOnce(testing::Invoke([&position_data](centralized_ai::ssl_interface::PositionData* data) {
             // Simulate processing the packet, handling multiple robots and a single ball
             for (int i = 0; i < 3; ++i) {
                 data->blue_robot_position[i].x = 50.0f + i * 10.0f;

@@ -22,6 +22,12 @@
 // Project .h files
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
+#include "../common_types.h"
+
+namespace centralized_ai
+{
+namespace ssl_interface
+{
 
 // Constructor
 VisionClient::VisionClient(std::string ip, int port)
@@ -72,7 +78,7 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
         robot = detection.robots_blue(i);
         id = robot.robot_id();
 
-        if (id < TEAM_SIZE)
+        if (id < team_size)
         {
           position_data->blue_robot_position[id].x = robot.x();
           position_data->blue_robot_position[id].y = robot.y();
@@ -89,7 +95,7 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
         robot = detection.robots_yellow(i);
         id = robot.robot_id();
 
-        if (id < TEAM_SIZE)
+        if (id < team_size)
         {
           position_data->yellow_robot_position[id].x = robot.x();
           position_data->yellow_robot_position[id].y = robot.y();
@@ -114,7 +120,7 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
 // Method to print position data, used for debugging/demo
 void VisionClient::PrintPositionData(struct PositionData position_data)
 {
-  for (int id = 0; id < TEAM_SIZE; id++)
+  for (int id = 0; id < team_size; id++)
   {
     printf("BLUE ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>  ", id,
       position_data.blue_robot_position[id].x,
@@ -130,3 +136,6 @@ void VisionClient::PrintPositionData(struct PositionData position_data)
     position_data.ball_position.x,
     position_data.ball_position.y);
 }
+
+} // namespace ssl_interface
+} // namesapce centralized_ai

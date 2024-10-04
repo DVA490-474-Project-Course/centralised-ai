@@ -18,8 +18,14 @@
 // Project .h files
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
+#include "../common_types.h"
 
-#define TEAM_SIZE 6
+namespace centralized_ai
+{
+namespace ssl_interface
+{
+
+const int max_datagram_size = 65536;
 
 struct PositionData
 {
@@ -36,8 +42,8 @@ struct PositionData
     float y = 0.0F;
   };
 
-  struct RobotPosition blue_robot_position[TEAM_SIZE];
-  struct RobotPosition yellow_robot_position[TEAM_SIZE];
+  struct RobotPosition blue_robot_position[team_size];
+  struct RobotPosition yellow_robot_position[team_size];
   struct BallPosition ball_position;
 };
 
@@ -51,8 +57,10 @@ public:
 protected:
   sockaddr_in client_address;
   int socket;
-  static const int max_datagram_size = 65536;
   socklen_t address_length;
 };
+
+} // namespace ssl_interface
+} // namesapce centralized_ai
 
 #endif // CENTRALIZEDAI_SSLVISIONCLIENT_H_

@@ -20,30 +20,13 @@
 
 // Project .h files
 
-#define TEAM_SIZE 6
-
 namespace centralized_ai
 {
-/*
-//==============================================================================
 
-// struct describing positions of a team
-struct TeamPosition
-{
-  struct Position[TEAM_SIZE];
-}
+const int team_size = 6;
 
-// Struct describing position of a ball or robot
-struct
-{
-  double x_position = 0L;
-  double y_position = 0L;
-  double rotation = 0L;
-} Position;
 
-//==============================================================================
 
-*/
 } // namespace centralized_ai
 
 #endif // CENTRALIZEDAI_COMMONTYPES_H_
