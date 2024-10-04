@@ -2,7 +2,12 @@
 The model of the centralies AI. Following a Multi Agent Proximal Policy Optimisation (MAPPO) structure coded in c++.
 This model is for a system of the the robocup competition team from Mälardalens University 2024. 
 ## Descriptions (not fixed)
-
+### install pytorch C++ API (ubuntu)
+1. download and unzip folder
+   ``` bash
+   wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
+   unzip libtorch-shared-with-deps-latest.zip
+2. Locate the unzip torch folder. Remember the location!
 ### CLion - Install/Debug
 1. Clone the repository:
    ```bash
@@ -10,16 +15,14 @@ This model is for a system of the the robocup competition team from Mälardalens
 2. Go to cmake debug folder in Clions terminal
     ```bash
    cd cmake-build-debug
-3. in terminal link the absolute path to libtorch
+3. in terminal link the absolute path to libtorch (as located earlier)
     ```bash
    cmake -DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch ..
    cmake -DCMAKE_PREFIX_PATH=/home/viktor/PRO/libtorch ..
 4. make file
    ```bash
    cmake --build . --config Release
-
-
-
+   
 - src: contains all source files (.cc) and their respective (private) header 
 files (.h) (these are meant for internal use and are not meant for distribution 
 to the public).
