@@ -28,11 +28,7 @@ public:
   using VisionClient::VisionClient;
   sockaddr_in& get_client_address() {return client_address;}
   int& get_socket() {return socket;}
-<<<<<<< Updated upstream
   static const int& get_max_datagram_size() {return centralized_ai::ssl_interface::max_datagram_size;}
-=======
-  const int& get_max_datagram_size() {return max_datagram_size;}
->>>>>>> Stashed changes
   socklen_t& get_address_length() {return address_length;}
 };
 /*class MockVisionClient : public VisionClient {

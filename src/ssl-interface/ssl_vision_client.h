@@ -57,12 +57,6 @@ public:
 protected:
   sockaddr_in client_address;
   int socket;
-<<<<<<< Updated upstream
-=======
-  static const int max_datagram_size = 65536;
-
-  //static const int max_datagram_size;
->>>>>>> Stashed changes
   socklen_t address_length;
 };
 
