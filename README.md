@@ -13,6 +13,7 @@ This model is for a system of the the robocup competition team from Mälardalens
 3. in terminal link the absolute path to libtorch
     ```bash
    cmake -DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch ..
+   cmake -DCMAKE_PREFIX_PATH=/home/viktor/PRO/libtorch ..
 4. make file
    ```bash
    cmake --build . --config Release
