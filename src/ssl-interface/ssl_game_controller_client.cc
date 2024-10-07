@@ -87,7 +87,7 @@ int GameControllerClient::GetYellowTeamScore()
   return yellow_team_score;
 }
 
-/* Convert enum Referee::Command (protobuf definition) to enum RefereeCommand enum (our definition) */
+/* Convert from protobuf enum definition to our enum definition */
 enum centralized_ai::RefereeCommand ConvertRefereeCommand(Referee::Command command)
 {
   switch (command)
