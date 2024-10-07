@@ -34,7 +34,7 @@ public:
   void ReceivePacket();
   void Print();
 
-  /* Get game state data */
+  /* Geters for game state data */
   enum RefereeCommand GetRefereeCommand();
   int GetBlueTeamScore();
   int GetYellowTeamScore();
