@@ -16,11 +16,18 @@ namespace centralised_ai{
 namespace collective_robot_behaviour{
 
     /* Returns the reward-to-go values, where
-        - discounts: The discount for each time step in a (1 X #time_steps) tensor, i.e. discount¹, discount², discount³, ...
-        - rewards: The accumulated reward for each time step in a (#time_steps X 1) tensor.
+        - discounts: The discount for each time step in a [1, num_time_steps] tensor, i.e. discount¹, discount², discount³, ...
+        - rewards: The accumulated reward for each time step in a tensor of shape [num_time_steps, 1].
         - num_time_steps: The number of time steps to compute the reward-to-go values over.
     */
-    Tensor compute_reward_to_go(Tensor rewards, uint32_t num_time_steps);
+    Tensor compute_reward_to_go(const Tensor& rewards, uint32_t num_time_steps);
+
+    /* Returns the general advantage estimation represented by a tensor of shape [num_time_steps, num_agents], where
+        - temporal_differences: Tensor of shape [num_time_steps, num_agents]
+        - discount: Discount factor.
+        - gae_parameter: GAE parameter.
+    */
+    Tensor compute_general_advantage_estimation(const Tensor& temporal_differences, double discount, double gae_parameter);
 
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
