@@ -14,13 +14,12 @@
 
 int main(int argc, char *argv[])
 {
-  // Demo the sslvision client
+  /* Demo the sslvision client */
   centralized_ai::ssl_interface::VisionClient vision_client("224.5.23.1", 10003);
-  struct centralized_ai::ssl_interface::PositionData position_data;
   while (true)
   {
-    vision_client.ReceivePacket(&position_data);
-    vision_client.PrintPositionData(position_data);
+    vision_client.ReceivePacket();
+    vision_client.Print();
   }
   return 0;
 }

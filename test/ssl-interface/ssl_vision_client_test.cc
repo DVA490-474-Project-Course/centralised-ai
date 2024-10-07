@@ -2,7 +2,7 @@
 //==============================================================================
 // Author: Aaiza A. Khan, Shruthi Puthiya Kunnon
 // Creation date: 2024-09-20
-// Last modified: 2024-10-02 by Shruthi Puthiya Kunnon
+// Last modified: 2024-10-07 by Emil Åberg
 // Description: A test suite for ssl-vision
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -19,17 +19,24 @@ public:
     MockVisionClient(std::string ip, int port) : VisionClient(ip, port) {}
 
     // Correctly mock the ReceivePacket method
-    MOCK_METHOD(void, ReceivePacket, (centralized_ai::ssl_interface::PositionData* position_data), (override));
+    MOCK_METHOD(void, ReceivePacket, (), (override));
+
+    void SetBlueRobotPositionX(int id, float value) {blue_robot_positions_x[id] = value;}
+    void SetBlueRobotPositionY(int id, float value) {blue_robot_positions_y[id] = value;}
+    void SetBlueRobotOrientation(int id, float value) {blue_robot_orientations[id] = value;}
+    void SetYellowRobotPositionX(int id, float value) {yellow_robot_positions_y[id] = value;}
+    void SetYellowRobotPositionY(int id, float value) {yellow_robot_positions_x[id] = value;}
+    void SetYellowRobotOrientation(int id, float value) {yellow_robot_orientations[id] = value;}
+    void SetBallPositionX(float value) {ball_position_x = value;}
+    void SetBallPositionY(float value) {ball_position_y = value;}
 };
 
 class VisionClientDerived : public centralized_ai::ssl_interface::VisionClient
 {
 public:
   using VisionClient::VisionClient;
-  sockaddr_in& get_client_address() {return client_address;}
-  int& get_socket() {return socket;}
-  static const int& get_max_datagram_size() {return centralized_ai::ssl_interface::max_datagram_size;}
-  socklen_t& get_address_length() {return address_length;}
+  sockaddr_in& GetClientAddress() {return client_address;}
+  int& GetSocket() {return socket;}
 };
 /*class MockVisionClient : public VisionClient {
 public:
@@ -47,18 +54,16 @@ TEST(VisionClientTest, InitializesCorrectly) {
 
     VisionClientDerived client("127.0.0.1", 10006);
 
-    EXPECT_EQ(client.get_client_address().sin_family, AF_INET);
-    EXPECT_EQ(ntohs(client.get_client_address().sin_port), 10006);
-    EXPECT_EQ(client.get_client_address().sin_addr.s_addr, inet_addr("127.0.0.1"));
-    EXPECT_GE(client.get_socket(), 0);  // socket should be valid (>= 0)
+    EXPECT_EQ(client.GetClientAddress().sin_family, AF_INET);
+    EXPECT_EQ(ntohs(client.GetClientAddress().sin_port), 10006);
+    EXPECT_EQ(client.GetClientAddress().sin_addr.s_addr, inet_addr("127.0.0.1"));
+    EXPECT_GE(client.GetSocket(), 0);  // socket should be valid (>= 0)
 
 }
 
 // Test case 2: Receives and parses packet
 TEST(VisionClientTest, ReceivesAndParsesPacket) {
-    //VisionClientDerived client("127.0.0.1", 10006);
     MockVisionClient mock_client("127.0.0.1", 10006);
-    centralized_ai::ssl_interface::PositionData position_data;
 
     // Mock SSL_WrapperPacket
     SSL_WrapperPacket packet;
@@ -106,32 +111,32 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
         memcpy(buffer, serialized_data.data(), serialized_data.size());
         return serialized_data.size();
     };
-    EXPECT_CALL(mock_client, ReceivePacket(testing::_))
-            .WillOnce(testing::Invoke([&](centralized_ai::ssl_interface::PositionData* position_data) {
+    EXPECT_CALL(mock_client, ReceivePacket())
+            .WillOnce(testing::Invoke([&]() {
                 SSL_WrapperPacket received_packet;
                 received_packet.ParseFromArray(buffer, serialized_data.size());
 
                 const SSL_DetectionFrame& received_frame = received_packet.detection();
                 if (received_frame.robots_blue_size() > 0) {
                     const SSL_DetectionRobot& robot = received_frame.robots_blue(1);
-                    position_data->blue_robot_position[1].x = robot.x();
-                    position_data->blue_robot_position[1].y = robot.y();
-                    position_data->blue_robot_position[1].orientation = robot.orientation();
+                    mock_client.SetBlueRobotPositionX(1, robot.x());
+                    mock_client.SetBlueRobotPositionY(1, robot.y());
+                    mock_client.SetBlueRobotOrientation(1, robot.orientation());
                 }
                 if (received_frame.balls_size() > 0) {
                     const SSL_DetectionBall& ball = received_frame.balls(0);
-                    position_data->ball_position.x = ball.x();
-                    position_data->ball_position.y = ball.y();
+                    mock_client.SetBallPositionX(ball.x());
+                    mock_client.SetBallPositionY(ball.y());
                 }
             }));
     // Call the method and verify the results
-    mock_client.ReceivePacket(&position_data);
+    mock_client.ReceivePacket();
 
-    EXPECT_EQ(position_data.blue_robot_position[0].x, 50.0f);
-    EXPECT_EQ(position_data.blue_robot_position[0].y, 100.0f);
-    EXPECT_EQ(position_data.blue_robot_position[0].orientation, 1.57f);
-    EXPECT_EQ(position_data.ball_position.x, 75.0f);
-    EXPECT_EQ(position_data.ball_position.y, 150.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotPositionX(1), 50.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotPositionY(1), 100.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotOrientation(1), 1.57f);
+    EXPECT_EQ(mock_client.GetBallPositionX(), 75.0f);
+    EXPECT_EQ(mock_client.GetBallPositionY(), 150.0f);
 }
 
 
@@ -142,7 +147,6 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
 // Test case 3: Handles empty packet
 TEST(VisionClientTest, HandlesEmptyPacket) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create an empty packet
     SSL_WrapperPacket empty_packet;
@@ -152,27 +156,29 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
     empty_packet.SerializeToString(&serialized_data);
 
     // Mock the behavior of ReceivePacket to simulate receiving an empty packet
-    EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data](centralized_ai::ssl_interface::PositionData* data) {
+    EXPECT_CALL(mock_client, ReceivePacket())
+        .WillOnce(testing::Invoke([&]() {
             // Simulate the outcome of processing an empty packet
-            data->blue_robot_position[0] = {}; // Clear position
-            data->ball_position = {}; // Clear ball position
+            mock_client.SetBlueRobotPositionX(0, {}); // Clear position
+            mock_client.SetBlueRobotPositionY(0, {});
+            mock_client.SetBlueRobotOrientation(0, {});
+            mock_client.SetBallPositionX({});         // Clear ball position
+            mock_client.SetBallPositionY({});
         }));
 
     // Call the mocked method
-    mock_client.ReceivePacket(&position_data);
+    mock_client.ReceivePacket();
 
     // Verify that no robots or balls were detected
-    EXPECT_EQ(position_data.blue_robot_position[0].x, 0.0f);
-    EXPECT_EQ(position_data.blue_robot_position[0].y, 0.0f);
-    EXPECT_EQ(position_data.ball_position.x, 0.0f);
-    EXPECT_EQ(position_data.ball_position.y, 0.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotPositionX(0), 0.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotPositionY(0), 0.0f);
+    EXPECT_EQ(mock_client.GetBallPositionX(), 0.0f);
+    EXPECT_EQ(mock_client.GetBallPositionY(), 0.0f);
 }
 
 // Test case 4: Handles missing orientation
 TEST(VisionClientTest, HandlesMissingRobotOrientation) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create a packet with a robot without orientation
     SSL_WrapperPacket packet;
@@ -200,27 +206,26 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
     packet.SerializeToString(&serialized_data);
 
     // Mock the behavior of ReceivePacket
-    EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data, &serialized_data](centralized_ai::ssl_interface::PositionData* data) {
+    EXPECT_CALL(mock_client, ReceivePacket())
+        .WillOnce(testing::Invoke([&]() {
             // Simulate processing the packet, leaving orientation as zero
-            data->blue_robot_position[0].x = 50.0f;
-            data->blue_robot_position[0].y = 100.0f;
-            data->blue_robot_position[0].orientation = 0.0f; // Default to zero
+            mock_client.SetBlueRobotPositionX(0, 50.0f);
+            mock_client.SetBlueRobotPositionY(0, 100.0f);
+            mock_client.SetBlueRobotOrientation(0, 0.0f); // Default to zero
         }));
 
     // Call the mocked method
-    mock_client.ReceivePacket(&position_data);
+    mock_client.ReceivePacket();
 
     // Verify the position and orientation of the robot
-    EXPECT_EQ(position_data.blue_robot_position[0].x, 50.0f);
-    EXPECT_EQ(position_data.blue_robot_position[0].y, 100.0f);
-    EXPECT_EQ(position_data.blue_robot_position[0].orientation, 0.0f); // Check default orientation
+    EXPECT_EQ(mock_client.GetBlueRobotPositionX(0), 50.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotPositionY(0), 100.0f);
+    EXPECT_EQ(mock_client.GetBlueRobotOrientation(0), 0.0f); // Check default orientation
 }
 
 // Test case 5: Handles multiple robots and a ball
 TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     MockVisionClient mock_client("127.0.0.1", 10006);
-    centralized_ai::ssl_interface::PositionData position_data;
 
     // Create a packet with multiple robots and a ball
     SSL_WrapperPacket packet;
@@ -257,32 +262,32 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
     packet.SerializeToString(&serialized_data);
 
     // Mock the behavior of ReceivePacket
-    EXPECT_CALL(mock_client, ReceivePacket(&position_data))
-        .WillOnce(testing::Invoke([&position_data](centralized_ai::ssl_interface::PositionData* data) {
+    EXPECT_CALL(mock_client, ReceivePacket())
+        .WillOnce(testing::Invoke([&]() {
             // Simulate processing the packet, handling multiple robots and a single ball
             for (int i = 0; i < 3; ++i) {
-                data->blue_robot_position[i].x = 50.0f + i * 10.0f;
-                data->blue_robot_position[i].y = 100.0f + i * 5.0f;
-                data->blue_robot_position[i].orientation = 1.0f + i * 0.5f;
+                mock_client.SetBlueRobotPositionX(i, 50.0f + i * 10.0f);
+                mock_client.SetBlueRobotPositionY(i, 100.0f + i * 5.0f);
+                mock_client.SetBlueRobotOrientation(i, 1.0f + i * 0.5f); // Default to zero
             }
 
             // Handle the single ball
-            data->ball_position.x = 75.0f;
-            data->ball_position.y = 150.0f;
+            mock_client.SetBallPositionX(75.0f);
+            mock_client.SetBallPositionY(150.0f);
         }));
 
     // Call the mocked method
-    mock_client.ReceivePacket(&position_data);
+    mock_client.ReceivePacket();
 
     // Verify the positions and orientations of the robots
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(position_data.blue_robot_position[i].x, 50.0f + i * 10.0f);
-        EXPECT_EQ(position_data.blue_robot_position[i].y, 100.0f + i * 5.0f);
-        EXPECT_EQ(position_data.blue_robot_position[i].orientation, 1.0f + i * 0.5f);
+        EXPECT_EQ(mock_client.GetBlueRobotPositionX(i), 50.0f + i * 10.0f);
+        EXPECT_EQ(mock_client.GetBlueRobotPositionY(i), 100.0f + i * 5.0f);
+        EXPECT_EQ(mock_client.GetBlueRobotOrientation(i), 1.0f + i * 0.5f);
     }
 
     // Verify the position of the single tracked ball
-    EXPECT_EQ(position_data.ball_position.x, 75.0f);
-    EXPECT_EQ(position_data.ball_position.y, 150.0f);
+    EXPECT_EQ(mock_client.GetBallPositionX(), 75.0f);
+    EXPECT_EQ(mock_client.GetBallPositionY(), 150.0f);
 }
 

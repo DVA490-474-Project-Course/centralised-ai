@@ -7,19 +7,19 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-// Related .h files
+/* Related .h files */
 #include "ssl_vision_client.h"
 
-// C system headers
+/* C system headers */
 #include <arpa/inet.h> 
 #include <netinet/in.h>
 #include <stdio.h>
 #include <sys/socket.h> 
 
-// C++ standard library headers
+/* C++ standard library headers */
 #include <string> 
 
-// Project .h files
+/* Project .h files */
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "../common_types.h"
@@ -29,45 +29,39 @@ namespace centralized_ai
 namespace ssl_interface
 {
 
-//const int VisionClient::max_datagram_size = 65536;
-// Constructor
+/* Constructor */
 VisionClient::VisionClient(std::string ip, int port)
-{ 
-    // Define client address
+{
+  /* Define client address */
   client_address.sin_family = AF_INET;
   client_address.sin_port = htons(port);
   client_address.sin_addr.s_addr = inet_addr(ip.c_str());
 
-  // Create the client socket
+  /* Create the client socket */
   socket = ::socket(AF_INET, SOCK_DGRAM, 0);
      
-  // Bind the socket with the client address 
+  /* Bind the socket with the client address */
   bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
-
-  // Save length of client address
-  address_length = sizeof(client_address);
 }
 
-// Receive one UDP packet and write the data to the output parameter
-void VisionClient::ReceivePacket(struct PositionData* position_data)
+/* Receive one UDP packet and write the data to the output parameter */
+void VisionClient::ReceivePacket()
 {
   SSL_WrapperPacket packet;
   SSL_DetectionFrame detection;
   SSL_DetectionRobot robot;
   SSL_DetectionBall ball;
   int id;
-  int n;
+  int message_length;
   char buffer[max_datagram_size];
 
-  // Receive raw packet
-    n = recvfrom(socket, (char *)buffer, max_datagram_size,  
-                MSG_WAITALL, (struct sockaddr *) &client_address, 
-                &address_length);
+  /* Receive raw packet */
+  message_length = recv(socket, (char *)buffer, max_datagram_size, MSG_WAITALL);
 
-  if (n > 0)
+  if (message_length > 0)
   {
     // Decode packet
-    packet.ParseFromArray(buffer, n);
+    packet.ParseFromArray(buffer, message_length);
 
     if (packet.has_detection())
     {
@@ -81,16 +75,16 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
 
         if (id < team_size)
         {
-          position_data->blue_robot_position[id].x = robot.x();
-          position_data->blue_robot_position[id].y = robot.y();
+          blue_robot_positions_x[id] = robot.x();
+          blue_robot_positions_y[id] = robot.y();
           if (robot.has_orientation())
           {
-            position_data->blue_robot_position[id].orientation = robot.orientation();
+            blue_robot_orientations[id] = robot.orientation();
           }
         }
       }
 
-      // Read positions of yellow robots
+      /* Read positions of yellow robots */
       for (int i = 0; i < detection.robots_yellow_size(); ++i)
       {
         robot = detection.robots_yellow(i);
@@ -98,45 +92,85 @@ void VisionClient::ReceivePacket(struct PositionData* position_data)
 
         if (id < team_size)
         {
-          position_data->yellow_robot_position[id].x = robot.x();
-          position_data->yellow_robot_position[id].y = robot.y();
+          yellow_robot_positions_x[id] = robot.x();
+          yellow_robot_positions_y[id] = robot.y();
           if (robot.has_orientation())
           {
-            position_data->yellow_robot_position[id].orientation = robot.orientation();
+            yellow_robot_orientations[id] = robot.orientation();
           }
         }
       }
 
-      // Read ball position
+      /* Read ball position */
       if (detection.balls_size() > 0)
       {
         ball = detection.balls(0);    // Assume only one ball is in play
-        position_data->ball_position.x = ball.x();
-        position_data->ball_position.y = ball.y();
+        ball_position_x = ball.x();
+        ball_position_y = ball.y();
       }
     }
   }
 }
 
-// Method to print position data, used for debugging/demo
-void VisionClient::PrintPositionData(struct PositionData position_data)
+/* Method to print position data, used for debugging/demo */
+void VisionClient::Print()
 {
   for (int id = 0; id < team_size; id++)
   {
     printf("BLUE ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>  ", id,
-      position_data.blue_robot_position[id].x,
-      position_data.blue_robot_position[id].y,
-      position_data.blue_robot_position[id].orientation);
+      blue_robot_positions_x[id],
+      blue_robot_positions_y[id],
+      blue_robot_orientations[id]);
     printf("YELLOW ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>\n", id,
-      position_data.yellow_robot_position[id].x,
-      position_data.yellow_robot_position[id].y,
-      position_data.yellow_robot_position[id].orientation);
+      yellow_robot_positions_x[id],
+      yellow_robot_positions_y[id],
+      yellow_robot_orientations[id]);
   }
   
   printf("BALL POS=<%9.2f,%9.2f> \n\n",
-    position_data.ball_position.x,
-    position_data.ball_position.y);
+    ball_position_x,
+    ball_position_y);
 }
 
-} // namespace ssl_interface
-} // namesapce centralized_ai
+float VisionClient::GetBlueRobotPositionX(int id)
+{
+  return blue_robot_positions_x[id];
+}
+
+float VisionClient::GetBlueRobotPositionY(int id)
+{
+  return blue_robot_positions_y[id];
+}
+
+float VisionClient::GetBlueRobotOrientation(int id)
+{
+  return blue_robot_orientations[id];
+}
+
+float VisionClient::GetYellowRobotPositionX(int id)
+{
+  return yellow_robot_positions_x[id];
+}
+
+float VisionClient::GetYellowRobotPositionY(int id)
+{
+  return yellow_robot_positions_y[id];
+}
+
+float VisionClient::GetYellowRobotOrientation(int id)
+{
+  return yellow_robot_orientations[id];
+}
+
+float VisionClient::GetBallPositionX()
+{
+  return ball_position_x;
+}
+
+float VisionClient::GetBallPositionY()
+{
+  return ball_position_y;
+}
+
+} /* namespace ssl_interface */
+} /* namesapce centralized_ai */
