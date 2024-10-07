@@ -13,15 +13,12 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-    Tensor compute_reward_to_go(Tensor discounts, Tensor rewards, uint32_t num_time_steps){
+    Tensor compute_reward_to_go(Tensor rewards, uint32_t num_time_steps){
         
         output = torch.zeros(num_time_steps);
 
         for (int32_t t = 0; t < num_time_steps; t++){
-            Tensor remaining_rewards = rewards.slice(0, t, num_time_steps);
-            Tensor remaining_discounts = discounts.slice(0, 0, num_time_steps - t)
-
-            output[t] = (remaining_discounts * remaining_rewards).sum();
+            output[t] = rewards.slice(0, t, num_time_steps).sum();
         }
         
         return output;

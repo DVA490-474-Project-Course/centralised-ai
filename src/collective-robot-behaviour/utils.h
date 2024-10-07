@@ -20,7 +20,7 @@ namespace collective_robot_behaviour{
         - rewards: The accumulated reward for each time step in a (#time_steps X 1) tensor.
         - num_time_steps: The number of time steps to compute the reward-to-go values over.
     */
-    Tensor compute_reward_to_go(Tensor discounts, Tensor rewards, uint32_t num_time_steps);
+    Tensor compute_reward_to_go(Tensor rewards, uint32_t num_time_steps);
 
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
