@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-  // Demo the game controller client
+  /* Demo the game controller client */
   centralized_ai::ssl_interface::GameControllerClient game_controller_client("127.0.0.1", 10003);
   while (true)
   {

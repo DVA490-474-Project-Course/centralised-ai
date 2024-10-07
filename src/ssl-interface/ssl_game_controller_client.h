@@ -10,14 +10,15 @@
 #ifndef CENTRALIZEDAI_SSLGMAECONTROLLERCLIENT_H_
 #define CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_
 
-// C system headers
+/* C system headers */
 #include <arpa/inet.h>
 
-// C++ standard library headers
+/* C++ standard library headers */
 #include <string> 
 
-// Project .h files
+/* Project .h files */
 #include "ssl_gc_referee_message.pb.h"
+#include "../common_types.h"
 
 namespace centralized_ai
 {
@@ -26,29 +27,34 @@ namespace ssl_interface
 
 const int max_datagram_size = 65536;
 
-struct GameStateData
-{
-  enum Referee_Command referee_command;
-  int blue_team_score;
-  int yellow_team_score;
-};
-
 class GameControllerClient
 {
 public:
   GameControllerClient(std::string ip, int port);
-  struct GameStateData ReceivePacket();
+  void ReceivePacket();
   void Print();
 
+  /* Get game state data */
+  enum RefereeCommand GetRefereeCommand();
+  int GetBlueTeamScore();
+  int GetYellowTeamScore();
+
 protected:
-  std::string CommandToString(Referee::Command command);
-  struct GameStateData ReadGameStateData(Referee packet);
+  enum centralized_ai::RefereeCommand ConvertRefereeCommand(Referee::Command command);
+  std::string RefereeCommandToString(enum centralized_ai::RefereeCommand referee_command);
+  void ReadGameStateData(Referee packet);
+
+  /* Network variables */
   sockaddr_in client_address;
   int socket;
-  struct GameStateData game_state_data;
+
+  /* Game state data */
+  enum RefereeCommand referee_command;
+  int blue_team_score;
+  int yellow_team_score;
 };
 
-} // namespace ssl_interface
-} // namesapce centralized_ai
+} /* namespace ssl_interface */
+} /* namesapce centralized_ai */
 
-#endif // CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_
+#endif /* CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_ */
