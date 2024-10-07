@@ -10,6 +10,9 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 // Test ReLU for a single value
 TEST(ReLUTest, SingleValue){
 	EXPECT_EQ(relu(5.0), 5.0);
@@ -29,3 +32,6 @@ TEST(ReLUTest, VectorValue){
 		EXPECT_EQ(result[i], expected[i]);
 	}
 }
+
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */

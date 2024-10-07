@@ -13,6 +13,7 @@ add_subdirectory(collective-robot-behaviour)
 target_link_libraries(main_exe
     world_lib
     mlp_lib
+    "${TORCH_LIBRARIES}"
 )
 
 target_include_directories(main_exe PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

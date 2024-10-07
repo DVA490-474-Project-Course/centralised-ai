@@ -8,9 +8,15 @@
 
 #include "gtest/gtest.h"
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 /* Main function for calling all tests.*/
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */

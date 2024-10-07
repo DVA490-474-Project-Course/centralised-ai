@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/collective_robot_behaviour_demo.dir/src/collective-robot-behaviour/mlp.cc.o CMakeFiles/collective_robot_behaviour_demo.dir/src/collective-robot-behaviour/world.cc.o CMakeFiles/collective_robot_behaviour_demo.dir/src/main.cc.o -o ../bin/collective_robot_behaviour_demo 

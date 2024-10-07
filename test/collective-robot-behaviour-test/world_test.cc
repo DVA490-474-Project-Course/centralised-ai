@@ -9,6 +9,9 @@
 #include <gtest/gtest.h>
 #include "../../src/collective-robot-behaviour/world.h"
 
+namespace centralised_ai{
+namespace collective_robot_behaviour{
+
 // Test Fixture for the World structure
 class WorldTest : public ::testing::Test {
 protected:
@@ -76,3 +79,6 @@ TEST_F(WorldTest, BallMovement) {
     EXPECT_EQ(world.ball.position_x, 15.0); // 10 + 5
     EXPECT_EQ(world.ball.position_y, 23.0); // 20 + 3
 }
+
+} /* namespace centralised_ai */
+} /* namespace collective_robot_behaviour */
