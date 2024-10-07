@@ -87,48 +87,48 @@ int GameControllerClient::GetYellowTeamScore()
   return yellow_team_score;
 }
 
-/* Convert from protobuf enum definition to our enum definition */
-enum centralized_ai::RefereeCommand ConvertRefereeCommand(Referee::Command command)
+/* Convert from protobuf enum definition to project enum definition */
+enum RefereeCommand GameControllerClient::ConvertRefereeCommand(enum Referee_Command command)
 {
   switch (command)
   {
-    case Referee::HALT: return centralized_ai::RefereeCommand::HALT;
-    case Referee::STOP: return centralized_ai::RefereeCommand::STOP;
-    case Referee::NORMAL_START: return centralized_ai::RefereeCommand::NORMAL_START;
-    case Referee::FORCE_START: return centralized_ai::RefereeCommand::FORCE_START;
-    case Referee::PREPARE_KICKOFF_YELLOW: return centralized_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW;
-    case Referee::PREPARE_KICKOFF_BLUE: return centralized_ai::RefereeCommand::PREPARE_KICKOFF_BLUE;
-    case Referee::PREPARE_PENALTY_YELLOW: return centralized_ai::RefereeCommand::PREPARE_PENALTY_YELLOW;
-    case Referee::PREPARE_PENALTY_BLUE: return centralized_ai::RefereeCommand::PREPARE_PENALTY_BLUE;
-    case Referee::DIRECT_FREE_YELLOW: return centralized_ai::RefereeCommand::DIRECT_FREE_YELLOW;
-    case Referee::DIRECT_FREE_BLUE: return centralized_ai::RefereeCommand::DIRECT_FREE_BLUE;
-    case Referee::TIMEOUT_YELLOW: return centralized_ai::RefereeCommand::TIMEOUT_YELLOW;
-    case Referee::TIMEOUT_BLUE: return centralized_ai::RefereeCommand::TIMEOUT_BLUE;
-    case Referee::BALL_PLACEMENT_YELLOW: return centralized_ai::RefereeCommand::BALL_PLACEMENT_YELLOW;
-    case Referee::BALL_PLACEMENT_BLUE: return centralized_ai::RefereeCommand::BALL_PLACEMENT_BLUE;
-    default: return centralized_ai::RefereeCommand::UNKNOWN_COMMAND;
+    case Referee::HALT: return RefereeCommand::HALT;
+    case Referee::STOP: return RefereeCommand::STOP;
+    case Referee::NORMAL_START: return RefereeCommand::NORMAL_START;
+    case Referee::FORCE_START: return RefereeCommand::FORCE_START;
+    case Referee::PREPARE_KICKOFF_YELLOW: return RefereeCommand::PREPARE_KICKOFF_YELLOW;
+    case Referee::PREPARE_KICKOFF_BLUE: return RefereeCommand::PREPARE_KICKOFF_BLUE;
+    case Referee::PREPARE_PENALTY_YELLOW: return RefereeCommand::PREPARE_PENALTY_YELLOW;
+    case Referee::PREPARE_PENALTY_BLUE: return RefereeCommand::PREPARE_PENALTY_BLUE;
+    case Referee::DIRECT_FREE_YELLOW: return RefereeCommand::DIRECT_FREE_YELLOW;
+    case Referee::DIRECT_FREE_BLUE: return RefereeCommand::DIRECT_FREE_BLUE;
+    case Referee::TIMEOUT_YELLOW: return RefereeCommand::TIMEOUT_YELLOW;
+    case Referee::TIMEOUT_BLUE: return RefereeCommand::TIMEOUT_BLUE;
+    case Referee::BALL_PLACEMENT_YELLOW: return RefereeCommand::BALL_PLACEMENT_YELLOW;
+    case Referee::BALL_PLACEMENT_BLUE: return RefereeCommand::BALL_PLACEMENT_BLUE;
+    default: return RefereeCommand::UNKNOWN_COMMAND;
   }
 }
 
 /* Translate RefereeCommand enumerator to string */
-std::string GameControllerClient::RefereeCommandToString(centralized_ai::RefereeCommand referee_command)
+std::string GameControllerClient::RefereeCommandToString(RefereeCommand referee_command)
 {
   switch (referee_command)
   {
-    case centralized_ai::RefereeCommand::HALT: return "HALT";
-    case centralized_ai::RefereeCommand::STOP: return "STOP";
-    case centralized_ai::RefereeCommand::NORMAL_START: return "NORMAL_START";
-    case centralized_ai::RefereeCommand::FORCE_START: return "FORCE_START";
-    case centralized_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
-    case centralized_ai::RefereeCommand::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
-    case centralized_ai::RefereeCommand::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
-    case centralized_ai::RefereeCommand::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
-    case centralized_ai::RefereeCommand::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
-    case centralized_ai::RefereeCommand::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
-    case centralized_ai::RefereeCommand::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
-    case centralized_ai::RefereeCommand::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
-    case centralized_ai::RefereeCommand::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
-    case centralized_ai::RefereeCommand::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
+    case RefereeCommand::HALT: return "HALT";
+    case RefereeCommand::STOP: return "STOP";
+    case RefereeCommand::NORMAL_START: return "NORMAL_START";
+    case RefereeCommand::FORCE_START: return "FORCE_START";
+    case RefereeCommand::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
+    case RefereeCommand::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
+    case RefereeCommand::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
+    case RefereeCommand::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
+    case RefereeCommand::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
+    case RefereeCommand::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
+    case RefereeCommand::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
+    case RefereeCommand::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
+    case RefereeCommand::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
+    case RefereeCommand::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
     default: return "UNKNOWN_COMMAND";
   }
 }

@@ -35,21 +35,21 @@ public:
   void Print();
 
   /* Get game state data */
-  enum centralized_ai::RefereeCommand GetRefereeCommand();
+  enum RefereeCommand GetRefereeCommand();
   int GetBlueTeamScore();
   int GetYellowTeamScore();
 
 protected:
-  std::string RefereeCommandToString(enum centralized_ai::RefereeCommand referee_command);
+  std::string RefereeCommandToString(enum RefereeCommand referee_command);
   void ReadGameStateData(Referee packet);
-  enum centralized_ai::RefereeCommand ConvertRefereeCommand(Referee::Command command);
+  enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command);
 
   /* Network variables */
   sockaddr_in client_address;
   int socket;
 
   /* Game state data */
-  enum centralized_ai::RefereeCommand referee_command;
+  enum RefereeCommand referee_command;
   int blue_team_score;
   int yellow_team_score;
 };
