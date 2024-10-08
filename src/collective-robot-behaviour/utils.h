@@ -29,6 +29,18 @@ namespace collective_robot_behaviour{
     */
     Tensor compute_general_advantage_estimation(const Tensor& temporal_differences, double discount, double gae_parameter);
 
+    /* Returns the probability ratio for all agents for each time step with the shape [num_time_steps, num_agents], where
+        - current_probabilities: Probability of choosing the action for each actor for each time step with current policy, with shape [num_time_steps, num_agents]
+        - previous_probabilities: Probability of choosing the same action for each actor for each time step with previous policy, with shape [num_time_steps, num_agents]
+    */
+    Tensor compute_probability_ratio(const Tensor& current_probabilities, const Tensor& previous_probabilities);
+
+    /* Returns the probability ratio clipped depending on the clip_value, where
+        - probability_ratio: Probability ratio for each actor for each time step of shape [num_time_steps, num_agents]
+        - clip_value: The parameter used to clip the probability ratio
+    */
+    Tensor clip_probability_ratio(const Tensor& probability_ratio, float clip_value);
+
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
 

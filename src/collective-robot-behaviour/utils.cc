@@ -46,5 +46,13 @@ namespace collective_robot_behaviour{
         return output;
     }
 
+    Tensor compute_probability_ratio(const Tensor& current_probabilities, const Tensor& previous_probabilities){
+        return current_probabilities.divide(previous_probabilities);
+    }
+
+    Tensor clip_probability_ratio(const Tensor& probability_ratio, float clip_value){
+        return probability_ratio.clamp(1-clip_value, 1+clip_value);
+    }
+
     } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */
