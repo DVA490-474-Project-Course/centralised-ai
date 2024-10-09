@@ -19,6 +19,7 @@ struct Experience {
 torch::Tensor get_states() {
     // Example state data stored in a std::vector
     std::vector<float> state_vector = {10.0, 11.0, 12.0,10.0, 11.0, 12.0};
+    //get 25 values
 
     // Convert the std::vector to a tensor and reshape if needed
     return torch::tensor(state_vector).reshape({1, 1, 6}); //change input size

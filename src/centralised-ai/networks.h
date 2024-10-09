@@ -115,7 +115,6 @@ void save_models(const std::vector<Agents>& models, CriticNetwork& critic) {
     catch (const std::exception& e) {
         std::cerr << "Error saving model for critic network!" << std::endl;
     }
-
 }
 
 void print_parameters(const Agents& agent) {
@@ -175,6 +174,7 @@ std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
     return agents;
 }
 
+/*Step function that oen agent makes an prediction and action for state and new states. This is for the expereience buffer*/
 Experience step(Agents& agent, CriticNetwork& critic) {
 
     //get current state
@@ -202,14 +202,13 @@ Experience step(Agents& agent, CriticNetwork& critic) {
 }
 
 
-
 // Training function
 void training(Policynetwork &model, torch::Tensor inputs, torch::Tensor targets, int epochs, float learning_rate) {
     model.train(); // Set the model to training mode
 
     // Define loss function and optimizer
     torch::nn::MSELoss loss_fn;
-    torch::optim::SGD optimizer(model.parameters(), torch::optim::SGDOptions(learning_rate));
+    torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(learning_rate).betas({0.9, 0.999}).eps(1e-08));
 
     for (int epoch = 0; epoch < epochs; ++epoch) {
         // Forward pass
@@ -244,7 +243,7 @@ void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector
 
     for (auto& agent : agents)
     {
-        training(agent.policyNetwork, inputs, targets, 1, 1);
+        training(agent.policyNetwork, inputs, targets, 1, 0.1);
     }
 }
 #endif //NETWORKS_H
