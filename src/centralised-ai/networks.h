@@ -118,6 +118,16 @@ void save_models(const std::vector<Agents>& models, CriticNetwork& critic) {
 
 }
 
+void print_parameters(const Agents& agent) {
+    std::vector<torch::Tensor> params = agent.policyNetwork.parameters();
+
+    std::cout << "Policy Network Parameters:" << std::endl;
+    for (size_t i = 0; i < params.size(); ++i) {
+        std::cout << "Parameter " << i << ": " << params[i] << std::endl;
+        std::cout << params[i] << std::endl; // This prints the actual tensor values
+    }
+}
+
 std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
     std::vector<Agents> agents;
     Policynetwork model;
@@ -134,6 +144,7 @@ std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
             model.load(input_archive);
             std::cout << "Loading agent " << player_count << " from " << model_path << std::endl;
             agents.emplace_back(player_count, model);
+
         }
         catch (const std::exception& e) {
             std::cerr << "Error loading model for agent " << player_count << ": " << e.what() << std::endl;
@@ -152,6 +163,8 @@ std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
         // Load the full model (policy network) from the archive
         critic.load(input_archive);
         std::cout << "Loading critic network from " << model_path << std::endl;
+
+
     }
     catch (const std::exception& e) {
         std::cerr << "Error loading model for critic network" << std::endl;
@@ -187,6 +200,8 @@ Experience step(Agents& agent, CriticNetwork& critic) {
     return Experience(state, action, reward, next_state, done);
 
 }
+
+
 
 // Training function
 void training(Policynetwork &model, torch::Tensor inputs, torch::Tensor targets, int epochs, float learning_rate) {

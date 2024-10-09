@@ -9,8 +9,6 @@ int amount_of_players_in_team = 2;
 // Define the LSTM network class
 #include <torch/torch.h>
 
-/*Get the experience from each action to new states over some time
- Inputs: timesteps, agents, */
 
 int main() {
 
@@ -22,8 +20,11 @@ int main() {
     CriticNetwork critic;
 
     /*create or load agents*/
-    //Models = createAgents(amount_of_players_in_team);
-    Models = load_agents(amount_of_players_in_team,critic);
+    Models = createAgents(amount_of_players_in_team);
+    //Models = load_agents(amount_of_players_in_team,critic);
+
+    // print_parameters(Models[0]); //check parameters if they are the updated or same
+
 
     /*Get values in experience buffer*/
     int max_timesteps = 500;
