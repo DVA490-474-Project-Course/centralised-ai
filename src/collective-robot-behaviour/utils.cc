@@ -65,7 +65,7 @@ namespace collective_robot_behaviour{
         return probability_ratio.clamp(1-clip_value, 1+clip_value);
     }
 
-    double compute_policy_loss(const Tensor& general_advantage_estimation, const Tensor& probability_ratio, float clip_value, double policy_entropy, float entropy_coefficient){
+    double compute_policy_loss(const Tensor& general_advantage_estimation, const Tensor& probability_ratio, float clip_value, double policy_entropy){
         Tensor probability_ratio_clipped = clip_probability_ratio(probability_ratio, clip_value);
         Tensor probability_ratio_gae_product = torch::min(probability_ratio * general_advantage_estimation, probability_ratio_clipped * general_advantage_estimation);
 
@@ -75,11 +75,8 @@ namespace collective_robot_behaviour{
 
         Tensor probability_ratio_gae_product_agent_sum = torch::sum(probability_ratio_gae_product, 1);
         Tensor probability_ratio_gae_product_batch_sum = torch::sum(probability_ratio_gae_product_agent_sum, 0);
-
-        Tensor policy_entropy_agent_sum = torch::sum(policy_entropy, 1);
-        Tensor policy_entropy_batch_sum = torch::sum(policy_entropy_agent_sum, 0);
         
-        return (1/(num_time_steps * num_agents))*(probability_ratio_gae_product_batch_sum + entropy_coefficient * policy_entropy_batch_sum);
+        return (1/(num_time_steps * num_agents)) * (probability_ratio_gae_product_batch_sum) + policy_entropy;
     }
 
     double compute_critic_loss(const Tensor& current_values, const Tensor& previous_values, const Tensor& reward_to_go, float clip_value){
@@ -103,6 +100,19 @@ namespace collective_robot_behaviour{
         Tensor max_values_agent_sum = torch::sum(max_values, 1);
         Tensor max_values_batch_sum = torch::sum(max_values_agent_sum, 0);
         return (1/(num_time_steps * num_agents)) * max_values_batch_sum;
+    }
+
+    double compute_policy_entropy(const Tensor& actions_probabilities, float entropy_coefficient){
+        // Ensure that the action probabilities are in the range (0, 1.0] in order to avoid log(0).
+        Tensor clipped_probabilities = torch::clamp(actions_probabilities, 1e-10, 1.0);
+
+        // Calculate the enropy for each time step and agent.
+        Tensor entropy = -torch::sum(clipped_probabilities * clipped_probabilities.log(), 2);
+
+        // Calculate the average entropy over the time steps and agents.
+        int32_t num_time_steps = actions_probabilities.size(0);
+        int32_t num_agents = actions_probabilities.size(1);
+        return (1/(num_time_steps * num_agents)) * entropy.sum() * entropy_coefficient;
     }
 
     } /* namespace collective_robot_behaviour */

@@ -44,10 +44,10 @@ namespace collective_robot_behaviour{
         - general_advantage_estimation: GAE for each agent for each time step with the shape [num_time_steps, num_agents]
         - probability_ratio: Probability ratio for each agent for each time step with the shape [num_time_steps, num_agents]
         - clip_value: The parameter used to clip the probability ratio
-        - policy_entropy: Policy entropy for each agent for each time step with the shape [num_time_steps, num_agents]
+        - policy_entropy: Average Policy entropy over the time steps and agents
         - entropy_coefficient: The parameter used to determine the weight of the entropies
     */
-    double compute_policy_loss(const Tensor& general_advantage_estimation, const Tensor& probability_ratio, float clip_value, double policy_entropy, float entropy_coefficient);
+    double compute_policy_loss(const Tensor& general_advantage_estimation, const Tensor& probability_ratio, float clip_value, double policy_entropy);
 
     /* Returns the critic loss over a number of time steps, where
         - current_values: Values from the Critic network with current parameters for each agent and time step, with shape [num_time_steps, num_agents]
@@ -56,6 +56,12 @@ namespace collective_robot_behaviour{
         - clip_value: The parameter used to clip the critic network values
     */
     double compute_critic_loss(const Tensor& current_values, const Tensor& previous_values, const Tensor& reward_to_go, float clip_value);
+
+    /* Returns the policy entropy, where
+        - actions_probabilities: Probabilities of choosing actions for each agent and time step, with the shape [num_time_steps, num_agents, num_actions]
+        - entropy_coefficient: The parameter used to determine the weight of the entropy
+    */
+    double compute_policy_entropy(const Tensor& actions_probabilities, float entropy_coefficient);
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
 
