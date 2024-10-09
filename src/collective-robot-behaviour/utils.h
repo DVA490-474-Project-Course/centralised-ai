@@ -16,11 +16,10 @@ namespace centralised_ai{
 namespace collective_robot_behaviour{
 
     /* Returns the reward-to-go values, where
-        - discounts: The discount for each time step in a [1, num_time_steps] tensor, i.e. discount¹, discount², discount³, ...
-        - rewards: The accumulated reward for each time step in a tensor of shape [num_time_steps, 1].
-        - num_time_steps: The number of time steps to compute the reward-to-go values over.
+        - rewards: The accumulated reward for each time step, with the shape [num_time_steps, 1]
+        - discount: The discount factor
     */
-    Tensor compute_reward_to_go(const Tensor& rewards, uint32_t num_time_steps);
+    Tensor compute_reward_to_go(const Tensor& rewards, float discount);
 
     /* Returns the general advantage estimation represented by a tensor of shape [num_time_steps, num_agents], where
         - temporal_differences: Tensor of shape [num_time_steps, num_agents]
@@ -53,7 +52,7 @@ namespace collective_robot_behaviour{
     /* Returns the critic loss over a number of time steps, where
         - current_values: Values from the Critic network with current parameters for each agent and time step, with shape [num_time_steps, num_agents]
         - previous_values: Values from the Critic network with previous parameters for each agent and time step, with shape [num_time_steps, num_agents]
-        - reward_to_go: The discounted reward-to-go values for each time step, with shape [num_time_steps, 0]
+        - reward_to_go: The discounted reward-to-go values for each time step, with shape [num_time_steps, 1]
         - clip_value: The parameter used to clip the critic network values
     */
     double compute_critic_loss(const Tensor& current_values, const Tensor& previous_values, const Tensor& reward_to_go, float clip_value);

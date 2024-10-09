@@ -13,14 +13,16 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-    Tensor compute_reward_to_go(const Tensor& rewards, uint32_t num_time_steps){
-        
-        output = torch.zeros(num_time_steps);
+    Tensor compute_reward_to_go(const Tensor& rewards, float discount){
 
-        for (int32_t t = 0; t < num_time_steps; t++){
-            output[t] = rewards.slice(0, t, num_time_steps).sum();
+        int32_t num_time_steps = rewards.size(0);
+
+        // Calculate the discounted reward to go.
+        Tensor output = rewards.clone();
+        for (int32_t t = num_time_steps - 2; t >= 0; t--){
+            output[t] += discount * output[t + 1];
         }
-        
+
         return output;
     }
 
@@ -28,14 +30,14 @@ namespace collective_robot_behaviour{
         
         uint32_t num_time_steps = temporal_differences.size(0);
 
-        // Precompute the factors for each time step
+        // Calculate the factors for each time step.
         Tensor factors = torch.zeros(num_time_steps);
         double discount_times_gae_parameter = discount * gae_parameter;
         for (int32_t t = 0; t < num_time_steps; t++){
             factors[i] = torch::pow(discount_times_gae_parameter, t);
         }
         
-        // Compute the GAE for each time step
+        // Calculate the GAE for each time step.
         Tensor output = torch::zeros_like(temporal_differences)
         for (int32_t t = 0; t < num_time_steps; t++){
             Tensor remaining_factors = factors.slize(1, 0, num_time_steps - t);
@@ -58,7 +60,7 @@ namespace collective_robot_behaviour{
         Tensor probability_ratio_clipped = clip_probability_ratio(probability_ratio, clip_value);
         Tensor probability_ratio_gae_product = torch::min(probability_ratio * general_advantage_estimation, probability_ratio_clipped * general_advantage_estimation);
 
-        // Compute the loss.
+        // Calculate the loss.
         int32_t num_time_steps = general_advantage_estimation.size(0);
         int32_t num_agents = general_advantage_estimation.size(1);
 
