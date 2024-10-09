@@ -17,13 +17,22 @@ namespace collective_robot_behaviour{
 
         int32_t num_time_steps = rewards.size(0);
 
-        // Calculate the discounted reward to go.
+        // Calculate the discounted reward-to-go.
         Tensor output = rewards.clone();
         for (int32_t t = num_time_steps - 2; t >= 0; t--){
             output[t] += discount * output[t + 1];
         }
 
-        return output;
+        // Normalize the discounted reward-to-go.
+        Tensor mean = output.mean();
+        Tensor std  = output.std();
+
+        // Handle zero standard deviation.
+        if (torch::allclose(std, torch::tensor(0.0f), 1e-5)){
+            return torch::zeros_like(output);
+        }
+
+        return (output - mean) / std;
     }
 
     Tensor compute_general_advantage_estimation(const Tensor& temporal_differences, double discount, double gae_parameter){
