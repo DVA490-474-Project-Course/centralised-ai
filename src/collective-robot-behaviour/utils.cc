@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-08 by Jacob Johansson
+// Last modified: 2024-10-09 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -69,6 +69,29 @@ namespace collective_robot_behaviour{
         Tensor policy_entropy_batch_sum = torch::sum(policy_entropy_agent_sum, 0);
         
         return (1/(num_time_steps * num_agents))*(probability_ratio_gae_product_batch_sum + entropy_coefficient * policy_entropy_batch_sum);
+    }
+
+    double compute_critic_loss(const Tensor& current_values, const Tensor& previous_values, const Tensor& reward_to_go, float clip_value){
+        
+        // Get the shape of the tensors.
+        int32_t num_time_steps = current_values.size(0);
+        int32_t num_agents = current_values.size(1);
+
+        // Clip the current values.
+        Tensor clipping_min = previous_values - clip_value;
+        Tensor clipping_max = previous_values + clip_value;
+        Tensor current_values_clipped = torch::clamp(current_values, clipping_min, clipping_max);
+
+        // Calculate Mean Squared Error.
+        Tensor reward_to_go_expanded = reward_to_go.expand({-1, num_agents});
+        Tensor current_values_mse = torch::pow(current_values - reward_to_go, 2);
+        Tensor current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go, 2);
+
+        // Calculate the loss.
+        Tensor max_values = torch::max(current_values_mse, current_values_clipped_mse);
+        Tensor max_values_agent_sum = torch::sum(max_values, 1);
+        Tensor max_values_batch_sum = torch::sum(max_values_agent_sum, 0);
+        return (1/(num_time_steps * num_agents)) * max_values_batch_sum;
     }
 
     } /* namespace collective_robot_behaviour */

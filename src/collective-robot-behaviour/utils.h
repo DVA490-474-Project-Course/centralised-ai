@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
-// Creation date: 2024-10-07
-// Last modified: 2024-10-08 by Jacob Johansson
+// Creation date: 2024-10-08
+// Last modified: 2024-10-09 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -49,6 +49,14 @@ namespace collective_robot_behaviour{
         - entropy_coefficient: The parameter used to determine the weight of the entropies
     */
     double compute_policy_loss(const Tensor& general_advantage_estimation, const Tensor& probability_ratio, float clip_value, double policy_entropy, float entropy_coefficient);
+
+    /* Returns the critic loss over a number of time steps, where
+        - current_values: Values from the Critic network with current parameters for each agent and time step, with shape [num_time_steps, num_agents]
+        - previous_values: Values from the Critic network with previous parameters for each agent and time step, with shape [num_time_steps, num_agents]
+        - reward_to_go: The discounted reward-to-go values for each time step, with shape [num_time_steps, 0]
+        - clip_value: The parameter used to clip the critic network values
+    */
+    double compute_critic_loss(const Tensor& current_values, const Tensor& previous_values, const Tensor& reward_to_go, float clip_value);
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
 
