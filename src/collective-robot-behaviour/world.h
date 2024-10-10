@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-01 by Jacob Johansson
+// Last modified: 2024-10-10 by Jacob Johansson
 // Description: Headers for world.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -13,6 +13,28 @@
 
 namespace centralised_ai{
 namespace collective_robot_behaviour{
+
+/* Global constants*/
+
+/* Width of the playing field, measured in meters.*/
+const int kFieldWidth = 9;
+/* Height of the playing field, measured in meters.*/
+const int kFieldHeight = 6;
+
+/* Width of the defense area, measured in meters.*/
+const int kDefenseAreaWidth = 2;
+/* Height of the defense area, measured in meters.*/
+const int kDefenseAreaHeight = 1;
+
+/* Distance from the opponent's goal center from which a team executes a penalty kick against the opponent goal, measured in meters.*/
+const int kPenaltyMarkDistance = 6;
+
+/* Width of the goal, measured in meters.*/
+const int kGoalWidth = 1;
+/* Depth of the goal, measured in meters.*/
+const float kGoalDepth = 0.18;
+
+//-------------------
 
 /* Definition of the representation of the state of each individual robot. */
 struct Robot {

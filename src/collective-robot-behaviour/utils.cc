@@ -92,7 +92,10 @@ namespace collective_robot_behaviour{
 
         // Calculate Mean Squared Error.
         Tensor reward_to_go_expanded = reward_to_go.expand({-1, num_agents});
-        Tensor current_values_mse = torch::pow(current_values - reward_to_go, 2);
+        Tensor current_values_mse = torch::pow(current_values - reward_to_go, 2);t learning rate α
+while step ≤ stepmax do
+set data buffer D = {}
+for i = 1 to batch_size 
         Tensor current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go, 2);
 
         // Calculate the loss.
