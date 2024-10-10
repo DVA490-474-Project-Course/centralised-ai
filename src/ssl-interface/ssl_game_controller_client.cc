@@ -67,6 +67,11 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   referee_command = ConvertRefereeCommand(packet.command());
   blue_team_score = packet.blue().score();
   yellow_team_score = packet.yellow().score();
+  if (packet.has_designated_position())
+  {
+    ball_designated_position_x = packet.designated_position().x();
+    ball_designated_position_y = packet.designated_position().y();
+  }
 }
 
 /* Getter for referee command */
@@ -83,6 +88,18 @@ int GameControllerClient::GetBlueTeamScore()
 
 /* Getter for yellow team score */
 int GameControllerClient::GetYellowTeamScore()
+{
+  return yellow_team_score;
+}
+
+/* Getter for designated position x coordinate */
+float GameControllerClient::GetBallDesignatedPositionX()
+{
+  return blue_team_score;
+}
+
+/* Getter for designated position y coordinate  */
+float GameControllerClient::GetBallDesignatedPositionY()
 {
   return yellow_team_score;
 }

@@ -38,6 +38,8 @@ public:
   enum RefereeCommand GetRefereeCommand();
   int GetBlueTeamScore();
   int GetYellowTeamScore();
+  float GetBallDesignatedPositionX();
+  float GetBallDesignatedPositionY();
 
 protected:
   std::string RefereeCommandToString(enum RefereeCommand referee_command);
@@ -52,6 +54,8 @@ protected:
   enum RefereeCommand referee_command;
   int blue_team_score;
   int yellow_team_score;
+  float ball_designated_position_x;
+  float ball_designated_position_y;
 };
 
 } /* namespace ssl_interface */
