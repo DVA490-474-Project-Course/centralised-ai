@@ -1,11 +1,12 @@
-// ssl_game_controller_client.h
-//==============================================================================
-// Author: Emil Åberg, Aaiza A. Khan
-// Creation date: 2024-10-01
-// Last modified: 2024-10-02 by Emil Åberg
-// Description: A client for receiveing game state from ssl game controller
-// License: See LICENSE file for license details.
-//==============================================================================
+/* ssl_game_controller_client.h
+ *==============================================================================
+ * Author: Emil Åberg, Aaiza A. Khan
+ * Creation date: 2024-10-01
+ * Last modified: 2024-10-10 by Emil Åberg
+ * Description: A client for receiveing game state from ssl game controller
+ * License: See LICENSE file for license details.
+ *=============================================================================
+ */
 
 #ifndef CENTRALIZEDAI_SSLGMAECONTROLLERCLIENT_H_
 #define CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_
@@ -34,12 +35,13 @@ public:
   void ReceivePacket();
   void Print();
 
-  /* Geters for game state data */
+  /* Getters for game state data */
   enum RefereeCommand GetRefereeCommand();
   int GetBlueTeamScore();
   int GetYellowTeamScore();
   float GetBallDesignatedPositionX();
   float GetBallDesignatedPositionY();
+  bool BlueTeamOnPositiveHalf();
 
 protected:
   std::string RefereeCommandToString(enum RefereeCommand referee_command);
@@ -56,6 +58,7 @@ protected:
   int yellow_team_score;
   float ball_designated_position_x;
   float ball_designated_position_y;
+  bool blue_team_on_positive_half;
 };
 
 } /* namespace ssl_interface */

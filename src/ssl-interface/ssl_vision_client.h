@@ -1,11 +1,13 @@
-// ssl_vision_client.h
-//==============================================================================
-// Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
-// Creation date: 2024-09-20
-// Last modified: 2024-10-01 by Shruthi Puthiya Kunnon
-// Description: Added virtual to Receivepacket function for test suite no.3.
-// License: See LICENSE file for license details.
-//==============================================================================
+/* ssl_vision_client.h
+ *==============================================================================
+ * Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
+ * Creation date: 2024-09-20
+ * Last modified: 2024-10-10 by Shruthi Puthiya Kunnon
+ * Description: Added virtual to Receivepacket function for test suite no.3.
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
+
 #ifndef CENTRALIZEDAI_SSLVISIONCLIENT_H_
 #define CENTRALIZEDAI_SSLVISIONCLIENT_H_
 

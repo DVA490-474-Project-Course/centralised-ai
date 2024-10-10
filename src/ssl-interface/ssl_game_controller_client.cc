@@ -1,11 +1,12 @@
-// ssl_game_controller_client.cc
-//==============================================================================
-// Author: Emil Åberg, Aaiza A. Khan
-// Creation date: 2024-10-01
-// Last modified: 2024-10-02 by Emil Åberg
-// Description: A client for receiveing game state from ssl game controller
-// License: See LICENSE file for license details.
-//==============================================================================
+/* ssl_game_controller_client.cc
+ *==============================================================================
+ * Author: Emil Åberg, Aaiza A. Khan
+ * Creation date: 2024-10-01
+ * Last modified: 2024-10-10 by Emil Åberg
+ * Description: A client for receiveing game state from ssl game controller
+ * License: See LICENSE file for license details.
+ *=============================================================================
+ */
 
 /* Related .h files */
 #include "ssl_game_controller_client.h"
@@ -71,6 +72,10 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   {
     ball_designated_position_x = packet.designated_position().x();
     ball_designated_position_y = packet.designated_position().y();
+  }
+  if (packet.has_blue_team_on_positive_half())
+  {
+    blue_team_on_positive_half = packet.blue_team_on_positive_half();
   }
 }
 

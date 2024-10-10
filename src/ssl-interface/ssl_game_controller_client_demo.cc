@@ -1,11 +1,12 @@
-// ssl_game_controller_client_demo.cc
-//==============================================================================
-// Author: Emil Åberg
-// Creation date: 2024-10-01
-// Last modified: 2024-10-02 by Emil Åberg
-// Description: demo of the ssl game controller client
-// License: See LICENSE file for license details.
-//==============================================================================
+/* ssl_game_controller_client_demo.cc
+ *==============================================================================
+ * Author: Emil Åberg
+ * Creation date: 2024-10-01
+ * Last modified: 2024-10-02 by Emil Åberg
+ * Description: demo of the ssl game controller client
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
 
 #include <iostream>
 #include <fstream>
