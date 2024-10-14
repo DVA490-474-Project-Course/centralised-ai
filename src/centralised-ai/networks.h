@@ -10,7 +10,7 @@ extern int input_size = 6; // Number of input features
 
 struct Policynetwork : torch::nn::Module {
     const int hidden_size = 4; // Number of LSTM hidden units
-    const int num_layers = 1; // Number of LSTM layers
+    const int num_layers = 64; // Number of LSTM layers
     const int output_size = 6; // Number of output classes
 
     torch::nn::LSTM lstm{nullptr};
@@ -81,8 +81,6 @@ std::vector<Agents> createAgents(int amount_of_players_in_team) {
     }
     return robots; // Return the vector of agents
 }
-
-
 
 void save_models(const std::vector<Agents>& models, CriticNetwork& critic) {
     for (const auto& agent : models) {
@@ -175,21 +173,11 @@ std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
 }
 
 /*Step function that oen agent makes an prediction and action for state and new states. This is for the expereience buffer*/
-Experience step(Agents& agent, CriticNetwork& critic) {
+Experience get_expbuff(CriticNetwork& critic) {
 
     //get current state
     torch::Tensor state = get_states();
-
-    //get CRITIC predictions of actions
-    torch::Tensor outputCritic = critic.forward(state);
-    //std::cout << "Critic Output: " << outputCritic << std::endl;
-
-    //get Policy predictions of actions of agent
-    torch::Tensor output = agent.policyNetwork.forward(state);
-    //std::cout << "Policy Output: " << output << std::endl;
-
-    torch::Tensor action = argmax(output);// Action is the highest prediction
-    //std::cout << "Action: " << action << std::endl;
+    torch::Tensor valuefunc = critic.forward(state);
 
     float reward = get_rewards();  //threshold reward
     // Generate the next state (replace with your own logic)
@@ -197,53 +185,26 @@ Experience step(Agents& agent, CriticNetwork& critic) {
     bool done = false;  //goal, game is done!
 
     // Return the experience
-    return Experience(state, action, reward, next_state, done);
 
 }
 
+void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<Experience> exper_buff) {
 
-// Training function
-void training(Policynetwork &model, torch::Tensor inputs, torch::Tensor targets, int epochs, float learning_rate) {
-    model.train(); // Set the model to training mode
+    torch::Tensor targets = torch::tensor({{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, torch::dtype(torch::kFloat));
+    torch::Tensor loss = torch::tensor(0.004, torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
 
-    // Define loss function and optimizer
-    torch::nn::MSELoss loss_fn;
-    torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(learning_rate).betas({0.9, 0.999}).eps(1e-08));
-
-    for (int epoch = 0; epoch < epochs; ++epoch) {
-        // Forward pass
-        torch::Tensor predictions = model.forward(inputs);
-        torch::Tensor loss = loss_fn(predictions, targets);
+    //update each agent
+    for (auto& agent : agents)
+    {
+        agent.policyNetwork.train(); // Set the model to training mode
+        torch::optim::Adam optimizer(agent.policyNetwork.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
 
         // Backpropagation
         optimizer.zero_grad();
         loss.backward();
         optimizer.step();
 
-        // Print loss every 100 epochs
-        if (epoch % 100 == 0) {
-            std::cout << "Epoch [" << epoch << "/" << epochs << "] Loss: " << loss.item<float>() << std::endl;
-        }
-    }
-}
-
-void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<Experience> exper_buff) {
-    torch::Tensor inputs = torch::tensor({
-                                                {{10.0, 11.0, 12.0,10.0, 11.0, 12.0}},
-                                                {{10.0, 11.0, 12.0,10.0, 11.0, 12.0}},
-                                                {{1.0, 1.0, 1.0,10.0, 11.0, 12.0}}
-                                            }, torch::dtype(torch::kFloat));
-
-    torch::Tensor targets = torch::tensor({
-                                              {1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                              {1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                                              {0.0, 0.0, 0.0, 0.0, .0, 1.0}
-                                          }, torch::dtype(torch::kFloat));
-
-
-    for (auto& agent : agents)
-    {
-        training(agent.policyNetwork, inputs, targets, 1, 0.1);
+        std::cout << "Loss: " << loss.item<float>() << std::endl;
     }
 }
 #endif //NETWORKS_H

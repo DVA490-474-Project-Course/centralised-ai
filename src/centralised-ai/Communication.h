@@ -6,23 +6,26 @@
 #define COMMUNICATION_H
 
 struct Experience {
-    torch::Tensor state;
-    torch::Tensor action;
-    float reward;
-    torch::Tensor next_state;
-    bool done;
 
-    Experience(torch::Tensor s, torch::Tensor a, float r, torch::Tensor ns, bool d)
-        : state(s), action(a), reward(r), next_state(ns), done(d) {}
+    torch::Tensor ValueFunc;
+    float reward;
+    //std::vector<float> actionprobs;
+    torch::Tensor act_prob ;
+
+    Experience(torch::Tensor ValueFunc, float reward,torch::Tensor actpr)
+        : ValueFunc(ValueFunc), reward(reward), act_prob(actpr) {}
+
+
+
 };
 
 torch::Tensor get_states() {
     // Example state data stored in a std::vector
-    std::vector<float> state_vector = {10.0, 11.0, 12.0,10.0, 11.0, 12.0};
+    torch::Tensor state_vector = torch::randn({1,1,6});
     //get 25 values
 
     // Convert the std::vector to a tensor and reshape if needed
-    return torch::tensor(state_vector).reshape({1, 1, 6}); //change input size
+    return state_vector;//change input size
     //                                  {amount to process at time,time steps, dimension input}
 }
 

@@ -19,38 +19,55 @@ int main() {
 
 
     /*Get values in experience buffer*/
-    int max_timesteps = 500;
-    int runs = 0;
-    int max_runs = 100;
-    while (runs < max_runs)
+    int max_timesteps = 5;
+    int steps = 0;
+    int step_max = 1;
+
+    while (steps < step_max)
     {
-        std::vector<Experience> experience_buffer; //reset buffer
+        std::vector<Experience> experience_buffer; //set data buffer. reset
+
         int timestep = 0;
         bool done = false;
+
         /*Run until timesteps or game is done*/
         while (timestep < max_timesteps) {
-            /*Sequentially make each robot do an action*/
-            for (auto& agent : Models) {
-                // Train agents and store experience
-                Experience exp = step(agent, critic); //send in agent and critic network
-                experience_buffer.push_back(exp); //add to experience buffer
-                timestep += 1; //Add timestep
 
-                /*Check if done or timestep, then update val*/
-                if (exp.done == true || timestep >= max_timesteps) {
-                    done = true;
-                    break;
-                }
-                //std::cout << "Timestep: " << timestep << std::endl;
+            /*Sequentially make each robot do an action*/
+            std::vector<int> actions;
+            std::vector<float> rewards;
+            torch::Tensor act_prob = torch::zeros({max_timesteps, amount_of_players_in_team, 6}); //6 actions for now
+
+            torch::Tensor state = get_states();
+            for (auto& agent : Models) {
+                //one state, all robots do their policy action
+                torch::Tensor output = agent.policyNetwork.forward(state);
+                torch::Tensor action = argmax(output);
+
+                //append action probabilities
+                actions.push_back(action.item().toInt());
+                act_prob.index_put_({timestep, agent.robotId},output);
             }
+
+            //do all actions
+                //sen command to do all actions
+
+            torch::Tensor valuefunc = critic.forward(state);
+            float reward = get_rewards();  //threshold reward
+            Experience exp = {valuefunc,reward,act_prob};//get_expbuff(critic); //send in agent and critic network
+            experience_buffer.push_back(exp); //add to experience buffer
+
+            timestep += 1; //Add timestep
+
         }
 
         update_nets(Models, critic,experience_buffer); //update networks
+
         /*Save or update the models*/
         save_models(Models,critic); //save models of all networks(policy and critic)
-        runs++;
+        steps++;
         std::cout << "-------------------" << std::endl;
-
     }
+
     return 0;
 }
