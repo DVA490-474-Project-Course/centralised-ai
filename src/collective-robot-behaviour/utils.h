@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-08
-// Last modified: 2024-10-09 by Jacob Johansson
+// Last modified: 2024-10-14 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -20,6 +20,13 @@ namespace collective_robot_behaviour{
         - discount: The discount factor
     */
     Tensor compute_reward_to_go(const Tensor& rewards, float discount);
+
+    /* Returns the temporal differences with the shape [num_time_steps, num_agents], where
+        - critic_values: Values from the critic network per time step with the shape [num_time_steps, 1]
+        - rewards: Reward per time step per actor with the shape [num_time_steps, num_actors]
+        - discount: Discount factor
+    */
+    Tensor compute_temporal_difference(const Tensor& critic_values, const Tensor& rewards, double discount);
 
     /* Returns the general advantage estimation represented by a tensor of shape [num_time_steps, num_agents], where
         - temporal_differences: Tensor of shape [num_time_steps, num_agents]

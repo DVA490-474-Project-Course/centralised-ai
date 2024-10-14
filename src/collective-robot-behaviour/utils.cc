@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-09 by Jacob Johansson
+// Last modified: 2024-10-14 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -33,6 +33,24 @@ namespace collective_robot_behaviour{
         }
 
         return (output - mean) / std;
+    }
+
+    Tensor compute_temporal_difference(const Tensor& critic_values, const Tensor& rewards, double discount){
+        uint32_t num_time_steps = rewards.size(0);
+        uint32_t num_agents = rewards.size(1);
+
+        Tensor critic_values_expanded = critic_values.expand({-1, num_agents});
+
+        // Calculate the temporal differences for all but the last time step.
+        Tensor output = torch::zeros(num_time_steps, num_agents);
+        for (uint32_t t = 0; t < num_time_steps - 1; t++){
+            output[t] = rewards[t] + discount * critic_values_expanded[t + 1] - critic_values_expanded[t];
+        }
+
+        // Handle the last time step (without discounting future value).
+        output[num_time_steps - 1] = rewards[num_time_steps - 1] - critic_values_expanded[num_time_steps - 1];
+
+        return output;
     }
 
     Tensor compute_general_advantage_estimation(const Tensor& temporal_differences, double discount, double gae_parameter){
