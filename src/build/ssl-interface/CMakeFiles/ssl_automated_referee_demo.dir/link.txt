@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/ssl_automated_referee_demo.dir/ssl_automated_referee_demo.o -o ssl_automated_referee_demo  libssl_interface_lib.a -lprotobuf 
