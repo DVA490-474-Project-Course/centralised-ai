@@ -49,7 +49,7 @@ private:
     float ball_designated_position_x;
     float ball_designated_position_y;
     bool inside_goal_prev = false;
-    
+    bool kickoff_triggered;
 
     // Track the team that last kicked the ball
     Team last_kicker_team;

@@ -90,8 +90,10 @@ void AutomatedReferee::AnalyzeGameState() {
     std::cout << "New ball position X: " << ball_designated_position_x 
               << ", Y: " << ball_designated_position_y << std::endl;
     std::cout << "Referee Command: " << referee_command << std::endl;
+    //kickoff_flag = true; 
 
-  }  else {
+  }  
+  else {
     referee_command = Referee::NORMAL_START;
 
   }
@@ -158,7 +160,15 @@ bool AutomatedReferee::IsKickoffConditionMet(double current_time) {
                           std::abs(current_time - extra_time_second_half_start) < time_tolerance);
 
   // Kickoff is triggered either at the start of a half or after a goal is scored
-  return is_kickoff_time;
+  //return is_kickoff_time;
+
+  // Check if the kickoff condition is met and has not already been triggered
+  if (is_kickoff_time && !kickoff_triggered) {
+      kickoff_triggered = true;  // Mark the event as triggered
+      return true;  // Return true to trigger the kickoff
+  }
+
+  return false;  // Otherwise, return false
 }
 
 
