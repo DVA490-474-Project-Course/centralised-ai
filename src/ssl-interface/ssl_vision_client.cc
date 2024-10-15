@@ -111,6 +111,7 @@ void VisionClient::ReceivePacket()
       }
     }
 
+    /* Get timestamp */
     timestamp = detection.t_capture();
   }
 }
