@@ -9,8 +9,8 @@
 extern int input_size = 6; // Number of input features
 
 struct Policynetwork : torch::nn::Module {
-    const int hidden_size = 4; // Number of LSTM hidden units
-    const int num_layers = 64; // Number of LSTM layers
+    const int hidden_size = 4; // Number of features in the hidden state
+    const int num_layers = 1; // Number of LSTM layers on top of eachother
     const int output_size = 6; // Number of output classes
 
     torch::nn::LSTM lstm{nullptr};
@@ -207,4 +207,5 @@ void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector
         std::cout << "Loss: " << loss.item<float>() << std::endl;
     }
 }
+
 #endif //NETWORKS_H
