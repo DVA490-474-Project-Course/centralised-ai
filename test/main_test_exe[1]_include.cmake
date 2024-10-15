@@ -1,5 +1,0 @@
-if(EXISTS "/home/jacob/centralised-ai/test/main_test_exe[1]_tests.cmake")
-  include("/home/jacob/centralised-ai/test/main_test_exe[1]_tests.cmake")
-else()
-  add_test(main_test_exe_NOT_BUILT main_test_exe_NOT_BUILT)
-endif()
