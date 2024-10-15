@@ -1,0 +1,8 @@
+# Hashes of file build rules.
+cc9bc7755567680bd23c7c07977ca0ee ../ssl-interface/generated/messages_robocup_ssl_detection.pb.h
+d49852dc6f495f14e52a2c1bcc3164d1 ../ssl-interface/generated/messages_robocup_ssl_geometry.pb.h
+77ce2b571c0d90573611a92037eb9edf ../ssl-interface/generated/messages_robocup_ssl_wrapper.pb.h
+4010a856a108ef6ed2c143acf31fcee1 ../ssl-interface/generated/ssl_gc_common.pb.h
+287163aecd3a906fe81372aceefb121e ../ssl-interface/generated/ssl_gc_game_event.pb.h
+a85e58c5b40d68403f4cfc15849c8bd7 ../ssl-interface/generated/ssl_gc_geometry.pb.h
+bf42f33283aac6bb6e5f49941a2eda37 ../ssl-interface/generated/ssl_gc_referee_message.pb.h

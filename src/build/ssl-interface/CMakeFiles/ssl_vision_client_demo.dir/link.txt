@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/ssl_vision_client_demo.dir/ssl_vision_client_demo.o -o ssl_vision_client_demo  libssl_interface_lib.a -lprotobuf 
