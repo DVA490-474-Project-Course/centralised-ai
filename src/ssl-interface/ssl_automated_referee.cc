@@ -30,43 +30,58 @@ void AutomatedReferee::AnalyzeGameState()
     // Check if a goal has been scored
     if (IsGoalScored(ball_x, ball_y))
     {
-        if (ball_x > 4500 && ball_y > -0500 && ball_y < 0500) // Ball in the blue team's goal
+        if (ball_x > 4500 && ball_y > -500 && ball_y < 500) // Ball in the blue team's goal
         {
-            referee_command = Referee::GOAL_BLUE;
+            //referee_command = Referee::GOAL_BLUE;
             blue_team_score++;
             std::cout << "Blue Team Scored!" << std::endl;
+            ball_designated_position_x = 0.0;
+            ball_designated_position_y = 0.0;
         }
-        else if (ball_x < -4500 && ball_y > -0500 && ball_y < 0500) // Ball in the yellow team's goal
+        else if (ball_x < -4500 && ball_y > -500 && ball_y < 500) // Ball in the yellow team's goal
         {
-            referee_command = Referee::GOAL_YELLOW;
+            //referee_command = Referee::GOAL_YELLOW;
             yellow_team_score++;
             std::cout << "Yellow Team Scored!" << std::endl;
+            ball_designated_position_x = 0.0;
+            ball_designated_position_y = 0.0;
         }
     }
     // Check for ball placement if out of field
     else if (IsBallOutOfField(ball_x, ball_y))
     {
-        if (ball_x > 4.5 && ball_y > 0.5)
+        if ((ball_x > 4500 && ball_y > 500) || (ball_x >= 4300 && ball_y > 3000))
         {
-            ball_designated_position_x = 4.3;
-            ball_designated_position_y = 2.8;
+            ball_designated_position_x = 4300;
+            ball_designated_position_y = 2800;
         }
-        else if (ball_x > 4.5 && ball_y < -0.5)
+        else if ((ball_x > 4500 && ball_y < -0500)|| (ball_x >= 4300 && ball_y < -3000))
         {
-            ball_designated_position_x = 4.3;
-            ball_designated_position_y = -2.8;
+            ball_designated_position_x = 4300;
+            ball_designated_position_y = -2800;
         }
-        else if (ball_x < -4.5 && ball_y > 0.5)
+        else if ((ball_x < -4500 && ball_y > 0500)|| (ball_x <= -4300 && ball_y > 3000))
         {
-            ball_designated_position_x = -4.3;
-            ball_designated_position_y = 2.8;
+            ball_designated_position_x = -4300;
+            ball_designated_position_y = 2800;
         }
-        else if (ball_x < -4.5 && ball_y < -0.5)
+        else if ((ball_x < -4500 && ball_y < -0500)|| (ball_x <= -4300 && ball_y < -3000))
         {
-            ball_designated_position_x = -4.3;
-            ball_designated_position_y = -2.8;
+            ball_designated_position_x = -4300;
+            ball_designated_position_y = -2800;
         }
-
+        else if (ball_x >-4300 && ball_x < 4300 && ball_y < -3000)
+        {
+            ball_designated_position_x = ball_x;
+            ball_designated_position_y = -2800;
+        }
+        else if (ball_x >-4300 && ball_x < 4300 && ball_y > 3000)
+        {
+            ball_designated_position_x = ball_x;
+            ball_designated_position_y = 2800;
+        }
+       
+       
         if (last_kicker_team == Team::YELLOW)
         {
             referee_command = Referee::DIRECT_FREE_BLUE;  // Free kick for blue team
@@ -147,7 +162,7 @@ bool AutomatedReferee::IsKickoffConditionMet(float ball_x, float ball_y)
 // Check if the ball has gone out of field
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
 {
-    return (ball_x > 4.5 || ball_x < -4.5 || ball_y > 3.0 || ball_y < -3.0);
+    return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
 }
 
 // Empty function to get the last robot to kick the ball
@@ -155,6 +170,8 @@ void AutomatedReferee::GetLastKicker(int& robot_id, Team& team)
 {
     // Logic to determine which robot last kicked the ball will be implemented later
     // The function will update the robot_id and team variables
+    last_kicker_team = team;
+   // last_kicker_robot_id = robot_id;
 }
 /* Convert from protobuf enum definition to project enum definition */
 enum RefereeCommand AutomatedReferee::ConvertRefereeCommand(enum Referee_Command command)
@@ -175,6 +192,7 @@ enum RefereeCommand AutomatedReferee::ConvertRefereeCommand(enum Referee_Command
     case Referee::TIMEOUT_BLUE: return RefereeCommand::TIMEOUT_BLUE;
     case Referee::BALL_PLACEMENT_YELLOW: return RefereeCommand::BALL_PLACEMENT_YELLOW;
     case Referee::BALL_PLACEMENT_BLUE: return RefereeCommand::BALL_PLACEMENT_BLUE;
+
     default: return RefereeCommand::UNKNOWN_COMMAND;
   }
 }
