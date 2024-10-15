@@ -36,7 +36,8 @@ public:
   virtual void ReceivePacket();
   void Print();
 
-  /* Getters for position data */
+  /* Getters for position and time data */
+  double GetTimestamp();
   float GetBlueRobotPositionX(int id);
   float GetBlueRobotPositionY(int id);
   float GetBlueRobotOrientation(int id);
@@ -51,7 +52,8 @@ protected:
   sockaddr_in client_address;
   int socket;
 
-  /* Position data */
+  /* Position data and time */
+  double timestamp;
   float blue_robot_positions_x[team_size];
   float blue_robot_positions_y[team_size];
   float blue_robot_orientations[team_size];

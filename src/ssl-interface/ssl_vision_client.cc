@@ -110,6 +110,8 @@ void VisionClient::ReceivePacket()
         ball_position_y = ball.y();
       }
     }
+
+    timestamp = detection.t_capture();
   }
 }
 
@@ -131,6 +133,11 @@ void VisionClient::Print()
   printf("BALL POS=<%9.2f,%9.2f> \n\n",
     ball_position_x,
     ball_position_y);
+}
+
+double VisionClient::GetTimestamp()
+{
+  return timestamp;
 }
 
 float VisionClient::GetBlueRobotPositionX(int id)
