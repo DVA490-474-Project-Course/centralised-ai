@@ -61,7 +61,7 @@ private:
     bool IsGoalScored(float ball_x, float ball_y);
 
     // Logic for detecting other conditions (e.g., kickoffs)
-    bool IsKickoffConditionMet(float ball_x, float ball_y);
+    bool IsKickoffConditionMet(double timestamp);
 
     // Detect if the ball is out of field
     bool IsBallOutOfField(float ball_x, float ball_y);
