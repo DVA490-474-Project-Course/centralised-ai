@@ -9,6 +9,7 @@
 #include <torch/torch.h>
 #include <stdint.h>
 #include "utils.h"
+#include <cmath>
 
 namespace centralised_ai{
 namespace collective_robot_behaviour{
@@ -42,7 +43,7 @@ namespace collective_robot_behaviour{
         torch::Tensor  critic_values_expanded = critic_values.expand({-1, num_agents});
 
         // Calculate the temporal differences for all but the last time step.
-        torch::Tensor  output = torch::zeros(num_time_steps, num_agents);
+        torch::Tensor  output = torch::empty((num_time_steps, num_agents));
         for (uint32_t t = 0; t < num_time_steps - 1; t++){
             output[t] = rewards[t] + discount * critic_values_expanded[t + 1] - critic_values_expanded[t];
         }
@@ -58,17 +59,17 @@ namespace collective_robot_behaviour{
         uint32_t num_time_steps = temporal_differences.size(0);
 
         // Calculate the factors for each time step.
-        torch::Tensor  factors = torch.zeros(num_time_steps);
+        torch::Tensor  factors = torch::empty(num_time_steps);
         double discount_times_gae_parameter = discount * gae_parameter;
         for (int32_t t = 0; t < num_time_steps; t++){
-            factors[t] = torch::pow(discount_times_gae_parameter, t);
+            factors[t] = pow(discount_times_gae_parameter, t);
         }
         
         // Calculate the GAE for each time step.
-        torch::Tensor  output = torch::zeros_like(temporal_differences)
+        torch::Tensor  output = torch::zeros_like(temporal_differences);
         for (int32_t t = 0; t < num_time_steps; t++){
-            torch::Tensor  remaining_factors = factors.slize(1, 0, num_time_steps - t);
-            torch::Tensor  remaining_temporal_differences = temporal_differences.slize(0, t, num_time_steps);
+            torch::Tensor  remaining_factors = factors.slice(1, 0, num_time_steps - t);
+            torch::Tensor  remaining_temporal_differences = temporal_differences.slice(0, t, num_time_steps);
             output[t] = remaining_factors.matmul(remaining_temporal_differences);
         }
 
@@ -83,7 +84,7 @@ namespace collective_robot_behaviour{
         return probability_ratio.clamp(1-clip_value, 1+clip_value);
     }
 
-    double compute_policy_loss(const torch::Tensor & general_advantage_estimation, const torch::Tensor & probability_ratio, float clip_value, double policy_entropy){
+    torch::Tensor compute_policy_loss(const torch::Tensor & general_advantage_estimation, const torch::Tensor & probability_ratio, float clip_value, const torch::Tensor & policy_entropy){
         torch::Tensor  probability_ratio_clipped = clip_probability_ratio(probability_ratio, clip_value);
         torch::Tensor  probability_ratio_gae_product = torch::min(probability_ratio * general_advantage_estimation, probability_ratio_clipped * general_advantage_estimation);
 
@@ -94,10 +95,10 @@ namespace collective_robot_behaviour{
         torch::Tensor  probability_ratio_gae_product_agent_sum = torch::sum(probability_ratio_gae_product, 1);
         torch::Tensor  probability_ratio_gae_product_batch_sum = torch::sum(probability_ratio_gae_product_agent_sum, 0);
         
-        return (1/(num_time_steps * num_agents)) * (probability_ratio_gae_product_batch_sum) + policy_entropy;
+        return ((1/(num_time_steps * num_agents)) * (probability_ratio_gae_product_batch_sum) + policy_entropy);
     }
 
-    double compute_critic_loss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value){
+    torch::Tensor compute_critic_loss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value){
         
         // Get the shape of the tensors.
         int32_t num_time_steps = current_values.size(0);
@@ -121,7 +122,7 @@ namespace collective_robot_behaviour{
         return (1/(num_time_steps * num_agents)) * max_values_batch_sum;
     }
 
-    double compute_policy_entropy(const torch::Tensor & actions_probabilities, float entropy_coefficient){
+    torch::Tensor compute_policy_entropy(const torch::Tensor & actions_probabilities, float entropy_coefficient){
         // Ensure that the action probabilities are in the range (0, 1.0] in order to avoid log(0).
         torch::Tensor  clipped_probabilities = torch::clamp(actions_probabilities, 1e-10, 1.0);
 
