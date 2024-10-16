@@ -15,11 +15,15 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-    /* Returns the reward-to-go values, where
+    /* Returns the reward-to-go values with the shape [num_time_steps, 1], where
         - rewards: The accumulated reward for each time step, with the shape [num_time_steps, 1]
-        - discount: The discount factor
     */
     torch::Tensor  compute_reward_to_go(const torch::Tensor & rewards, float discount);
+
+    /* Returns the normalized reward-to-go values with the shape [num_time_steps, 1], where
+        - reward_to_go: Unnormalized reward-to-go values, with the shape [num_time_steps, 1]
+    */
+    torch::Tensor normalize_reward_to_go(const torch::Tensor & reward_to_go);
 
     /* Returns the temporal differences with the shape [num_time_steps, num_agents], where
         - critic_values: Values from the critic network per time step with the shape [num_time_steps, 1]
