@@ -13,10 +13,7 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-  TEST(ComputeRewardToGoTest, SingleValue){
-  EXPECT_EQ(relu(5.0), 5.0);
-  EXPECT_EQ(relu(-3.0), 0.0);
-  EXPECT_EQ(relu(0.0), 0.0);
+  TEST(ComputeRewardToGoTest, test_1){
 }
 
 

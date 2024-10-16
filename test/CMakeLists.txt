@@ -21,6 +21,18 @@ include(GoogleTest)
 
 enable_testing()
 
+# Fetch and include LibTorch
+include(FetchContent)
+FetchContent_Declare(
+    libtorch
+    URL https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
+)
+FetchContent_MakeAvailable(libtorch)
+
+set(Torch_DIR "${libtorch_SOURCE_DIR}/share/cmake/Torch")
+find_package(Torch REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
 #===============================================================================
 # Setup gtest with main_test
 
@@ -32,6 +44,7 @@ target_link_libraries(
   GTest::gtest_main
   world_lib
   mlp_lib
+  utils_lib
 )
 
 #===============================================================================
@@ -42,6 +55,7 @@ target_sources(main_test_exe PRIVATE
 main_test
 collective-robot-behaviour-test/world_test.cc
 collective-robot-behaviour-test/mlp_test.cc
+collective-robot-behaviour-test/utils_test.cc
 )
 
 # Packages that must be included
