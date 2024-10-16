@@ -58,7 +58,7 @@ namespace collective_robot_behaviour{
         uint32_t num_time_steps = temporal_differences.size(0);
 
         // Calculate the factors for each time step.
-        Tensor factors = torch.zeros(num_time_steps);
+        Tensor factors = torch::zeros(num_time_steps);
         double discount_times_gae_parameter = discount * gae_parameter;
         for (int32_t t = 0; t < num_time_steps; t++){
             factors[i] = torch::pow(discount_times_gae_parameter, t);

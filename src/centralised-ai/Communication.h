@@ -7,7 +7,12 @@
 #ifndef COMMUNICATION_H
 #define COMMUNICATION_H
 
-struct Experience {
+extern int input_size;
+extern int num_actions;
+extern int amount_of_players_in_team;
+int buffer_a_b_size;
+
+struct trajectory {
     // State, action probabilities, rewards, new state
     torch::Tensor state;
     torch::Tensor act_prob;
@@ -17,20 +22,27 @@ struct Experience {
     torch::Tensor new_state;
 
 
-    Experience()
-        : state(torch::zeros({1, 6})), // Initialize state with a 1x6 zero tensor
-          act_prob(torch::zeros({1, 6})), // Initialize action probabilities with a 1x6 zero tensor
+    trajectory()
+        : state(torch::zeros({1, amount_of_players_in_team})), // Initialize state with a 1x6 zero tensor
+          act_prob(torch::zeros({1, num_actions})), // Initialize action probabilities with a 1x6 zero tensor
           val_out(torch::zeros(1)),
-          actions(std::vector<int>{1,6}),
+          actions(std::vector<int>{1,amount_of_players_in_team}),
           rewards(float{1}), // Initialize rewards as an empty vector
-          new_state(torch::zeros({1, 6})) // Initialize new_state with a 1x6 zero tensor
+          new_state(torch::zeros({1, amount_of_players_in_team})) // Initialize new_state with a 1x6 zero tensor
     {}
 };
 
+struct databuffer {
+    std::vector<trajectory> t;
+    torch::Tensor A = torch::zeros({1,buffer_a_b_size});
+    torch::Tensor R = torch::zeros({1,buffer_a_b_size});
+    //torch::Tensor<float> R;
+
+};
 
 torch::Tensor get_states() {
     // Example state data stored in a std::vector
-    torch::Tensor state_vector = torch::randn({1,1,6});
+    torch::Tensor state_vector = torch::randn({1,1,input_size});
     //std::cout << state_vector << std::endl;
     //get 25 values
 
@@ -40,7 +52,7 @@ torch::Tensor get_states() {
 }
 
 float get_rewards() {
-    float reward = 1.0; //dummy value for now
+    float reward = 1.0;
     return reward;
 }
 

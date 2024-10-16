@@ -6,12 +6,14 @@
 #ifndef NETWORKS_H
 #define NETWORKS_H
 #include "Communication.h"
-extern int input_size = 6; // Number of input features
+int input_size = 6; // Number of input features
+int num_actions = 4;
+int amount_of_players_in_team = 6;
 
 struct Policynetwork : torch::nn::Module {
     const int hidden_size = 4; // Number of features in the hidden state
     const int num_layers = 1; // Number of LSTM layers on top of eachother
-    const int output_size = 6; // Number of output classes
+    const int output_size = num_actions; // Number of output classes
 
     torch::nn::LSTM lstm{nullptr};
     torch::nn::Linear output_layer{nullptr};
@@ -172,23 +174,7 @@ std::vector<Agents> load_agents(int player_count, CriticNetwork& critic) {
     return agents;
 }
 
-/*Step function that oen agent makes an prediction and action for state and new states. This is for the expereience buffer*/
-Experience get_expbuff(CriticNetwork& critic) {
-
-    //get current state
-    torch::Tensor state = get_states();
-    torch::Tensor valuefunc = critic.forward(state);
-
-    float reward = get_rewards();  //threshold reward
-    // Generate the next state (replace with your own logic)
-    torch::Tensor next_state = get_states();  // Replace with actual next state logic
-    bool done = false;  //goal, game is done!
-
-    // Return the experience
-
-}
-
-void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<Experience> exper_buff) {
+void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<databuffer> exper_buff) {
 
     torch::Tensor targets = torch::tensor({{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, torch::dtype(torch::kFloat));
     torch::Tensor loss = torch::tensor(0.004, torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
