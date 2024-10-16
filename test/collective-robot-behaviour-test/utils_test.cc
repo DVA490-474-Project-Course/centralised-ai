@@ -13,8 +13,8 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-  TEST(ComputeRewardToGoTest, test_1){
-}
+//  TEST(ComputeRewardToGoTest, test_1){
+//}
 
 
 } /* namespace centralised_ai */
