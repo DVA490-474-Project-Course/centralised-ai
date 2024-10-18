@@ -20,8 +20,6 @@ AutomatedReferee::AutomatedReferee(VisionClient &vision_client)
       blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
       ball_designated_position_x(0.0), ball_designated_position_y(0.0),
       starting_team(Team::kBlue), kickoff_triggered(false) {}
-      //blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::UNKNOWN),
-      //all_designated_position_x(0.0), ball_designated_position_y(0.0) ,
 
 
 // Analyze the game state by using VisionClient to access robot and ball
@@ -93,7 +91,6 @@ void AutomatedReferee::AnalyzeGameState() {
     }
   } 
   else if (IsKickoffConditionMet(current_time)) {  // <-- Added arguments
-    //referee_command = Referee::PREPARE_KICKOFF_BLUE;  // Example kickoff for blue
     ball_designated_position_x = 0.0;  // Place ball at the center (0, 0)
     ball_designated_position_y = 0.0;
     std::cout << "New ball position X: " << ball_designated_position_x
