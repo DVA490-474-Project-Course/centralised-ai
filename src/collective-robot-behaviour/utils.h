@@ -17,8 +17,9 @@ namespace collective_robot_behaviour{
 
     /* Returns the reward-to-go values with the shape [num_time_steps, 1], where
         - rewards: The accumulated reward for each time step, with the shape [num_time_steps, 1]
+        - discount: Discount factor
     */
-    torch::Tensor  compute_reward_to_go(const torch::Tensor & rewards, float discount);
+    torch::Tensor  compute_reward_to_go(const torch::Tensor & rewards, double discount);
 
     /* Returns the normalized reward-to-go values with the shape [num_time_steps, 1], where
         - reward_to_go: Unnormalized reward-to-go values, with the shape [num_time_steps, 1]

@@ -14,16 +14,16 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-    torch::Tensor compute_reward_to_go(const torch::Tensor & rewards){
+    torch::Tensor compute_reward_to_go(const torch::Tensor & rewards, double discount){
 
         int32_t num_time_steps = rewards.size(0);
 
         // Calculate the finite-horizon undiscounted reward-to-go.
-        torch::Tensor output = rewards.clone();
+        torch::Tensor output = torch::zeros(1);
         
         output[num_time_steps - 1] = rewards[num_time_steps - 1];
         for (int32_t t = num_time_steps - 2; t >= 0; t--){
-            output[t] += output[t + 1];
+            output[t] += pow(discount) * output[t + 1];
         }
 
         return output;
