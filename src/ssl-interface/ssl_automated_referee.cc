@@ -18,7 +18,11 @@ namespace ssl_interface {
 AutomatedReferee::AutomatedReferee(VisionClient &vision_client)
     : vision_client_(vision_client), referee_command(Referee::STOP),
       blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
-      ball_designated_position_x(0.0), ball_designated_position_y(0.0) {}
+      ball_designated_position_x(0.0), ball_designated_position_y(0.0),
+      starting_team(Team::kBlue), kickoff_triggered(false) {}
+      //blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::UNKNOWN),
+      //all_designated_position_x(0.0), ball_designated_position_y(0.0) ,
+
 
 // Analyze the game state by using VisionClient to access robot and ball
 // positions
@@ -37,21 +41,22 @@ void AutomatedReferee::AnalyzeGameState() {
     if (ball_x > 4500 && ball_y > -500 &&
         ball_y < 500) // Ball in the blue team's goal
     {
-      // referee_command = Referee::GOAL_BLUE;
       blue_team_score++;
       std::cout << "Blue Team Scored!" << std::endl;
       ball_designated_position_x = 0.0;
       ball_designated_position_y = 0.0;
+      referee_command = Referee::PREPARE_KICKOFF_YELLOW;  // kickoff for yellow team
+      ResetKickoffTrigger();
     } else if (ball_x < -4500 && ball_y > -500 &&
                ball_y < 500) // Ball in the yellow team's goal
     {
-      // referee_command = Referee::GOAL_YELLOW;
       yellow_team_score++;
       std::cout << "Yellow Team Scored!" << std::endl;
       ball_designated_position_x = 0.0;
       ball_designated_position_y = 0.0;
+      referee_command = Referee::PREPARE_KICKOFF_BLUE;  // kickoff for blue team
+      ResetKickoffTrigger();
     }
-    referee_command = Referee::PREPARE_KICKOFF_BLUE;  // Example kickoff for blue
     ball_designated_position_x = 0.0;  // Place ball at the center (0, 0)
     ball_designated_position_y = 0.0;
   }
@@ -88,18 +93,16 @@ void AutomatedReferee::AnalyzeGameState() {
     }
   } 
   else if (IsKickoffConditionMet(current_time)) {  // <-- Added arguments
-    referee_command = Referee::PREPARE_KICKOFF_BLUE;  // Example kickoff for blue
+    //referee_command = Referee::PREPARE_KICKOFF_BLUE;  // Example kickoff for blue
     ball_designated_position_x = 0.0;  // Place ball at the center (0, 0)
     ball_designated_position_y = 0.0;
-    std::cout << "New ball position X: " << ball_designated_position_x 
+    std::cout << "New ball position X: " << ball_designated_position_x
               << ", Y: " << ball_designated_position_y << std::endl;
     std::cout << "Referee Command: " << referee_command << std::endl;
-    //kickoff_flag = true; 
-
-  }  
+    ResetKickoffTrigger();
+  }
   else {
     referee_command = Referee::NORMAL_START;
-
   }
 }
 
@@ -145,34 +148,43 @@ bool AutomatedReferee::IsGoalScored(float ball_x, float ball_y) {
 
 // Check if a kickoff condition is met (e.g., ball in center of field after a
 // goal)
+
 bool AutomatedReferee::IsKickoffConditionMet(double current_time) {
-  const double time_tolerance = 0.02;
+    const double time_tolerance = 0.02;
   // Timestamp-based conditions for start of half or after a goal
-  //double current_time = vision_client_.GetTimestamp();
-  
-  // Define kickoff times for start of each half and extra time (examples)
+
+  // Defined kickoff times for start of each half and extra time (examples)
   double first_half_start_time = 0.0;  // Start of the match
   double second_half_start_time = 600.0;  // 10 minutes into the match
   double extra_time_first_half_start = 1200.0;  // After 20 minutes
   double extra_time_second_half_start = 1470.0;  // After 24min and 30sec
 
   // Check if the current time matches any of the kickoff conditions
-  bool is_kickoff_time = (std::abs(current_time - first_half_start_time) < time_tolerance || 
+  bool is_kickoff_time = (std::abs(current_time - first_half_start_time) < time_tolerance ||
                           std::abs(current_time - second_half_start_time) < time_tolerance || 
                           std::abs(current_time - extra_time_first_half_start) < time_tolerance || 
                           std::abs(current_time - extra_time_second_half_start) < time_tolerance);
 
-  // Kickoff is triggered either at the start of a half or after a goal is scored
-  //return is_kickoff_time;
-
-  // Check if the kickoff condition is met and has not already been triggered
-  if (is_kickoff_time && !kickoff_triggered) {
-      kickoff_triggered = true;  // Mark the event as triggered
+    if (std::abs(current_time - 0.1) < time_tolerance && !kickoff_triggered) {
+      kickoff_triggered = true;
+      if (starting_team == Team::kBlue) {
+            referee_command = Referee::PREPARE_KICKOFF_BLUE;
+            starting_team = Team::kYellow;  // Alternate for next kickoff
+      } else if (starting_team == Team::kYellow) {
+            referee_command = Referee::PREPARE_KICKOFF_YELLOW;
+            starting_team = Team::kBlue;  // Alternate for next kickoff
+      }
       return true;  // Return true to trigger the kickoff
-  }
+      ResetKickoffTrigger();
+    }
 
   return false;  // Otherwise, return false
 }
+
+void AutomatedReferee::ResetKickoffTrigger() {
+    kickoff_triggered = false;  // Reset the kickoff trigger for next half or after a goal
+}
+
 
 // Check if the ball has gone out of field
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y) {

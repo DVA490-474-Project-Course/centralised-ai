@@ -8,7 +8,7 @@ using namespace centralized_ai::ssl_interface;
 int main() {
     // Define the IP and port for the VisionClient
     std::string vision_ip = "127.0.0.1";  // Replace with actual IP if needed
-    int vision_port = 10003;  // Replace with actual port if needed
+    int vision_port = 10006;  // Replace with actual port if needed
 
     // Create the VisionClient instance with IP and port
     VisionClient vision_client(vision_ip, vision_port);

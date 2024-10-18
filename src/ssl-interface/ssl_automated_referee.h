@@ -60,6 +60,9 @@ private:
     // Track the team that last kicked the ball
     Team last_kicker_team;
 
+    // Declare the starting_team member variable
+    Team starting_team;
+
     // Helper to translate command to string
     std::string CommandToString(Referee::Command command);
 
@@ -77,6 +80,9 @@ private:
 
     // returns the distance between the specified robot and ball
     float DistanceToBall(int id, enum Team team);
+
+    //Reset Kick-off trigger
+    void ResetKickoffTrigger();
 };
 
 } // namespace ssl_interface
