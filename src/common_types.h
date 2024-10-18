@@ -23,7 +23,15 @@
 namespace centralized_ai
 {
 
+const float robot_radius = 0.09;
 const int team_size = 6;
+
+enum class Team
+{
+  kBlue = 0,
+  kYellow = 1,
+  kUnknown = -1
+};
 
 enum class RefereeCommand
 {

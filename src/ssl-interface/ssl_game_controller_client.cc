@@ -68,45 +68,31 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   referee_command = ConvertRefereeCommand(packet.command());
   blue_team_score = packet.blue().score();
   yellow_team_score = packet.yellow().score();
+
   if (packet.has_designated_position())
   {
     ball_designated_position_x = packet.designated_position().x();
     ball_designated_position_y = packet.designated_position().y();
   }
+
   if (packet.has_blue_team_on_positive_half())
   {
     blue_team_on_positive_half = packet.blue_team_on_positive_half();
   }
-}
 
-/* Getter for referee command */
-enum RefereeCommand GameControllerClient::GetRefereeCommand()
-{
-  return referee_command;
-}
+  if (packet.has_next_command())
+  {
+    next_referee_command = ConvertRefereeCommand(packet.next_command());
+  }
+  else
+  {
+    next_referee_command = RefereeCommand::UNKNOWN_COMMAND;
+  }
 
-/* Getter for blue team score */
-int GameControllerClient::GetBlueTeamScore()
-{
-  return blue_team_score;
-}
-
-/* Getter for yellow team score */
-int GameControllerClient::GetYellowTeamScore()
-{
-  return yellow_team_score;
-}
-
-/* Getter for designated position x coordinate */
-float GameControllerClient::GetBallDesignatedPositionX()
-{
-  return blue_team_score;
-}
-
-/* Getter for designated position y coordinate  */
-float GameControllerClient::GetBallDesignatedPositionY()
-{
-  return yellow_team_score;
+  if (packet.has_stage_time_left())
+  {
+    stage_time_left = packet.stage_time_left();
+  }
 }
 
 /* Convert from protobuf enum definition to project enum definition */
@@ -158,9 +144,22 @@ std::string GameControllerClient::RefereeCommandToString(RefereeCommand referee_
 /* Method to print the game state, used for debugging/demo */
 void GameControllerClient::Print()
 {
-  printf("referee command:<%s> score: <%i, %i>\n",
-    RefereeCommandToString(referee_command).c_str(), blue_team_score, yellow_team_score);
+  printf("referee command: <%s> next command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
+    RefereeCommandToString(referee_command).c_str(),
+    RefereeCommandToString(next_referee_command).c_str(),
+    blue_team_score, yellow_team_score, ball_designated_position_x, ball_designated_position_y,
+    stage_time_left);
 }
+
+/* Public getters */
+enum RefereeCommand GameControllerClient::GetRefereeCommand() {return referee_command;}
+enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;}
+int GameControllerClient::GetBlueTeamScore() {return blue_team_score;}
+int GameControllerClient::GetYellowTeamScore() {return yellow_team_score;}
+float GameControllerClient::GetBallDesignatedPositionX() {return blue_team_score;}
+float GameControllerClient::GetBallDesignatedPositionY() {return yellow_team_score;}
+int64_t GameControllerClient::GetStageTimeLeft() {return stage_time_left;}
+bool GameControllerClient::BlueTeamOnPositiveHalf() {return blue_team_on_positive_half;}
 
 } /* namespace ssl_interface */
 } /* namesapce centralized_ai */

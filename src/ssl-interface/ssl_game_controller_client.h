@@ -37,10 +37,12 @@ public:
 
   /* Getters for game state data */
   enum RefereeCommand GetRefereeCommand();
+  enum RefereeCommand GetNextRefereeCommand();
   int GetBlueTeamScore();
   int GetYellowTeamScore();
   float GetBallDesignatedPositionX();
   float GetBallDesignatedPositionY();
+  int64_t GetStageTimeLeft();
   bool BlueTeamOnPositiveHalf();
 
 protected:
@@ -54,8 +56,10 @@ protected:
 
   /* Game state data */
   enum RefereeCommand referee_command;
+  enum RefereeCommand next_referee_command;
   int blue_team_score;
   int yellow_team_score;
+  int64_t stage_time_left;
   float ball_designated_position_x;
   float ball_designated_position_y;
   bool blue_team_on_positive_half;

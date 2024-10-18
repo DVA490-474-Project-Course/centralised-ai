@@ -141,34 +141,52 @@ double VisionClient::GetTimestamp()
   return timestamp;
 }
 
-float VisionClient::GetBlueRobotPositionX(int id)
+float VisionClient::GetRobotPositionX(int id, enum Team team)
 {
-  return blue_robot_positions_x[id];
+  if (team == Team::kBlue)
+  {
+    return blue_robot_positions_x[id];
+  }
+  else if (team == Team::kYellow)
+  {
+    return yellow_robot_positions_x[id];
+  }
+  else
+  {
+    return 0.0F;
+  }
 }
 
-float VisionClient::GetBlueRobotPositionY(int id)
+float VisionClient::GetRobotPositionY(int id, enum Team team)
 {
-  return blue_robot_positions_y[id];
+  if (team == Team::kBlue)
+  {
+    return blue_robot_positions_y[id];
+  }
+  else if (team == Team::kYellow)
+  {
+    return yellow_robot_positions_y[id];
+  }
+  else
+  {
+    return 0.0F;
+  }
 }
 
-float VisionClient::GetBlueRobotOrientation(int id)
+float VisionClient::GetRobotOrientation(int id, enum Team team)
 {
-  return blue_robot_orientations[id];
-}
-
-float VisionClient::GetYellowRobotPositionX(int id)
-{
-  return yellow_robot_positions_x[id];
-}
-
-float VisionClient::GetYellowRobotPositionY(int id)
-{
-  return yellow_robot_positions_y[id];
-}
-
-float VisionClient::GetYellowRobotOrientation(int id)
-{
-  return yellow_robot_orientations[id];
+  if (team == Team::kBlue)
+  {
+    return blue_robot_orientations[id];
+  }
+  else if (team == Team::kYellow)
+  {
+    return yellow_robot_orientations[id];
+  }
+  else
+  {
+    return 0.0F;
+  }
 }
 
 float VisionClient::GetBallPositionX()

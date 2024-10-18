@@ -23,10 +23,8 @@ int main() {
         vision_client.ReceivePacket();
 
         // Manually set the last kicker team (Blue or Yellow)
-        Team team = Team::BLUE;  // Change this to Team::YELLOW to test yellow's free kick
+        enum centralized_ai::Team team = centralized_ai::Team::kBlue;  // Change this to Team::YELLOW to test yellow's free kick
         int robot_id = 1;
-        // Simulate the last kicker being set manually
-        referee.GetLastKicker(robot_id, team);  // The function can be called, but team is set manually
         
         // Call AnalyzeGameState to check the goal logic
         referee.AnalyzeGameState();
@@ -35,9 +33,6 @@ int main() {
         // Print the current ball designated position if it's set
         std::cout << "Ball Designated Position X: " << referee.GetBallDesignatedPositionX() << std::endl;
         std::cout << "Ball Designated Position Y: " << referee.GetBallDesignatedPositionY() << std::endl;
-
-        // Update the last kicker team (Blue or Yellow)
-        referee.GetLastKicker(robot_id, team);  // Change team as needed
 
         // Call AnalyzeGameState again to check ball placement logic
         referee.AnalyzeGameState();

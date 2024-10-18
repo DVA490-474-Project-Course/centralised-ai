@@ -23,6 +23,9 @@ public:
     // Analyze the game state using VisionClient and generate commands
     void AnalyzeGameState();
 
+    void StartGame();
+    void StopGame();
+
     // Print the current command and score
     void PrintCommand();
 
@@ -35,7 +38,7 @@ public:
 
 
     // NEW: Function to get the robot ID and team of the last kicker
-    void GetLastKicker(int& robot_id, Team& team);
+    void GetLastKicker(int& robot_id, enum centralized_ai::Team& team);
       // New methods to convert referee commands
     enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command); // Added declaration
     std::string RefereeCommandToString(enum RefereeCommand referee_command); // Added declaration
@@ -50,6 +53,9 @@ private:
     float ball_designated_position_y;
     bool inside_goal_prev = false;
     bool kickoff_triggered;
+    float collision_margin = 0.005;
+
+    float stop_time;
 
     // Track the team that last kicked the ball
     Team last_kicker_team;
@@ -65,6 +71,12 @@ private:
 
     // Detect if the ball is out of field
     bool IsBallOutOfField(float ball_x, float ball_y);
+
+    // Check if ball is currently touching a robot
+    void CheckForCollision();
+
+    // returns the distance between the specified robot and ball
+    float DistanceToBall(int id, enum Team team);
 };
 
 } // namespace ssl_interface

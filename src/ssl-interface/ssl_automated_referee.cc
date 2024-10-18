@@ -10,18 +10,22 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 
 namespace centralized_ai {
 namespace ssl_interface {
 
 AutomatedReferee::AutomatedReferee(VisionClient &vision_client)
     : vision_client_(vision_client), referee_command(Referee::STOP),
-      blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::UNKNOWN),
+      blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
       ball_designated_position_x(0.0), ball_designated_position_y(0.0) {}
 
 // Analyze the game state by using VisionClient to access robot and ball
 // positions
 void AutomatedReferee::AnalyzeGameState() {
+  // Check if any robot is touching the ball
+  CheckForCollision();
+
   float ball_x = vision_client_.GetBallPositionX();
   float ball_y = vision_client_.GetBallPositionY();
   double current_time = vision_client_.GetTimestamp();
@@ -76,9 +80,9 @@ void AutomatedReferee::AnalyzeGameState() {
       ball_designated_position_y = 2800;
     }
 
-    if (last_kicker_team == Team::YELLOW) {
+    if (last_kicker_team == Team::kYellow) {
       referee_command = Referee::DIRECT_FREE_BLUE; // Free kick for blue team
-    } else if (last_kicker_team == Team::BLUE) {
+    } else if (last_kicker_team == Team::kBlue) {
       referee_command =
           Referee::DIRECT_FREE_YELLOW; // Free kick for yellow team
     }
@@ -141,9 +145,8 @@ bool AutomatedReferee::IsGoalScored(float ball_x, float ball_y) {
 
 // Check if a kickoff condition is met (e.g., ball in center of field after a
 // goal)
-
 bool AutomatedReferee::IsKickoffConditionMet(double current_time) {
-    const double time_tolerance = 0.02;
+  const double time_tolerance = 0.02;
   // Timestamp-based conditions for start of half or after a goal
   //double current_time = vision_client_.GetTimestamp();
   
@@ -171,20 +174,30 @@ bool AutomatedReferee::IsKickoffConditionMet(double current_time) {
   return false;  // Otherwise, return false
 }
 
-
-
 // Check if the ball has gone out of field
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y) {
   return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
 }
 
-// Empty function to get the last robot to kick the ball
-void AutomatedReferee::GetLastKicker(int &robot_id, Team &team) {
-  // Logic to determine which robot last kicked the ball will be implemented
-  // later The function will update the robot_id and team variables
-  last_kicker_team = team;
-  // last_kicker_robot_id = robot_id;
+// Check any ball is touching a robot, keep track of which team touched the ball last
+void AutomatedReferee::CheckForCollision() {
+  for (auto team : {Team::kYellow, Team::kBlue}) {
+    for (int id = 0; id < team_size; id++) {
+      if (DistanceToBall(id, team) <= collision_margin) {
+        last_kicker_team = team;
+      }
+    }
+  }
 }
+
+// Return distance to ball and specified robot
+float AutomatedReferee::DistanceToBall(int id, enum Team team) {
+  return std::sqrt(
+    std::pow((vision_client_.GetBallPositionX() - vision_client_.GetRobotPositionX(id, team)), 2) +
+    std::pow((vision_client_.GetBallPositionY() - vision_client_.GetRobotPositionY(id, team)), 2)) -
+    robot_radius;
+}
+
 /* Convert from protobuf enum definition to project enum definition */
 enum RefereeCommand
 AutomatedReferee::ConvertRefereeCommand(enum Referee_Command command) {
@@ -222,6 +235,7 @@ AutomatedReferee::ConvertRefereeCommand(enum Referee_Command command) {
     return RefereeCommand::UNKNOWN_COMMAND;
   }
 }
+
 /* Translate RefereeCommand enumerator to string */
 std::string
 AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command) {

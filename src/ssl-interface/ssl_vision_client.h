@@ -38,12 +38,9 @@ public:
 
   /* Getters for position and time data */
   double GetTimestamp();
-  float GetBlueRobotPositionX(int id);
-  float GetBlueRobotPositionY(int id);
-  float GetBlueRobotOrientation(int id);
-  float GetYellowRobotPositionX(int id);
-  float GetYellowRobotPositionY(int id);
-  float GetYellowRobotOrientation(int id);
+  float GetRobotPositionX(int id, enum Team team);
+  float GetRobotPositionY(int id, enum Team team);
+  float GetRobotOrientation(int id, enum Team team);
   float GetBallPositionX();
   float GetBallPositionY();
  
