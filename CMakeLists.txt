@@ -10,15 +10,15 @@ project(robot_controller_interface)
 
 #===============================================================================
 # find_package, include etc. Lastly add_subdirectory.
+
+# Need to set the absolute path
+set(CMAKE_PREFIX_PATH "/home/jacob/Hämtningar/libtorch/libtorch/share/cmake/Torch")
+
 find_package(GTest REQUIRED)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-
+find_package(Torch REQUIRED)
 #===============================================================================
 # add_subdirectories must be last
 
 add_subdirectory(src)
 add_subdirectory(test)
-
-#find_package(Torch REQUIRED)
 #===============================================================================

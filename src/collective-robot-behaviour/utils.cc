@@ -23,7 +23,7 @@ namespace collective_robot_behaviour{
         
         output[num_time_steps - 1] = rewards[num_time_steps - 1];
         for (int32_t t = num_time_steps - 2; t >= 0; t--){
-            output[t] += pow(discount) * output[t + 1];
+            output[t] += pow(discount, t) * output[t + 1];
         }
 
         return output;
