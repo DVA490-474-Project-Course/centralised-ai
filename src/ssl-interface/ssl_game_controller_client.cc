@@ -77,7 +77,14 @@ void GameControllerClient::ReadGameStateData(Referee packet)
 
   if (packet.has_blue_team_on_positive_half())
   {
-    blue_team_on_positive_half = packet.blue_team_on_positive_half();
+    if (packet.blue_team_on_positive_half())
+    {
+      team_on_positive_half = Team::kBlue;
+    }
+    else
+    {
+      team_on_positive_half = Team::kYellow;
+    }
   }
 
   if (packet.has_next_command())
@@ -159,7 +166,7 @@ int GameControllerClient::GetYellowTeamScore() {return yellow_team_score;}
 float GameControllerClient::GetBallDesignatedPositionX() {return blue_team_score;}
 float GameControllerClient::GetBallDesignatedPositionY() {return yellow_team_score;}
 int64_t GameControllerClient::GetStageTimeLeft() {return stage_time_left;}
-bool GameControllerClient::BlueTeamOnPositiveHalf() {return blue_team_on_positive_half;}
+enum Team GameControllerClient::TeamOnPositiveHalf() {return team_on_positive_half;}
 
 } /* namespace ssl_interface */
 } /* namesapce centralized_ai */

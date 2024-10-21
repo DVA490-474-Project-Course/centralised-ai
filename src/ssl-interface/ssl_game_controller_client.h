@@ -43,7 +43,7 @@ public:
   float GetBallDesignatedPositionX();
   float GetBallDesignatedPositionY();
   int64_t GetStageTimeLeft();
-  bool BlueTeamOnPositiveHalf();
+  enum Team TeamOnPositiveHalf();
 
 protected:
   std::string RefereeCommandToString(enum RefereeCommand referee_command);
@@ -62,7 +62,7 @@ protected:
   int64_t stage_time_left;
   float ball_designated_position_x;
   float ball_designated_position_y;
-  bool blue_team_on_positive_half;
+  enum Team team_on_positive_half;
 };
 
 } /* namespace ssl_interface */
