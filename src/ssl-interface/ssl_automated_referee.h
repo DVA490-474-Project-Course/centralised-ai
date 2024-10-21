@@ -74,7 +74,7 @@ private:
   /* Check if ball is currently touching a robot */
   void CheckForCollision();
 
-  /* returns the distance between the specified robot and ball */
+  /* Returns the distance between the specified robot and ball */
   float DistanceToBall(int id, enum Team team);
 
   /* Return distance to ball and specified point */

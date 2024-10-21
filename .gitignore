@@ -4,8 +4,8 @@
 /.vscode/*
 /CMakeFiles/*
 /generated/*
-/src/simulation-interface/generated/*
 /cmake-build-debug/*
 /build/*
 /src/ssl-interface/generated/*
+/docs/html/*
 *.swp
