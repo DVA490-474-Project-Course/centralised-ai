@@ -6,12 +6,13 @@
 #ifndef NETWORKS_H
 #define NETWORKS_H
 #include "Communication.h"
-int input_size = 6; // Number of input features
-int num_actions = 4;
+int input_size = 7; // Number of input features
+int num_actions = 3;
 int amount_of_players_in_team = 6;
+int hidden_size = 5;
 
 struct Policynetwork : torch::nn::Module {
-    const int hidden_size = 4; // Number of features in the hidden state
+ // Number of features in the hidden state
     const int num_layers = 1; // Number of LSTM layers on top of eachother
     const int output_size = num_actions; // Number of output classes
 
@@ -23,30 +24,52 @@ struct Policynetwork : torch::nn::Module {
           output_layer(register_module("output_layer", torch::nn::Linear(hidden_size, output_size))) {
     }
 
-    torch::Tensor forward(torch::Tensor x) {
-        auto lstm_output = lstm->forward(x);
-        auto output = std::get<0>(lstm_output); // Output from LSTM
-        output = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
-        return output_layer(output); // Final output
+    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(
+         torch::Tensor input,
+         torch::Tensor hx,
+         torch::Tensor cx) {
+
+        auto hidden_states = std::make_tuple(hx, cx);
+        auto lstm_output = lstm->forward(input, hidden_states);
+        auto val = std::get<0>(lstm_output);
+        auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
+        auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
+
+        auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
+        auto value = output_layer(output);
+
+        // Return value, hx_new, and cx_new as a flat tuple (no nesting)
+        return std::make_tuple(value, hx_new, cx_new);
     }
+
 };
 
 struct CriticNetwork : torch::nn::Module {
      // Number of input features
-    const int hidden_size = 4; // Number of LSTM hidden units
+
     const int num_layers = 1; // Number of LSTM layers
     const int output_size = 1; // Single value output for critic
 
     CriticNetwork()
-        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
+        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
           value_layer(register_module("value_layer", torch::nn::Linear(hidden_size, output_size))) {
     }
 
-    torch::Tensor forward(torch::Tensor x) {
-        auto lstm_output = lstm->forward(x);
-        auto output = std::get<0>(lstm_output); // Output from LSTM
-        output = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
-        return value_layer(output); // Final output (value estimation)
+    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(
+         torch::Tensor input,
+         torch::Tensor hx,
+         torch::Tensor cx) {
+
+        auto hidden_states = std::make_tuple(hx, cx);
+        auto lstm_output = lstm->forward(input, hidden_states);
+        auto val = std::get<0>(lstm_output);
+        auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
+        auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
+        //WRONG DIMENSIONS HERE; DONT KNOW WHY THO! POLICY COULD HAVE SAME PROBLEM!
+        auto value = value_layer(val); // Final output (value estimation)
+
+        // Return value, hx_new, and cx_new as a flat tuple (no nesting)
+        return std::make_tuple(value, hx_new, cx_new);
     }
 
 private:
@@ -68,10 +91,7 @@ struct Agents { // Generate two random floats between 0 and 1
         : robotId(id), policyNetwork(std::move(network)) {
     }
 
-    // Function to use the policy network for prediction
-    torch::Tensor predict(torch::Tensor input) {
-        return policyNetwork.forward(input);
-    }
+
 };
 
 // Function to create agents

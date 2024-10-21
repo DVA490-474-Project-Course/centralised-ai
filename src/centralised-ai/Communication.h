@@ -15,8 +15,8 @@ int buffer_a_b_size;
 struct trajectory {
     // State, action probabilities, rewards, new state
     torch::Tensor state;
-    torch::Tensor act_prob;
-    torch::Tensor  val_out;
+    torch::Tensor ht_p;
+    torch::Tensor  ht_v;
     std::vector<int> actions;
     float rewards;
     torch::Tensor new_state;
@@ -24,8 +24,8 @@ struct trajectory {
 
     trajectory()
         : state(torch::zeros({1, amount_of_players_in_team})), // Initialize state with a 1x6 zero tensor
-          act_prob(torch::zeros({1, num_actions})), // Initialize action probabilities with a 1x6 zero tensor
-          val_out(torch::zeros(1)),
+          ht_p(torch::zeros({1, num_actions})), // Initialize action probabilities with a 1x6 zero tensor
+          ht_v(torch::zeros(1)),
           actions(std::vector<int>{1,amount_of_players_in_team}),
           rewards(float{1}), // Initialize rewards as an empty vector
           new_state(torch::zeros({1, amount_of_players_in_team})) // Initialize new_state with a 1x6 zero tensor
@@ -43,6 +43,8 @@ struct databuffer {
 torch::Tensor get_states() {
     // Example state data stored in a std::vector
     torch::Tensor state_vector = torch::randn({1,1,input_size});
+    //torch::Tensor state_vector = torch::randn({1,1,input_size});
+
     //std::cout << state_vector << std::endl;
     //get 25 values
 
