@@ -8,7 +8,11 @@ file(MAKE_DIRECTORY ${PROTO_GENERATED_DIR})
 file(GLOB_RECURSE PROTO_FILES proto/*.proto)
 protobuf_generate_cpp(PROTO_CPP PROTO_H ${PROTO_FILES} PROTOC_OUT_DIR ${PROTO_GENERATED_DIR})
 
-add_library(ssl_interface_lib ssl_vision_client.cc ssl_game_controller_client.cc ${PROTO_CPP} ${PROTO_FILES} ssl_automated_referee.cc)
+add_library(ssl_interface_lib
+  ssl_vision_client.cc ssl_game_controller_client.cc
+  ${PROTO_CPP} ${PROTO_FILES}
+  ssl_automated_referee.cc
+  simulation_reset.cc)
 
 # add executables for demos
 add_executable(ssl_vision_client_demo ssl_vision_client_demo.cc)

@@ -23,7 +23,8 @@
 namespace centralized_ai
 {
 
-const float robot_radius = 0.09;
+const float robot_radius = 85;
+const float ball_radius = 21.5;
 const int team_size = 6;
 
 enum class Team

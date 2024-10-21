@@ -1,12 +1,11 @@
 #ifndef SSL_AUTOMATED_REFEREE_H
 #define SSL_AUTOMATED_REFEREE_H
 
-// C++ standard library headers
+/* C++ standard library headers */
 #include <string>
 
-// Protobuf generated header
-#include "ssl_gc_referee_message.pb.h"
-#include "ssl_vision_client.h" // Include the VisionClient header
+/* Project .h files */
+#include "ssl_vision_client.h"
 #include "../common_types.h"
 
 namespace centralized_ai
@@ -17,75 +16,76 @@ namespace ssl_interface
 class AutomatedReferee
 {
 public:
-    AutomatedReferee();
+  /* Constructor */
+  AutomatedReferee(VisionClient& vision_client, std::string grsim_ip,
+    uint16_t grsim_port);
 
-    AutomatedReferee(VisionClient& vision_client);
-    // Analyze the game state using VisionClient and generate commands
-    void AnalyzeGameState();
+  /* Analyze the game state using VisionClient and generate commands */
+  void AnalyzeGameState();
 
-    void StartGame();
-    void StopGame();
+  /* Start the automated referee, reset score, referee command,
+   * robot and ball positions */
+  void StartGame(enum Team starting_team, enum Team team_on_positive_half,
+    double prepare_kickoff_start_time);
 
-    // Print the current command and score
-    void PrintCommand();
+  /* Stop the automated referee, outputs will no longer be updated */
+  void StopGame();
 
-    // New getters for game state data
-    enum RefereeCommand GetRefereeCommand();             // Same return type as ssl_game_controller_client.h
-    int GetBlueTeamScore();                              // Same return type
-    int GetYellowTeamScore();                            // Same return type
-    float GetBallDesignatedPositionX();                  // Same return type
-    float GetBallDesignatedPositionY();                  // Same return type
+  /* Print the current command and score */
+  void PrintCommand();
 
-
-    // NEW: Function to get the robot ID and team of the last kicker
-    void GetLastKicker(int& robot_id, enum centralized_ai::Team& team);
-      // New methods to convert referee commands
-    enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command); // Added declaration
-    std::string RefereeCommandToString(enum RefereeCommand referee_command); // Added declaration
-
+  /* Getters for game state data */
+  enum RefereeCommand GetRefereeCommand();
+  int GetBlueTeamScore();
+  int GetYellowTeamScore();
+  float GetBallDesignatedPositionX();
+  float GetBallDesignatedPositionY();
+  enum Team TeamOnPositiveHalf();
 
 private:
-    VisionClient& vision_client_;
-    Referee::Command referee_command;
-    int blue_team_score;
-    int yellow_team_score;
-    float ball_designated_position_x;
-    float ball_designated_position_y;
-    bool inside_goal_prev = false;
-    bool kickoff_triggered;
-    float collision_margin = 0.005;
+  /* automated referee variables */
+  VisionClient& vision_client_;
+  std::string grsim_ip;
+  uint16_t grsim_port;
+  float collision_margin = 12;
+  double prepare_kickoff_duration;
+  double prepare_kickoff_start_time;
+  bool game_running;
+  enum Team last_kicker_team;
 
-    float stop_time;
+  /* Game state data */
+  RefereeCommand referee_command;
+  int blue_team_score;
+  int yellow_team_score;
+  float ball_designated_position_x;
+  float ball_designated_position_y;
+  enum Team team_on_positive_half;
 
-    // Track the team that last kicked the ball
-    Team last_kicker_team;
+  /* Helper to translate command to string */
+  std::string CommandToString(RefereeCommand command);
 
-    // Declare the starting_team member variable
-    Team starting_team;
+  /* Detect if the ball is out of field */
+  bool IsBallOutOfField(float ball_x, float ball_y);
 
-    // Helper to translate command to string
-    std::string CommandToString(Referee::Command command);
+  /* Check if ball is currently touching a robot */
+  void CheckForCollision();
 
-    // Game logic to determine if a goal has been scored
-    bool IsGoalScored(float ball_x, float ball_y);
+  /* returns the distance between the specified robot and ball */
+  float DistanceToBall(int id, enum Team team);
 
-    // Logic for detecting other conditions (e.g., kickoffs)
-    bool IsKickoffConditionMet(double timestamp);
+  /* Return distance to ball and specified point */
+  float DistanceToBall(float x, float y);
+  bool PrepareKickoffTimePassed();
+  bool IsBallInBlueGoal(float ball_x, float ball_y);
+  bool IsBallInYellowGoal(float ball_x, float ball_y);
+  void SetBallDesignatedPosition();
+  bool BallSuccessfullyPlaced();
+  void UpdateRefereeCommand();
 
-    // Detect if the ball is out of field
-    bool IsBallOutOfField(float ball_x, float ball_y);
-
-    // Check if ball is currently touching a robot
-    void CheckForCollision();
-
-    // returns the distance between the specified robot and ball
-    float DistanceToBall(int id, enum Team team);
-
-    //Reset Kick-off trigger
-    void ResetKickoffTrigger();
+  std::string RefereeCommandToString(enum RefereeCommand referee_command); // Added declaration
 };
 
-} // namespace ssl_interface
-} // namespace centralized_ai
+} /* namespace ssl_interface */
+} /* namespace centralized_ai */
 
-#endif // SSL_AUTOMATED_REFEREE_H
+#endif /* SSL_AUTOMATED_REFEREE_H */
