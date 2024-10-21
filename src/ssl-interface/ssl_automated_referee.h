@@ -41,6 +41,7 @@ public:
   float GetBallDesignatedPositionX();
   float GetBallDesignatedPositionY();
   enum Team TeamOnPositiveHalf();
+  int64_t GetStageTimeLeft();
 
 private:
   /* automated referee variables */
@@ -79,13 +80,27 @@ private:
   /* Return distance to ball and specified point */
   float DistanceToBall(float x, float y);
 
+  /* Returns true when time to prepare kickoff has passed */
   bool PrepareKickoffTimePassed();
+
+  /* Returns true when ball is in blue teams goal */
   bool IsBallInBlueGoal(float ball_x, float ball_y);
+
+  /* Returns true when ball is in yellow teams goal */
   bool IsBallInYellowGoal(float ball_x, float ball_y);
+
+  /* Sets the ball designated position based on where it exited
+    the field and who which robot touched the ball last */
   void SetBallDesignatedPosition();
+
+  /* Returns true when ball is considered 'successfully placed'
+     according to ssl rules */
   bool BallSuccessfullyPlaced();
+
+  /* Update the current referee command */
   void UpdateRefereeCommand();
-  int64_t GetStageTimeLeft();
+
+  /* Convert referee command enum to string */
   std::string RefereeCommandToString(enum RefereeCommand referee_command); // Added declaration
 };
 

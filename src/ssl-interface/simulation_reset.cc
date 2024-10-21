@@ -80,31 +80,31 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
     command = packet.mutable_commands()->add_robot_commands();
     command->set_id(k);
     command->set_wheelsspeed(false);
-    command->set_veltangent(0.0F); // Stop all movement
-    command->set_velnormal(0.0F);  // Stop all movement
-    command->set_velangular(0.0F); // Stop angular movement
-    command->set_kickspeedx(0.0F); // No kick speed
-    command->set_kickspeedz(0.0F); // No kick in Z direction
-    command->set_spinner(false);   // Turn off the spinner
+    command->set_veltangent(0.0F); /* Stop all movement */
+    command->set_velnormal(0.0F);  /* Stop all movement */
+    command->set_velangular(0.0F); /* Stop angular movement */
+    command->set_kickspeedx(0.0F); /* No kick speed */
+    command->set_kickspeedz(0.0F); /* No kick in Z direction */
+    command->set_spinner(false);   /* Turn off the spinner */
 
     /* Set up the replacement packet for blue team */
     replacement = packet.mutable_replacement()->add_robots();
     replacement->set_id(k);
-    replacement->set_x(-initial_position_x[k]);          // Set new x position
-    replacement->set_y(initial_position_y[k]);           // Set new y position
-    replacement->set_dir(0.0F);         // Set direction (angle in radians)
-    replacement->set_yellowteam(false); // Set to blue team (yellowteam = false)
+    replacement->set_x(-initial_position_x[k]);          /* Set new x position */
+    replacement->set_y(initial_position_y[k]);           /* Set new y position */
+    replacement->set_dir(0.0F);         /* Set direction (angle in radians) */
+    replacement->set_yellowteam(false); /* Set to blue team (yellowteam = false) */
 
     /* Reset yellow team robots (yellowteam = true) */
     command = packet.mutable_commands()->add_robot_commands();
     command->set_id(k);
     command->set_wheelsspeed(false);
-    command->set_veltangent(0.0F); // Stop all movement
-    command->set_velnormal(0.0F);  // Stop all movement
-    command->set_velangular(0.0F); // Stop angular movement
-    command->set_kickspeedx(0.0F); // No kick speed
-    command->set_kickspeedz(0.0F); // No kick in Z direction
-    command->set_spinner(false);   // Turn off the spinner
+    command->set_veltangent(0.0F); /* Stop all movement */
+    command->set_velnormal(0.0F);  /* Stop all movement */
+    command->set_velangular(0.0F); /* Stop angular movement */
+    command->set_kickspeedx(0.0F); /* No kick speed */
+    command->set_kickspeedz(0.0F); /* No kick in Z direction */
+    command->set_spinner(false);   /* Turn off the spinner */
 
     /* Set up the replacement packet for yellow team */
     replacement = packet.mutable_replacement()->add_robots();

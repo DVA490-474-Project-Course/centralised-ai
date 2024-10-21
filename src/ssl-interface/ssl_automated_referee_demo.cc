@@ -31,11 +31,11 @@ int main()
   {
     vision_client.ReceivePacket();
     
-    // Call AnalyzeGameState to check the goal logic
+    /* Call AnalyzeGameState to check the goal logic */
     referee.AnalyzeGameState();
     referee.PrintCommand();
 
-    // Print the current ball designated position if it's set
+    /* Print the current ball designated position */
     std::cout << "Ball Designated Position X: " << referee.GetBallDesignatedPositionX() << std::endl;
     std::cout << "Ball Designated Position Y: " << referee.GetBallDesignatedPositionY() << std::endl;
   }
