@@ -41,6 +41,10 @@ void AutomatedReferee::AnalyzeGameState() {
 
     /* Update referee command according to ssl game rules */
     UpdateRefereeCommand();
+
+    /* Update stage time left */
+    stage_time_left = stage_time + (int)std::round(time_at_game_start -
+      vision_client_.GetTimestamp());
   }
 }
 
@@ -101,16 +105,20 @@ void AutomatedReferee::UpdateRefereeCommand() {
 }
 
 void AutomatedReferee::StartGame(enum Team starting_team,
-  enum Team team_on_positive_half, double prepare_kickoff_duration) {
+  enum Team team_on_positive_half, double prepare_kickoff_duration,
+  int64_t stage_time) {
   yellow_team_score = 0;
   blue_team_score = 0;
   ball_designated_position_x = 0.0;
   ball_designated_position_y = 0.0;
   prepare_kickoff_start_time = vision_client_.GetTimestamp();
+  time_at_game_start = vision_client_.GetTimestamp();
   this->prepare_kickoff_duration = prepare_kickoff_duration;
   this->team_on_positive_half = team_on_positive_half;
   last_kicker_team = starting_team;
   game_running = true;
+  this->stage_time = stage_time;
+  stage_time_left = stage_time;
 
   if (starting_team == Team::kBlue) {
     referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
@@ -133,6 +141,7 @@ void AutomatedReferee::PrintCommand() {
   std::cout << "Referee Command: " << command_str << std::endl;
   std::cout << "Score - Blue: " << blue_team_score
             << " | Yellow: " << yellow_team_score << std::endl;
+  std::cout << "Stage time left: " << stage_time_left << std::endl;
 }
 
 /* Returns true if ball is in blue teams goal */
@@ -270,6 +279,7 @@ int AutomatedReferee::GetYellowTeamScore() {return yellow_team_score;}
 float AutomatedReferee::GetBallDesignatedPositionX() {return ball_designated_position_x;}
 float AutomatedReferee::GetBallDesignatedPositionY() {return ball_designated_position_y;}
 enum Team AutomatedReferee::TeamOnPositiveHalf() {return team_on_positive_half;}
+int64_t AutomatedReferee::GetStageTimeLeft() {return stage_time_left;};
 
 } /* namespace ssl_interface */
 } /* namespace centralized_ai */

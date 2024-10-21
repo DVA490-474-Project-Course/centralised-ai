@@ -25,7 +25,7 @@ int main()
   AutomatedReferee referee(vision_client, grsim_ip, grsim_port);
 
   /* Start the automated referee */
-  referee.StartGame(centralized_ai::Team::kBlue, centralized_ai::Team::kBlue, 3.0F);
+  referee.StartGame(centralized_ai::Team::kBlue, centralized_ai::Team::kBlue, 3.0F, 300);
 
   while (true)
   {
