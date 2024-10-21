@@ -160,13 +160,13 @@ void GameControllerClient::Print()
 
 /* Public getters */
 enum RefereeCommand GameControllerClient::GetRefereeCommand() {return referee_command;}
-enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;}
 int GameControllerClient::GetBlueTeamScore() {return blue_team_score;}
 int GameControllerClient::GetYellowTeamScore() {return yellow_team_score;}
 float GameControllerClient::GetBallDesignatedPositionX() {return blue_team_score;}
 float GameControllerClient::GetBallDesignatedPositionY() {return yellow_team_score;}
 int64_t GameControllerClient::GetStageTimeLeft() {return stage_time_left;}
-enum Team GameControllerClient::TeamOnPositiveHalf() {return team_on_positive_half;}
+enum Team GameControllerClient::GetTeamOnPositiveHalf() {return team_on_positive_half;}
+/* enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;} */
 
 } /* namespace ssl_interface */
 } /* namesapce centralized_ai */
