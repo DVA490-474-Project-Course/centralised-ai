@@ -14,6 +14,7 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
+  /* Tests for reward-to-go function*/
   TEST(ComputeRewardToGoTest, Test_1)
   {
         torch::Tensor input = torch::ones(6);
@@ -64,6 +65,8 @@ namespace collective_robot_behaviour{
     EXPECT_EQ(output[4].item<float>(), 224);
     EXPECT_EQ(output[5].item<float>(), 160);
   }
+
+  /*Tests for general advantage estimation function*/
 
   TEST(ComputeGAETest, Test_1)
   {
@@ -126,6 +129,41 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[1].item<float>(), 3);
     EXPECT_FLOAT_EQ(output[2].item<float>(), 2);
     EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+  }
+
+  /* Tests for probability ratio function*/
+  TEST(ComputeProbabilityRatio, Test_1)
+  {
+    // Arrange
+    torch::Tensor currrentprobs = torch::ones((1, 4));
+    torch::Tensor previousprobs = torch::ones((1, 4));
+
+    // Execute
+    torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
+
+    // Assert
+    EXPECT_EQ(output.size(0), 4);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+  }
+
+  TEST(ComputeProbabilityRatio, Test_2)
+  {
+    // Arrange
+    torch::Tensor currrentprobs = torch::ones((1, 4));
+    torch::Tensor previousprobs = torch::ones((1, 4)) * 2;
+
+    // Execute
+    torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
+
+    // Assert
+    EXPECT_EQ(output.size(0), 4);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[1].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[2].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[3].item<float>(), 0.5);
   }
 
 

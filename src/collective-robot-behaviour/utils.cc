@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-21 by Jacob Johansson
+// Last modified: 2024-10-22 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
