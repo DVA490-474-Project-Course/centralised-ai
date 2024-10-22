@@ -16,13 +16,13 @@
 
 namespace centralized_ai
 {
-namespace simulation_reset
+namespace ssl_interface
 {
 
 /* Reset ball and all robots position and other attributes */
 void ResetRobotsAndBall(std::string ip, uint16_t port);
 
-} /* namespace simulation_reset */
+} /* namespace ssl_interface */
 } /* namespace centralized_ai */
 
 #endif /* SIMULATION_RESET_H */

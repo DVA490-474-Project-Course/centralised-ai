@@ -26,7 +26,7 @@
 
 namespace centralized_ai
 {
-namespace simulation_reset
+namespace ssl_interface
 {
 
 /* Initial position of yellow robots, for blue x values will have opposite sign */

@@ -78,14 +78,14 @@ void AutomatedReferee::UpdateRefereeCommand() {
         yellow_team_score++;
         referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
         prepare_kickoff_start_time = current_time;
-        simulation_reset::ResetRobotsAndBall(grsim_ip, grsim_port);
+        ResetRobotsAndBall(grsim_ip, grsim_port);
       }
       else if (IsBallInYellowGoal(vision_client_.GetBallPositionX(),
         vision_client_.GetBallPositionY())) {
         blue_team_score++;
         referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
         prepare_kickoff_start_time = current_time;
-        simulation_reset::ResetRobotsAndBall(grsim_ip, grsim_port);
+        ResetRobotsAndBall(grsim_ip, grsim_port);
       }
       else if (IsBallOutOfField(vision_client_.GetBallPositionX(),
         vision_client_.GetBallPositionY())) {
@@ -128,7 +128,7 @@ void AutomatedReferee::StartGame(enum Team starting_team,
     referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
   }
 
-  simulation_reset::ResetRobotsAndBall(grsim_ip, grsim_port);
+  ResetRobotsAndBall(grsim_ip, grsim_port);
 }
 
 void AutomatedReferee::StopGame() {
