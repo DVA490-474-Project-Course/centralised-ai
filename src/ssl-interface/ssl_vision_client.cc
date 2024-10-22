@@ -153,7 +153,7 @@ float VisionClient::GetRobotPositionX(int id, enum Team team)
   }
   else
   {
-    return 0.0F;
+    std::perror("GetRobotPositionX called with unknown team.");
   }
 }
 
@@ -169,7 +169,7 @@ float VisionClient::GetRobotPositionY(int id, enum Team team)
   }
   else
   {
-    return 0.0F;
+    std::perror("GetRobotPositionY called with unknown team.");
   }
 }
 
@@ -185,7 +185,7 @@ float VisionClient::GetRobotOrientation(int id, enum Team team)
   }
   else
   {
-    return 0.0F;
+    std::perror("GetRobotOrientation called with unknown team.");
   }
 }
 
