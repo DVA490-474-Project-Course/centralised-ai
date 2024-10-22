@@ -166,6 +166,24 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[3].item<float>(), 0.5);
   }
 
+  /* Tests for clip probability ratio function*/
+  TEST(ClipProbabilityRatio, Test_1)
+  {
+    // Arrange
+    torch::Tensor probabilities = torch::ones((1, 4));
+    float clip_value = 2;
+
+    // Execute
+    torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+
+    // Assert
+    EXPECT_EQ(output.size(0), 4);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+  }
+
 
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
