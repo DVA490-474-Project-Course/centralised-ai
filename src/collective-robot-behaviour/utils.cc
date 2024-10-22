@@ -7,6 +7,8 @@
 //==============================================================================
 
 #include <torch/torch.h>
+#include <torch/nn.h>
+#include <torch/nn/modules/utils.h>
 #include <stdint.h>
 #include "utils.h"
 #include <cmath>
