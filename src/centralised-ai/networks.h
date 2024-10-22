@@ -7,7 +7,7 @@
 #define NETWORKS_H
 #include "Communication.h"
 int input_size = 7; // Number of input features
-int num_actions = 3;
+int num_actions = 9;
 int amount_of_players_in_team = 6;
 int hidden_size = 5;
 
@@ -51,7 +51,7 @@ struct CriticNetwork : torch::nn::Module {
     const int output_size = 1; // Single value output for critic
 
     CriticNetwork()
-        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
+        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
           value_layer(register_module("value_layer", torch::nn::Linear(hidden_size, output_size))) {
     }
 
@@ -62,10 +62,13 @@ struct CriticNetwork : torch::nn::Module {
 
         auto hidden_states = std::make_tuple(hx, cx);
         auto lstm_output = lstm->forward(input, hidden_states);
-        auto val = std::get<0>(lstm_output);
+        auto val = std::get<0>(lstm_output); //get all timesteps of Output
         auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
         auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
         //WRONG DIMENSIONS HERE; DONT KNOW WHY THO! POLICY COULD HAVE SAME PROBLEM!
+        val = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
+
+        // Print the sizes of the tensors for debugging
         auto value = value_layer(val); // Final output (value estimation)
 
         // Return value, hx_new, and cx_new as a flat tuple (no nesting)
