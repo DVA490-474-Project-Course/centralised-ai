@@ -39,6 +39,16 @@ GameControllerClient::GameControllerClient(std::string ip, int port)
      
   /* Bind the socket with the client address */
   bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
+
+  /* Set initial values for game state data */
+  referee_command = RefereeCommand::UNKNOWN_COMMAND;
+  next_referee_command = RefereeCommand::UNKNOWN_COMMAND;
+  blue_team_score = 0;
+  yellow_team_score = 0;
+  stage_time_left = 0;
+  ball_designated_position_x = 0.0F;
+  ball_designated_position_y = 0.0F;
+  Team team_on_positive_half = Team::kUnknown;
 }
 
 /* Read a UDP packet from game controller and return the game state */
