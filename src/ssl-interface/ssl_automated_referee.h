@@ -1,3 +1,13 @@
+/* ssl_automated_referee.h
+ *==============================================================================
+ * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
+ * Creation date: 2024-10-10
+ * Last modified: 2024-10-22 by Emil Åberg
+ * Description: Automates referee commands based on robot and ball positions.
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
+
 #ifndef SSL_AUTOMATED_REFEREE_H
 #define SSL_AUTOMATED_REFEREE_H
 
@@ -13,38 +23,138 @@ namespace centralized_ai
 namespace ssl_interface
 {
 
+/*!
+ * @brief Class representing an automated referee.
+ * 
+ * Class representing an automated referee, which outputs referee commands for
+ * kickoff, freekicks/cornerkicks and keeps track of the score. Mainly intended
+ * to be used during AI training so that it can be done without human supervision.
+ */
 class AutomatedReferee
 {
 public:
-  /* Constructor */
+  /*!
+    * @brief Constructor for instantiating the automated referee.
+    *
+    * @param[in] vision_client A reference to the vision client.
+    *
+    * @param[in] ip Ip address of the computer that is running grSim. When running
+    * grSim on the same computer that the simulation interface is running on this
+    * value should be localhost i.e. "127.0.0.1".
+    *
+    * @param[in] port The command listen port of grSim. This should
+    * be set to the same value as that which is set in the grSim configuration.
+    */
   AutomatedReferee(VisionClient& vision_client, std::string grsim_ip,
     uint16_t grsim_port);
 
-  /* Analyze the game state using VisionClient and generate commands */
+  /*!
+    * @brief Analyze the game state, needs to be called continously.
+    *
+    * @param[in] vision_client A reference to the vision client.
+    */
   void AnalyzeGameState();
 
-  /* Start the automated referee, reset score, referee command,
-   * robot and ball positions */
+  /*!
+    * @brief Start the automated referee, reset score, referee command,
+    * robot and ball positions.
+    *
+    * @param[in] starting_team The team that has the first kickoff.
+    * 
+    * @param[in] team_on_positive_half The team that has its goal on the half
+    * of the field that is positive in ssl visision's coordinate system
+    * 
+    * @param[in] stage_time The stage time duration.
+    */
   void StartGame(enum Team starting_team, enum Team team_on_positive_half,
     double prepare_kickoff_start_time, int64_t stage_time);
 
-  /* Stop the automated referee, outputs will no longer be updated */
+  /*!
+    * @brief Stop the automated referee, outputs will no longer be updated.
+    */
   void StopGame();
 
-  /* Print the current command and score */
-  void PrintCommand();
+  /*!
+    * @brief Prints the game controller data that has been read by this client.
+    * 
+    * Prints the game controller data that has been read by this client including
+    * referee command, next referee command, score, ball designated position,
+    * remaining stage time and which team has been assigned to the positive half
+    * of the field. Used for debugging purpuses.
+    */
+  void Print();
 
-  /* Getters for game state data */
+  /*!
+    * @brief Returns the referee command.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   enum RefereeCommand GetRefereeCommand();
+
+  /*!
+    * @brief Returns the blue team score.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   int GetBlueTeamScore();
+
+  /*!
+    * @brief Returns the yellow team score.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * beforehand.
+    */
   int GetYellowTeamScore();
+
+  /*!
+    * @brief Returns the X coordinate of the ball designated position.
+    * 
+    * Returns the X coordinate in mm of the ball designated position. This value is
+    * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
+    * issued by the referee, which means that a robot has to bring the ball to the
+    * designated position.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   float GetBallDesignatedPositionX();
+
+  /*!
+    * @brief Returns the Y coordinate of the ball designated position.
+    * 
+    * Returns the Y coordinate in mm of the ball designated position. This value is
+    * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
+    * issued by the referee, which means that a robot has to bring the ball to the
+    * designated position.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   float GetBallDesignatedPositionY();
+
+  /*!
+    * @brief Returns the team that has been assigned to the positive half of the field.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   enum Team TeamOnPositiveHalf();
+
+  /*!
+    * @brief Returns the remaining stage time left.
+    * 
+    * Returns the remaining stage time left in seconds. If the stage time is passed
+    * this value becomed negative.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
   int64_t GetStageTimeLeft();
 
 private:
-  /* automated referee variables */
+  /* Automated referee variables */
   VisionClient& vision_client_;
   std::string grsim_ip;
   uint16_t grsim_port;

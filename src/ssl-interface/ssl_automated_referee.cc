@@ -1,7 +1,8 @@
-/* ssl_automated_referee.cc
+/* ssl_automated_referee.h
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
+ * Last modified: 2024-10-21 by Emil Åberg
  * Description: Automates referee commands based on robot and ball positions.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -135,13 +136,11 @@ void AutomatedReferee::StopGame() {
 }
 
 /* Print the current command and score */
-void AutomatedReferee::PrintCommand() {
-  std::string command_str = RefereeCommandToString(referee_command);
-
-  std::cout << "Referee Command: " << command_str << std::endl;
-  std::cout << "Score - Blue: " << blue_team_score
-            << " | Yellow: " << yellow_team_score << std::endl;
-  std::cout << "Stage time left: " << stage_time_left << std::endl;
+void AutomatedReferee::Print() {
+  printf("referee command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
+    RefereeCommandToString(referee_command).c_str(),
+    blue_team_score, yellow_team_score, ball_designated_position_x, ball_designated_position_y,
+    stage_time_left);
 }
 
 /* Returns true if ball is in blue teams goal */
