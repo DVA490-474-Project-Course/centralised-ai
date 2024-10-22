@@ -65,6 +65,25 @@ namespace collective_robot_behaviour{
     EXPECT_EQ(output[5].item<float>(), 160);
   }
 
+  TEST(ComputeGAETest, Test_1)
+  {
+    // Arrange
+    torch::Tensor temporaldiffs = torch::zeros((1, 4));
+    double discount = 2;
+    double gae_parameter = 2;
+
+    // Execute
+    torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
+
+    // Assert
+    EXPECT_EQ(temporaldiffs.size(0), 4);
+    EXPECT_EQ(output.size(0), 4);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[1].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[2].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[3].item<float>(), 0);
+  }
+
 
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */

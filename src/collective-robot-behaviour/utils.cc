@@ -77,7 +77,7 @@ namespace collective_robot_behaviour{
         // Calculate the GAE for each time step.
         torch::Tensor  output = torch::zeros_like(temporal_differences);
         for (int32_t t = 0; t < num_time_steps; t++){
-            torch::Tensor  remaining_factors = factors.slice(1, 0, num_time_steps - t);
+            torch::Tensor  remaining_factors = factors.slice(0, 0, num_time_steps - t);
             torch::Tensor  remaining_temporal_differences = temporal_differences.slice(0, t, num_time_steps);
             output[t] = remaining_factors.matmul(remaining_temporal_differences);
         }
