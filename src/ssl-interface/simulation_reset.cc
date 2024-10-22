@@ -126,5 +126,5 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
   SendPacket(packet, ip, port);
 }
 
-} /* namespace simulation_reset */
+} /* namespace ssl_interface */
 } /* namespace centralized_ai */
