@@ -4,9 +4,7 @@ project(AI-Model)
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
-add_executable(AI-Model main.cc
-        networks.h
-        Communication.h)
+add_executable(AI-Model main.cc)
 
 target_link_libraries(AI-Model "${TORCH_LIBRARIES}")
 set_property(TARGET AI-Model PROPERTY CXX_STANDARD 17)

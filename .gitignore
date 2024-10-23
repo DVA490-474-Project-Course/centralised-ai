@@ -4,7 +4,6 @@
 /.vscode/*
 /CMakeFiles/*
 /generated/*
-/cmake-build-debug/*
 /build/*
 /src/ssl-interface/generated/*
 /docs/html/*
