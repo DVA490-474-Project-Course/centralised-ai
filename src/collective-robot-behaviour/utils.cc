@@ -107,7 +107,7 @@ namespace collective_robot_behaviour{
         torch::Tensor  probability_ratio_gae_product_agent_sum = torch::sum(probability_ratio_gae_product, 1);
         torch::Tensor  probability_ratio_gae_product_batch_sum = torch::sum(probability_ratio_gae_product_agent_sum, 0);
         
-        return ((1/(num_time_steps * num_agents)) * (probability_ratio_gae_product_batch_sum) + policy_entropy);
+        return probability_ratio_gae_product_batch_sum.div(num_time_steps * num_agents) + policy_entropy;
     }
 
     torch::Tensor compute_critic_loss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value){
@@ -131,7 +131,7 @@ namespace collective_robot_behaviour{
         torch::Tensor  max_values = torch::max(current_values_mse, current_values_clipped_mse);
         torch::Tensor  max_values_agent_sum = torch::sum(max_values, 1);
         torch::Tensor  max_values_batch_sum = torch::sum(max_values_agent_sum, 0);
-        return (1/(num_time_steps * num_agents)) * max_values_batch_sum;
+        return max_values_batch_sum.div(num_time_steps * num_agents);
     }
 
     torch::Tensor compute_policy_entropy(const torch::Tensor & actions_probabilities, float entropy_coefficient){
