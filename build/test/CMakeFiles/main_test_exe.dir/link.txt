@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/main_test_exe.dir/__/src/ssl-interface/ssl_vision_client.cc.o CMakeFiles/main_test_exe.dir/main_test.cc.o CMakeFiles/main_test_exe.dir/ssl-interface/ssl_vision_client_test.cc.o -o ../../bin/main_test_exe  ../lib/libgtest_main.a ../lib/libgmock.a ../src/ssl-interface/libssl_interface_lib.a ../lib/libgtest.a /usr/lib/x86_64-linux-gnu/libprotobuf.so 

@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/ssl_automated_referee_demo.dir/ssl_automated_referee_demo.cc.o -o ../../../bin/ssl_automated_referee_demo  libssl_interface_lib.a /usr/lib/x86_64-linux-gnu/libprotobuf.so 
