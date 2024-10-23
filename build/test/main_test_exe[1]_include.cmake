@@ -1,0 +1,5 @@
+if(EXISTS "/home/vicore/Git/centralised-ai/build/test/main_test_exe[1]_tests.cmake")
+  include("/home/vicore/Git/centralised-ai/build/test/main_test_exe[1]_tests.cmake")
+else()
+  add_test(main_test_exe_NOT_BUILT main_test_exe_NOT_BUILT)
+endif()
