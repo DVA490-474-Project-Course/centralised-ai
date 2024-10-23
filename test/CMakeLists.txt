@@ -1,16 +1,6 @@
 #===============================================================================
 # Includes
 
-# Fetch pybind11
-include(FetchContent)
-FetchContent_Declare(
-  pybind11
-  GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        v2.10.4  # You can specify the latest version here
-)
-FetchContent_MakeAvailable(pybind11)
-
-# Fetch googletest
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -20,35 +10,37 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 enable_testing()
+
 #===============================================================================
 # Setup gtest with main_test
 
-add_executable(main_test_exe main_test.cc)
+add_executable(main_test_exe 
+${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface/ssl_vision_client.cc 
+${CMAKE_CURRENT_SOURCE_DIR}/main_test.cc
+${CMAKE_CURRENT_SOURCE_DIR}/ssl-interface/ssl_vision_client_test.cc
+)
 
-# Libraries used by tests
+# !!! Add any libraries (MADE BY YOU!) that your tests use here !!!
 target_link_libraries(
   main_test_exe
   GTest::gtest_main
-  world_lib
-  mlp_lib
-  utils_lib
+  GTest::gmock   # Link against Google Mock
+  ssl_interface_lib
 )
+
 
 #===============================================================================
 # Dependencies
 
-# Test source files
-target_sources(main_test_exe PRIVATE
-main_test
-collective-robot-behaviour-test/world_test.cc
-collective-robot-behaviour-test/mlp_test.cc
-collective-robot-behaviour-test/utils_test.cc
+target_include_directories(main_test_exe PRIVATE 
+  "${CMAKE_CURRENT_SOURCE_DIR}/test" 
+  "${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface"
+  "${gtest_SOURCE_DIR}/include"   # Include the gtest directory
+  "${gmock_SOURCE_DIR}/include"   # Include the gmock directory
 )
 
-# Packages that must be included
-target_include_directories(main_test_exe PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 #===============================================================================
+# Must be last (I think)
+
 gtest_discover_tests(main_test_exe)
-
-#===============================================================================
