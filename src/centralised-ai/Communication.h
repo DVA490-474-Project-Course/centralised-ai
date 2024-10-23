@@ -1,17 +1,16 @@
 //
-// Created by viktor on 2024-10-04.
+// Created by viktor on 2024-10-23.
 //
 
-#include <torch/torch.h>
-#include "networks.h"
 #ifndef COMMUNICATION_H
 #define COMMUNICATION_H
+#include <torch/torch.h>
 
 extern int input_size;
 extern int num_actions;
 extern int amount_of_players_in_team;
 extern int hidden_size;
-int buffer_a_b_size;
+
 
 struct hidden_states {
     torch::Tensor ht_p;
@@ -51,29 +50,15 @@ struct trajectory {
 
 struct databuffer {
     std::vector<trajectory> t;
-    torch::Tensor A = torch::zeros({1,buffer_a_b_size});
-    torch::Tensor R = torch::zeros({1,buffer_a_b_size});
+    torch::Tensor A = torch::zeros({1,hidden_size});
+    torch::Tensor R = torch::zeros({1,hidden_size});
     //torch::Tensor<float> R;
 
 };
 
-torch::Tensor get_states() {
-    // Example state data stored in a std::vector
-    torch::Tensor state_vector = torch::randn({1,1,input_size});
-    //torch::Tensor state_vector = torch::randn({1,1,input_size});
+torch::Tensor get_states();
 
-    //std::cout << state_vector << std::endl;
-    //get 25 values
 
-    // Convert the std::vector to a tensor and reshape if needed
-    return state_vector;//change input size
-    //                                  {amount to process at time,time steps, dimension input}
-}
-
-float get_rewards() {
-    float reward = 1.0;
-    return reward;
-}
-
+float get_rewards();
 
 #endif //COMMUNICATION_H

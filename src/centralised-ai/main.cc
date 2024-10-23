@@ -3,14 +3,16 @@
 #include <valarray>
 #include <vector>
 #include <torch/serialize.h>
-#include "networks.h"
+
+#include "network.h"
 #include "Communication.h"
+
 #include <torch/script.h>
 
 
 extern int amount_of_players_in_team;
 extern int num_actions;
-extern int buffer_a_b_size;
+
 
 int main() {
     std::vector<Agents> Models; //Create Models class for each robot.
@@ -59,8 +61,6 @@ int main() {
                         new_states.ct_p = ct_new;
                         exp.hiddenP.push_back(new_states);
 
-                        std::cout << exp.hiddenP[0].ht_p << std::endl;
-
                         hx = hx_new; //h(t-1) by making next itteration from the previous values
                         ct = ct_new;
                     } //end for agent
@@ -83,7 +83,7 @@ int main() {
 
             //split to mini batches, databuffer[timestep] = {t,A,R}
             int L = 10;
-            buffer_a_b_size = L;
+
             for (int l = 0; l < max_timesteps/L; l++)
             {
                 databuffer dat;
@@ -106,13 +106,11 @@ int main() {
         //“Minibatch” refers to the number of mini-batches a batch of data is split into
         //“gain” refers to the weight initialization gain of the last network layer
         int len = data_buffer.size();
+        std::vector<databuffer> min_batch;
         for (int k = 0; k <= 5; k++) {
-            std::vector<databuffer> min_batch;
             int rand_index = torch::randint(0, len, {1}).item<int>();
             min_batch.push_back(data_buffer[rand_index]);
-
             //Send in the minibatch and update the hidden states by the saved stateds and hidden values.
-            for (int l = 0; l < len; l++) {
                 //for each timestep in batch
                 for (int i = 0; i < min_batch[0].t.size(); i++) {
                     auto state_read = min_batch[k].t[i].state;
@@ -128,7 +126,6 @@ int main() {
                     auto cv_read = min_batch[k].t[i].hiddenV.ct_p;
                     critic.forward(state_read,hv_read,cv_read);
                 } //update LSTM hidden states for policy and critic network from first hidden state in data chunk.
-            } //end for
         } //end for
 
 
@@ -140,6 +137,4 @@ int main() {
         steps++;
     } //end while
     return 0;
-
 }
-
