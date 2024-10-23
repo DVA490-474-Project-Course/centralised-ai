@@ -16,8 +16,10 @@ enable_testing()
 
 add_executable(main_test_exe 
 ${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface/ssl_vision_client.cc 
+${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface/ssl_game_controller_client.cc
 ${CMAKE_CURRENT_SOURCE_DIR}/main_test.cc
 ${CMAKE_CURRENT_SOURCE_DIR}/ssl-interface/ssl_vision_client_test.cc
+${CMAKE_CURRENT_SOURCE_DIR}/ssl-interface/ssl_game_controller_client_test.cc
 )
 
 # !!! Add any libraries (MADE BY YOU!) that your tests use here !!!

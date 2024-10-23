@@ -64,7 +64,7 @@ public:
     * is doing. It is recommended to continously run this method in a thread
     * separate from where the Get* functions are called.
     */
-  void ReceivePacket();
+  virtual void ReceivePacket();
 
   /*!
     * @brief Prints the game controller data that has been read by this client.
@@ -82,7 +82,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  enum RefereeCommand GetRefereeCommand();
+  virtual enum RefereeCommand GetRefereeCommand();
 
   /*!
     * @brief Returns the blue team score.
@@ -90,7 +90,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  int GetBlueTeamScore();
+  virtual int GetBlueTeamScore();
 
   /*!
     * @brief Returns the yellow team score.
@@ -98,7 +98,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  int GetYellowTeamScore();
+  virtual int GetYellowTeamScore();
 
   /*!
     * @brief Returns the X coordinate of the ball designated position.
@@ -111,7 +111,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  float GetBallDesignatedPositionX();
+  virtual float GetBallDesignatedPositionX();
 
   /*!
     * @brief Returns the Y coordinate of the ball designated position.
@@ -124,7 +124,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  float GetBallDesignatedPositionY();
+  virtual float GetBallDesignatedPositionY();
 
   /*!
     * @brief Returns the remaining stage time left.
@@ -135,7 +135,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  int64_t GetStageTimeLeft();
+  virtual int64_t GetStageTimeLeft();
 
   /*!
     * @brief Returns the team that has been assigned to the positive half of the field.
@@ -143,7 +143,8 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  enum Team GetTeamOnPositiveHalf();
+  virtual enum Team GetTeamOnPositiveHalf();
+  virtual ~GameControllerClient() = default;
 
   /* enum RefereeCommand GetNextRefereeCommand(); */
 

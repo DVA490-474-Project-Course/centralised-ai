@@ -89,8 +89,8 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
 
     // Add a ball to the detection frame
     SSL_DetectionBall* ball = detection->add_balls();
-    ball->set_x(75.0f);
-    ball->set_y(150.0f);
+    ball->set_x(75.0);
+    ball->set_y(150.0);
 
     // Set required fields for ball
     ball->set_confidence(1.0f);
@@ -131,7 +131,6 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
             }));
     // Call the method and verify the results
     mock_client.ReceivePacket();
-
     EXPECT_EQ(mock_client.GetRobotPositionX(1, centralized_ai::Team::kBlue), 50.0f);
     EXPECT_EQ(mock_client.GetRobotPositionY(1, centralized_ai::Team::kBlue), 100.0f);
     EXPECT_EQ(mock_client.GetRobotOrientation(1, centralized_ai::Team::kBlue), 1.57f);
