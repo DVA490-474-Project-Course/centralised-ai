@@ -120,19 +120,67 @@ public:
   float GetBallPositionY();
  
 protected:
+  /*********************/
   /* Network variables */
+  /*********************/
+
+  /*!
+   * @brief Address of grSim.
+   */
   sockaddr_in client_address;
+
+  /*!
+   * @brief socket file descriptor.
+   */
   int socket;
 
+  /**************************/
   /* Position data and time */
+  /**************************/
+
+  /*!
+   * @brief The Unix timestamp of the latest packet that has been received.
+   */
   double timestamp;
+
+  /*!
+   * @brief Array containing the x coordinates of the blue team robots.
+   */
   float blue_robot_positions_x[team_size];
+
+  /*!
+   * @brief Array containing the y coordinates of the blue team robots.
+   */
   float blue_robot_positions_y[team_size];
+
+  /*!
+   * @brief Array containing the theta coordinates of the blue team robots.
+   */
   float blue_robot_orientations[team_size];
+
+  /*!
+   * @brief Array containing the x coordinates of the yellow team robots.
+   */
   float yellow_robot_positions_x[team_size];
+
+  /*!
+   * @brief Array containing the y coordinates of the yellow team robots.
+   */
   float yellow_robot_positions_y[team_size];
+
+  /*!
+   * @brief Array containing the theta coordinates of the yellow team robots.
+   */
   float yellow_robot_orientations[team_size];
+
+  /*!
+   * @brief X coordinate of the ball.
+   */
   float ball_position_x;
+
+  /*!
+   * @brief Y coordinate of the ball.
+   */
   float ball_position_y;
 };
 

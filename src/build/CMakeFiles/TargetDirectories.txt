@@ -1,8 +1,0 @@
-/home/aaiza/Desktop/centralised-ai/src/build/CMakeFiles/edit_cache.dir
-/home/aaiza/Desktop/centralised-ai/src/build/CMakeFiles/rebuild_cache.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/ssl_interface_lib.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/ssl_vision_client_demo.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/ssl_game_controller_client_demo.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/ssl_automated_referee_demo.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/edit_cache.dir
-/home/aaiza/Desktop/centralised-ai/src/build/ssl-interface/CMakeFiles/rebuild_cache.dir

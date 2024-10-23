@@ -1,1 +1,0 @@
-/usr/bin/c++ -rdynamic CMakeFiles/ssl_game_controller_client_demo.dir/ssl_game_controller_client_demo.o -o ssl_game_controller_client_demo  libssl_interface_lib.a -lprotobuf 
