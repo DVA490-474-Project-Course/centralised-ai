@@ -4,9 +4,13 @@
 #include <filesystem>
 #include <torch/script.h>
 #include "network.h" //structs
+
+/*!
+ * Configuration of the networks
+ */
 int input_size = 7; // Number of input features
 int num_actions = 9;
-int amount_of_players_in_team = 6;
+extern int amount_of_players_in_team;
 int hidden_size = 5;
 
 // Function to create agents
@@ -27,8 +31,6 @@ void save_models(const std::vector<Agents>& models, CriticNetwork& critic) {
             torch::serialize::OutputArchive output_archive;
             // Save the full model (policy network) to the archive
             agent.policyNetwork.save(output_archive);
-
-            // Save the serialized model to file
             output_archive.save_to(model_path);
         }
         catch (const std::exception& e) {

@@ -61,7 +61,6 @@ struct CriticNetwork : torch::nn::Module {
         auto val = std::get<0>(lstm_output); //get all timesteps of Output
         auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
         auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
-        //WRONG DIMENSIONS HERE; DONT KNOW WHY THO! POLICY COULD HAVE SAME PROBLEM!
         val = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
 
         // Print the sizes of the tensors for debugging

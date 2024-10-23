@@ -11,7 +11,9 @@ add_executable(example-app
 
 add_library(network_lib network.cc)
 
-add_library(communication_lib Communication.cc)
+add_library(communication_lib Communication.cc
+        MAPPO.cc
+        MAPPO.h)
 target_link_libraries(communication_lib network_lib "${TORCH_LIBRARIES}")
 target_link_libraries(network_lib communication_lib "${TORCH_LIBRARIES}")
 
