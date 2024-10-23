@@ -18,8 +18,8 @@ struct hidden_states {
 
     hidden_states()
     :
-    ht_p(torch::zeros({amount_of_players_in_team, 1, hidden_size})), // Initialize action probabilities with a 1x6 zero tensor
-    ct_p(torch::zeros({amount_of_players_in_team, 1, hidden_size})) // Initialize action probabilities with a 1x6 zero tensor
+    ht_p(torch::zeros({1, 1, hidden_size})), // Initialize action probabilities with a 1x6 zero tensor
+    ct_p(torch::zeros({1, 1, hidden_size})) // Initialize action probabilities with a 1x6 zero tensor
 
     {}
 };
