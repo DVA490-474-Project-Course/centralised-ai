@@ -138,12 +138,23 @@ namespace collective_robot_behaviour{
         // Ensure that the action probabilities are in the range (0, 1.0] in order to avoid log(0).
         torch::Tensor  clipped_probabilities = torch::clamp(actions_probabilities, 1e-10, 1.0);
 
-        // Calculate the enropy for each time step and agent.
-        torch::Tensor  entropy = -torch::sum(clipped_probabilities * clipped_probabilities.log(), 2);
+        uint32_t num_time_steps = actions_probabilities.size(0);
+        uint32_t num_agents = actions_probabilities.size(1);
+        uint32_t num_actions = actions_probabilities.size(2);
+
+        torch::Tensor entropy = torch::empty({num_time_steps, num_agents});
+
+        for(int32_t t = 0; t < num_time_steps; t++)
+        {
+            for(int32_t k = 0; k < num_agents; k++)
+            {
+                torch::Tensor probabitilies = actions_probabilities[t][k];
+
+                entropy[t][k] = -torch::sum(probabitilies.log());
+            }
+        }
 
         // Calculate the average entropy over the time steps and agents.
-        int32_t num_time_steps = actions_probabilities.size(0);
-        int32_t num_agents = actions_probabilities.size(1);
         return (1/(num_time_steps * num_agents)) * entropy.sum() * entropy_coefficient;
     }
 
