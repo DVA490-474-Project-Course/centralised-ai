@@ -1,0 +1,3 @@
+/home/viktor/PRO/Git_folder/centralised-ai/src/centralised-ai/build/CMakeFiles/AI-Model.dir
+/home/viktor/PRO/Git_folder/centralised-ai/src/centralised-ai/build/CMakeFiles/edit_cache.dir
+/home/viktor/PRO/Git_folder/centralised-ai/src/centralised-ai/build/CMakeFiles/rebuild_cache.dir
