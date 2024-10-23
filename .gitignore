@@ -1,11 +1,5 @@
-/cmake-build-debug/*
-/.idea/*
-/bin/*
-/.vscode/*
-/CMakeFiles/*
-/generated/*
-/src/simulation-interface/generated/*
-/cmake-build-debug/*
-/build/*
-/src/ssl-interface/generated/*
-*.swp
+# Ignore CMake build directories
+cmake-build-debug/
+cmake-build-release/
+build/
+.idea
