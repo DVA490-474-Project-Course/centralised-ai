@@ -232,5 +232,56 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.5);
   }
 
+  /* Tests for compute policy entropy function*/
+  TEST(ComputePolicyEntropy, Test_1)
+  {
+    // Arrange
+    torch::Tensor actions_probabilities = torch::ones({2, 4, 4});
+    float entropy_coefficient = 1;
+
+    // Execute
+    torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+
+    // Assert
+    EXPECT_EQ(actions_probabilities.size(0), 2);
+    EXPECT_EQ(actions_probabilities.size(1), 4);
+    EXPECT_EQ(actions_probabilities.size(2), 4);
+    EXPECT_EQ(output.item<float>(), 0);
+  }
+
+  TEST(ComputePolicyEntropy, Test_2)
+  {
+    // Arrange
+    torch::Tensor actions_probabilities = torch::ones({2, 4, 4}) * 0.5;
+    float entropy_coefficient = 1;
+
+    // Execute
+    torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+
+    // Assert
+    EXPECT_EQ(actions_probabilities.size(0), 2);
+    EXPECT_EQ(actions_probabilities.size(1), 4);
+    EXPECT_EQ(actions_probabilities.size(2), 4);
+    EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output.item<float>(), -4*log(0.5));
+  }
+
+  TEST(ComputePolicyEntropy, Test_3)
+  {
+    // Arrange
+    torch::Tensor actions_probabilities = torch::ones({4, 4, 4}) * 0.25;
+    float entropy_coefficient = 2;
+
+    // Execute
+    torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+
+    // Assert
+    EXPECT_EQ(actions_probabilities.size(0), 4);
+    EXPECT_EQ(actions_probabilities.size(1), 4);
+    EXPECT_EQ(actions_probabilities.size(2), 4);
+    EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.25);
+    EXPECT_FLOAT_EQ(output.item<float>(), -8*log(0.25));
+  }
+
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
