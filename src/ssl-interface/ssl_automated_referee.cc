@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-23 by Emil Åberg
  * Description: Automates referee commands based on robot and ball positions.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -30,18 +30,24 @@ AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
   std::string grsim_ip, uint16_t grsim_port)
     : vision_client_(vision_client), referee_command(RefereeCommand::STOP),
       blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
-      ball_designated_position_x(0.0), ball_designated_position_y(0.0),
+      designated_position({0.0F, 0.0F}),
       game_running(false), grsim_ip(grsim_ip), grsim_port(grsim_port) {}
 
 /* Analyze the game state by using VisionClient to access robot and ball
    positions */
 void AutomatedReferee::AnalyzeGameState() {
-  if (game_running) {
-    /* Check if any robot is touching the ball */
-    CheckForCollision();
+  enum Team touching_ball;
 
-    /* Update referee command according to ssl game rules */
-    UpdateRefereeCommand();
+  if (game_running) {
+    /* Keep track of which team touched ball last */
+    touching_ball = CheckForCollision();
+    if (touching_ball != Team::kUnknown)
+    {
+      last_kicker_team = CheckForCollision();
+    }
+
+    /* Update current referee command according to ssl game rules */
+    RefereeStateHandler();
 
     /* Update stage time left */
     stage_time_left = stage_time + (int)std::round(time_at_game_start -
@@ -49,8 +55,9 @@ void AutomatedReferee::AnalyzeGameState() {
   }
 }
 
-/* Update referee command according to ssl game rules */
-void AutomatedReferee::UpdateRefereeCommand() {
+/* Updates the current referee command, designated position, score and
+ * resets ball and robot position when a goal is scored. */
+void AutomatedReferee::RefereeStateHandler() {
   float current_time = vision_client_.GetTimestamp();
 
   switch (referee_command) {
@@ -89,7 +96,7 @@ void AutomatedReferee::UpdateRefereeCommand() {
       }
       else if (IsBallOutOfField(vision_client_.GetBallPositionX(),
         vision_client_.GetBallPositionY())) {
-        SetBallDesignatedPosition();
+        designated_position = CalcBallDesignatedPosition();
         if (last_kicker_team == Team::kYellow) {
           /* Free kick for blue team */
           referee_command = RefereeCommand::BALL_PLACEMENT_BLUE;
@@ -105,13 +112,15 @@ void AutomatedReferee::UpdateRefereeCommand() {
   }
 }
 
+/* Starts the automated referee, reset score, referee command,
+ * robot and ball positions. */
 void AutomatedReferee::StartGame(enum Team starting_team,
   enum Team team_on_positive_half, double prepare_kickoff_duration,
   int64_t stage_time) {
   yellow_team_score = 0;
   blue_team_score = 0;
-  ball_designated_position_x = 0.0;
-  ball_designated_position_y = 0.0;
+  designated_position.x = 0.0;
+  designated_position.y = 0.0;
   prepare_kickoff_start_time = vision_client_.GetTimestamp();
   time_at_game_start = vision_client_.GetTimestamp();
   this->prepare_kickoff_duration = prepare_kickoff_duration;
@@ -131,6 +140,7 @@ void AutomatedReferee::StartGame(enum Team starting_team,
   ResetRobotsAndBall(grsim_ip, grsim_port);
 }
 
+/* Stops the automated referee, outputs will no longer be updated. */
 void AutomatedReferee::StopGame() {
   game_running = false;
 }
@@ -139,7 +149,7 @@ void AutomatedReferee::StopGame() {
 void AutomatedReferee::Print() {
   printf("referee command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
     RefereeCommandToString(referee_command).c_str(),
-    blue_team_score, yellow_team_score, ball_designated_position_x, ball_designated_position_y,
+    blue_team_score, yellow_team_score, designated_position.x, designated_position.y,
     stage_time_left);
 }
 
@@ -158,16 +168,18 @@ bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y) {
   return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
 }
 
-/* Check if any ball is touching a robot,
-   keep track of which team touched the ball last */
-void AutomatedReferee::CheckForCollision() {
+/* Returns which team is currently touching the ball, returns kUnknow if no
+ * team is currently in contact with the ball. */
+enum Team AutomatedReferee::CheckForCollision() {
   for (auto team : {Team::kYellow, Team::kBlue}) {
     for (int id = 0; id < team_size; id++) {
       if (DistanceToBall(id, team) <= ball_radius + collision_margin) {
-        last_kicker_team = team;
+        return team;
       }
     }
   }
+
+  return Team::kUnknown;
 }
 
 /* Return distance to ball and specified robot */
@@ -198,7 +210,7 @@ bool AutomatedReferee::BallSuccessfullyPlaced() {
   }
 
   /* the ball is at a position within 0.15 meters radius from the requested position */
-  if (DistanceToBall(ball_designated_position_x, ball_designated_position_y)
+  if (DistanceToBall(designated_position.x, designated_position.y)
     > 150) {
     return false;
   }
@@ -206,68 +218,58 @@ bool AutomatedReferee::BallSuccessfullyPlaced() {
   return true;
 }
 
-void AutomatedReferee::SetBallDesignatedPosition() {
+/* Assuming ball is out of field, returns the point of where ball should be
+   placed for freekick/cornerkick. */
+struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition() {
+  struct Point local_designated_position;
   float ball_x = vision_client_.GetBallPositionX();
   float ball_y = vision_client_.GetBallPositionY();
 
   if ((ball_x > 4500 && ball_y > 500) || (ball_x >= 4300 && ball_y > 3000)) {
-    ball_designated_position_x = 4300;
-    ball_designated_position_y = 2800;
+    local_designated_position.x = 4300;
+    local_designated_position.y = 2800;
   } else if ((ball_x > 4500 && ball_y < -0500) ||
              (ball_x >= 4300 && ball_y < -3000)) {
-    ball_designated_position_x = 4300;
-    ball_designated_position_y = -2800;
+    local_designated_position.x = 4300;
+    local_designated_position.y = -2800;
   } else if ((ball_x < -4500 && ball_y > 0500) ||
              (ball_x <= -4300 && ball_y > 3000)) {
-    ball_designated_position_x = -4300;
-    ball_designated_position_y = 2800;
+    local_designated_position.x = -4300;
+    local_designated_position.y = 2800;
   } else if ((ball_x < -4500 && ball_y < -0500) ||
              (ball_x <= -4300 && ball_y < -3000)) {
-    ball_designated_position_x = -4300;
-    ball_designated_position_y = -2800;
+    local_designated_position.x = -4300;
+    local_designated_position.y = -2800;
   } else if (ball_x > -4300 && ball_x < 4300 && ball_y < -3000) {
-    ball_designated_position_x = ball_x;
-    ball_designated_position_y = -2800;
+    local_designated_position.x = ball_x;
+    local_designated_position.y = -2800;
   } else if (ball_x > -4300 && ball_x < 4300 && ball_y > 3000) {
-    ball_designated_position_x = ball_x;
-    ball_designated_position_y = 2800;
+    local_designated_position.x = ball_x;
+    local_designated_position.y = 2800;
   }
+
+  return local_designated_position;
 }
 
 /* Translate RefereeCommand enumerator to string */
 std::string
 AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command) {
   switch (referee_command) {
-  case RefereeCommand::HALT:
-    return "HALT";
-  case RefereeCommand::STOP:
-    return "STOP";
-  case RefereeCommand::NORMAL_START:
-    return "NORMAL_START";
-  case RefereeCommand::FORCE_START:
-    return "FORCE_START";
-  case RefereeCommand::PREPARE_KICKOFF_YELLOW:
-    return "PREPARE_KICKOFF_YELLOW";
-  case RefereeCommand::PREPARE_KICKOFF_BLUE:
-    return "PREPARE_KICKOFF_BLUE";
-  case RefereeCommand::PREPARE_PENALTY_YELLOW:
-    return "PREPARE_PENALTY_YELLOW";
-  case RefereeCommand::PREPARE_PENALTY_BLUE:
-    return "PREPARE_PENALTY_BLUE";
-  case RefereeCommand::DIRECT_FREE_YELLOW:
-    return "DIRECT_FREE_YELLOW";
-  case RefereeCommand::DIRECT_FREE_BLUE:
-    return "DIRECT_FREE_BLUE";
-  case RefereeCommand::TIMEOUT_YELLOW:
-    return "TIMEOUT_YELLOW";
-  case RefereeCommand::TIMEOUT_BLUE:
-    return "TIMEOUT_BLUE";
-  case RefereeCommand::BALL_PLACEMENT_YELLOW:
-    return "BALL_PLACEMENT_YELLOW";
-  case RefereeCommand::BALL_PLACEMENT_BLUE:
-    return "BALL_PLACEMENT_BLUE";
-  default:
-    return "UNKNOWN_COMMAND";
+  case RefereeCommand::HALT: return "HALT";
+  case RefereeCommand::STOP: return "STOP";
+  case RefereeCommand::NORMAL_START: return "NORMAL_START";
+  case RefereeCommand::FORCE_START: return "FORCE_START";
+  case RefereeCommand::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
+  case RefereeCommand::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
+  case RefereeCommand::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
+  case RefereeCommand::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
+  case RefereeCommand::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
+  case RefereeCommand::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
+  case RefereeCommand::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
+  case RefereeCommand::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
+  case RefereeCommand::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
+  case RefereeCommand::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
+  default: return "UNKNOWN_COMMAND";
   }
 }
 
@@ -275,8 +277,8 @@ AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command) {
 enum RefereeCommand AutomatedReferee::GetRefereeCommand() {return referee_command;}
 int AutomatedReferee::GetBlueTeamScore() {return blue_team_score;}
 int AutomatedReferee::GetYellowTeamScore() {return yellow_team_score;}
-float AutomatedReferee::GetBallDesignatedPositionX() {return ball_designated_position_x;}
-float AutomatedReferee::GetBallDesignatedPositionY() {return ball_designated_position_y;}
+float AutomatedReferee::GetBallDesignatedPositionX() {return designated_position.x;}
+float AutomatedReferee::GetBallDesignatedPositionY() {return designated_position.y;}
 enum Team AutomatedReferee::TeamOnPositiveHalf() {return team_on_positive_half;}
 int64_t AutomatedReferee::GetStageTimeLeft() {return stage_time_left;};
 

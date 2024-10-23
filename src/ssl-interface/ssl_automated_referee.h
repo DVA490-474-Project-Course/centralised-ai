@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
- * Last modified: 2024-10-22 by Emil Åberg
+ * Last modified: 2024-10-23 by Emil Åberg
  * Description: Automates referee commands based on robot and ball positions.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -153,7 +153,16 @@ public:
     */
   int64_t GetStageTimeLeft();
 
-private:
+protected:
+  /*!
+    * @brief Private class to represent a point on the field.
+    */
+  struct Point
+  {
+    float x;
+    float y;
+  };
+
   /* Automated referee variables */
   VisionClient& vision_client_;
   std::string grsim_ip;
@@ -167,51 +176,93 @@ private:
   int64_t stage_time_left;
   int64_t stage_time;
 
+  /*******************/
   /* Game state data */
+  /*******************/
+
+  /*!
+    * @brief The latest issued referee command.
+    */
   RefereeCommand referee_command;
+
+  /*!
+    * @brief Blue team's score.
+    */
   int blue_team_score;
+
+  /*!
+    * @brief Yellow team's score.
+    */
   int yellow_team_score;
-  float ball_designated_position_x;
-  float ball_designated_position_y;
+
+  /*!
+    * @brief When the BALL_PLACMENT_YELLOW/BLUE commands are issued, indicates
+    * where the ball should be brought for a free kick.
+    */
+  struct Point designated_position;
+
+  /*!
+    * @brief Indicates which team is on the positive half of the field.
+    */
   enum Team team_on_positive_half;
 
-  /* Helper to translate command to string */
-  std::string CommandToString(RefereeCommand command);
+  /*******************/
+  /* Private methods */
+  /*******************/
 
-  /* Detect if the ball is out of field */
+  /*!
+    * @brief Convert RefereeCommand enum to string.
+    */
+  std::string RefereeCommandToString(RefereeCommand command);
+
+  /*!
+    * @brief Returns true if ball is out of field.
+    */
   bool IsBallOutOfField(float ball_x, float ball_y);
 
-  /* Check if ball is currently touching a robot */
-  void CheckForCollision();
+  /*!
+    * @brief Returns which team is currently touching the ball, returns kUnknow
+    * if no team is currently in contact with the ball.
+    */
+  enum Team CheckForCollision();
 
-  /* Returns the distance between the specified robot and ball */
+  /*!
+    * @brief Returns the distance between the specified robot and ball.
+    */
   float DistanceToBall(int id, enum Team team);
 
-  /* Return distance to ball and specified point */
+  /*!
+    * @brief Returns the distance to ball and specified point
+    */
   float DistanceToBall(float x, float y);
 
-  /* Returns true when time to prepare kickoff has passed */
-  bool PrepareKickoffTimePassed();
-
-  /* Returns true when ball is in blue teams goal */
+  /*!
+    * @brief Returns true when ball is in blue teams goal.
+    */
   bool IsBallInBlueGoal(float ball_x, float ball_y);
 
-  /* Returns true when ball is in yellow teams goal */
+  /*!
+    * @brief Returns true when ball is in yellow teams goal.
+    */
   bool IsBallInYellowGoal(float ball_x, float ball_y);
 
-  /* Sets the ball designated position based on where it exited
-    the field and who which robot touched the ball last */
-  void SetBallDesignatedPosition();
+  /*!
+    * @brief Assuming ball is out of field, returns the point of where ball should
+    * be placed for freekick/cornerkick.
+    */
+  struct Point CalcBallDesignatedPosition();
 
-  /* Returns true when ball is considered 'successfully placed'
-     according to ssl rules */
+  /*!
+    * @brief Returns true when ball is considered 'successfully placed' according
+    * to ssl rules
+    */
   bool BallSuccessfullyPlaced();
 
-  /* Update the current referee command */
-  void UpdateRefereeCommand();
-
-  /* Convert referee command enum to string */
-  std::string RefereeCommandToString(enum RefereeCommand referee_command); // Added declaration
+  /*!
+    * @brief Updates the current referee command, designated position, score and
+    * resets ball and robot position when a goal is scored.
+    */
+  void RefereeStateHandler();
 };
 
 } /* namespace ssl_interface */
