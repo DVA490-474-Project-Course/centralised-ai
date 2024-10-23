@@ -71,7 +71,7 @@ namespace collective_robot_behaviour{
   TEST(ComputeGAETest, Test_1)
   {
     // Arrange
-    torch::Tensor temporaldiffs = torch::zeros((1, 4));
+    torch::Tensor temporaldiffs = torch::zeros({1, 4});
     double discount = 2;
     double gae_parameter = 2;
 
@@ -79,22 +79,24 @@ namespace collective_robot_behaviour{
     torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
 
     // Assert
-    EXPECT_EQ(temporaldiffs.size(0), 4);
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 0);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 0);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 0);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 0);
+    EXPECT_EQ(temporaldiffs.size(0), 1);
+    EXPECT_EQ(temporaldiffs.size(1), 4);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 0);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0);
   }
 
   TEST(ComputeGAETest, Test_2)
   {
     // Arrange
-    torch::Tensor temporaldiffs = torch::zeros((1, 4));
-    temporaldiffs[0] = 1;
-    temporaldiffs[1] = 2;
-    temporaldiffs[2] = 3;
-    temporaldiffs[3] = 4;
+    torch::Tensor temporaldiffs = torch::zeros({1, 4});
+    temporaldiffs[0][0] = 1;
+    temporaldiffs[0][1] = 2;
+    temporaldiffs[0][2] = 3;
+    temporaldiffs[0][3] = 4;
 
     double discount = 2;
     double gae_parameter = 2;
@@ -103,18 +105,20 @@ namespace collective_robot_behaviour{
     torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
 
     // Assert
-    EXPECT_EQ(temporaldiffs.size(0), 4);
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 313);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 78);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 19);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 4);
+    EXPECT_EQ(temporaldiffs.size(0), 1);
+    EXPECT_EQ(temporaldiffs.size(1), 4);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 2);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 3);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 4);
   }
 
   TEST(ComputeGAETest, Test_3)
   {
     // Arrange
-    torch::Tensor temporaldiffs = torch::ones((1, 4));
+    torch::Tensor temporaldiffs = torch::ones({1, 4});
 
     double discount = 1;
     double gae_parameter = 1;
@@ -123,67 +127,110 @@ namespace collective_robot_behaviour{
     torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
 
     // Assert
-    EXPECT_EQ(temporaldiffs.size(0), 4);
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 4);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 3);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 2);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+    EXPECT_EQ(temporaldiffs.size(1), 4);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
   }
 
   /* Tests for probability ratio function*/
   TEST(ComputeProbabilityRatio, Test_1)
   {
     // Arrange
-    torch::Tensor currrentprobs = torch::ones((1, 4));
-    torch::Tensor previousprobs = torch::ones((1, 4));
+    torch::Tensor currrentprobs = torch::ones({1, 4});
+    torch::Tensor previousprobs = torch::ones({1, 4});
 
     // Execute
     torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
 
     // Assert
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
   }
 
   TEST(ComputeProbabilityRatio, Test_2)
   {
     // Arrange
-    torch::Tensor currrentprobs = torch::ones((1, 4));
-    torch::Tensor previousprobs = torch::ones((1, 4)) * 2;
+    torch::Tensor currrentprobs = torch::ones({1, 4});
+    torch::Tensor previousprobs = torch::ones({1, 4}) * 2;
 
     // Execute
     torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
 
     // Assert
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 0.5);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 0.5);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 0.5);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 0.5);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 0.5);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0.5);
   }
 
   /* Tests for clip probability ratio function*/
   TEST(ClipProbabilityRatio, Test_1)
   {
     // Arrange
-    torch::Tensor probabilities = torch::ones((1, 4));
+    torch::Tensor probabilities = torch::ones({1, 4});
     float clip_value = 2;
 
     // Execute
     torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
 
     // Assert
-    EXPECT_EQ(output.size(0), 4);
-    EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
-    EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
   }
 
+  TEST(ClipProbabilityRatio, Test_2)
+  {
+    // Arrange
+    torch::Tensor probabilities = torch::ones({1, 4}) * 2;
+    float clip_value = 0.5;
+
+    // Execute
+    torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+
+    // Assert
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.5);
+  }
+
+  TEST(ClipProbabilityRatio, Test_3)
+  {
+    // Arrange
+    torch::Tensor probabilities = torch::ones({2, 4}) * 2;
+    float clip_value = 0.5;
+
+    // Execute
+    torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+
+    // Assert
+    EXPECT_EQ(output.size(0), 2);
+    EXPECT_EQ(output.size(1), 4);
+    EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[1][0].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[1][1].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[1][2].item<float>(), 1.5);
+    EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.5);
+  }
 
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */

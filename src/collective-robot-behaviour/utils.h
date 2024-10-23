@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-08
-// Last modified: 2024-10-16 by Jacob Johansson
+// Last modified: 2024-10-23 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -46,7 +46,7 @@ namespace collective_robot_behaviour{
     */
     torch::Tensor  compute_probability_ratio(const torch::Tensor & current_probabilities, const torch::Tensor & previous_probabilities);
 
-    /* Returns the probability ratio clipped depending on the clip_value, where
+    /* Returns the probability ratio clipped depending on the clip_value with the shape [num_time_steps, num_agents], where
         - probability_ratio: Probability ratio for each agent for each time step of shape [num_time_steps, num_agents]
         - clip_value: The parameter used to clip the probability ratio
     */

@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-22 by Jacob Johansson
+// Last modified: 2024-10-23 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -68,6 +68,7 @@ namespace collective_robot_behaviour{
     torch::Tensor  compute_general_advantage_estimation(const torch::Tensor & temporal_differences, double discount, double gae_parameter){
         
         uint32_t num_time_steps = temporal_differences.size(0);
+        uint32_t num_agents = temporal_differences.size(1);
 
         // Calculate the factors for each time step.
         torch::Tensor  factors = torch::empty(num_time_steps);
@@ -77,10 +78,10 @@ namespace collective_robot_behaviour{
         }
         
         // Calculate the GAE for each time step.
-        torch::Tensor  output = torch::zeros_like(temporal_differences);
+        torch::Tensor  output = torch::zeros({num_time_steps, num_agents});
         for (int32_t t = 0; t < num_time_steps; t++){
             torch::Tensor  remaining_factors = factors.slice(0, 0, num_time_steps - t);
-            torch::Tensor  remaining_temporal_differences = temporal_differences.slice(0, t, num_time_steps);
+            torch::Tensor  remaining_temporal_differences = temporal_differences.index({torch::indexing::Slice(t, num_time_steps)});
             output[t] = remaining_factors.matmul(remaining_temporal_differences);
         }
 
