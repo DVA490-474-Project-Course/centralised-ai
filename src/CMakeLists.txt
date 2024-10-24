@@ -21,6 +21,4 @@ target_link_libraries(main_exe
     utils_lib
 )
 
-target_include_directories(main_exe PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
 #===============================================================================

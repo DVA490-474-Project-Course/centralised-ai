@@ -15,7 +15,6 @@ project(centralized_ai)
 # Need to set the absolute path
 #set(CMAKE_PREFIX_PATH "/home/jacob/Hämtningar/libtorch/libtorch/share/cmake/Torch")
 
-#find_package(GTest REQUIRED)#new
 find_package(GTest REQUIRED)
 find_package(Torch REQUIRED)
 
