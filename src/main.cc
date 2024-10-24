@@ -1,17 +1,18 @@
-// main.cc
-//==============================================================================
-// Author: Emil Åberg
-// Creation date: 2024-09-16
-// Last modified: 2024-09-19 by Emil Åberg
-// Description: Main
-// License: See LICENSE file for license details.
-//==============================================================================
+/* main.cc
+ *==============================================================================
+ * Author: Jacob Johansson, Emil Åberg
+ * Creation date: 2024-09-16
+ * Last modified: 2024-10-01 by Jacob Johansson
+ * Description: Main function.
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
 
-#include <iostream>
-#include <fstream>
-#include <string>
+/* Project .h files */
+#include "collective-robot-behaviour/world.h"
+#include "collective-robot-behaviour/mlp.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-  return 0;
+    return 0;
 }

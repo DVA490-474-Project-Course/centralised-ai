@@ -14,13 +14,7 @@ enable_testing()
 #===============================================================================
 # Setup gtest with main_test
 
-add_executable(main_test_exe 
-${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface/ssl_vision_client.cc 
-${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface/ssl_game_controller_client.cc
-${CMAKE_CURRENT_SOURCE_DIR}/main_test.cc
-${CMAKE_CURRENT_SOURCE_DIR}/ssl-interface/ssl_vision_client_test.cc
-${CMAKE_CURRENT_SOURCE_DIR}/ssl-interface/ssl_game_controller_client_test.cc
-)
+add_executable(main_test_exe main_test.cc)
 
 # !!! Add any libraries (MADE BY YOU!) that your tests use here !!!
 target_link_libraries(
@@ -28,21 +22,27 @@ target_link_libraries(
   GTest::gtest_main
   GTest::gmock   # Link against Google Mock
   ssl_interface_lib
+  world_lib
+  mlp_lib
+  utils_lib
 )
-
 
 #===============================================================================
 # Dependencies
 
-target_include_directories(main_test_exe PRIVATE 
-  "${CMAKE_CURRENT_SOURCE_DIR}/test" 
-  "${CMAKE_CURRENT_SOURCE_DIR}/../src/ssl-interface"
-  "${gtest_SOURCE_DIR}/include"   # Include the gtest directory
-  "${gmock_SOURCE_DIR}/include"   # Include the gmock directory
+# Test source files
+target_sources(main_test_exe PRIVATE
+  main_test
+  collective-robot-behaviour-test/world_test.cc
+  collective-robot-behaviour-test/mlp_test.cc
+  collective-robot-behaviour-test/utils_test.cc
+  ssl_interface_test/ssl_game_controller_client_test.cc
+  ssl_interface_test/ssl_vision_client_test.cc
 )
-
 
 #===============================================================================
 # Must be last (I think)
 
 gtest_discover_tests(main_test_exe)
+
+#===============================================================================

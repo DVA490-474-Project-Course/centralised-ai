@@ -3,7 +3,8 @@ cmake-build-release/
 cmake-build-debug/
 /.idea/*
 /bin/*
-/.vscode/*
+.vscode
+.gitmodules
 /CMakeFiles/*
 /generated/*
 /cmake-build-debug/*
