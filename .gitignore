@@ -5,7 +5,7 @@
 **/bin/*
 **/build/*
 **/generated/*
-*/docs/html/*
+**/html/*
 *.swp
 *.idea*
 *.gitmodules*

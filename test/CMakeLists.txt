@@ -32,7 +32,7 @@ target_link_libraries(
 
 # Test source files
 target_sources(main_test_exe PRIVATE
-  main_test
+  main_test.cc
   collective-robot-behaviour-test/world_test.cc
   collective-robot-behaviour-test/mlp_test.cc
   collective-robot-behaviour-test/utils_test.cc
