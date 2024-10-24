@@ -36,8 +36,8 @@ target_sources(main_test_exe PRIVATE
   collective-robot-behaviour-test/world_test.cc
   collective-robot-behaviour-test/mlp_test.cc
   collective-robot-behaviour-test/utils_test.cc
-  ssl_interface_test/ssl_game_controller_client_test.cc
-  ssl_interface_test/ssl_vision_client_test.cc
+  ssl-interface-test/ssl_game_controller_client_test.cc
+  ssl-interface-test/ssl_vision_client_test.cc
 )
 
 #===============================================================================
