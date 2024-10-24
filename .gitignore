@@ -1,7 +1,8 @@
 /cmake-build-debug/*
 /.idea/*
 /bin/*
-/.vscode/*
+.vscode
+.gitmodules
 /CMakeFiles/*
 /generated/*
 /src/simulation-interface/generated/*
