@@ -9,10 +9,14 @@
  */
 
 /* Project .h files */
+#include <iostream>
+#include <ostream>
+
 #include "collective-robot-behaviour/world.h"
 #include "collective-robot-behaviour/mlp.h"
 
 int main(int argc, char **argv)
 {
+    std::cout << "Hello, World!" << std::endl;
     return 0;
 }

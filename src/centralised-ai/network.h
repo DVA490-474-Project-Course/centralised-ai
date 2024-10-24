@@ -24,6 +24,10 @@ struct Policynetwork : torch::nn::Module {
          torch::Tensor hx,
          torch::Tensor cx) {
 
+        std::cerr << input << std::endl;
+        std::cerr << hx << std::endl;
+        std::cerr << cx << std::endl;
+
         auto hidden_states = std::make_tuple(hx, cx);
         auto lstm_output = lstm->forward(input, hidden_states);
         auto val = std::get<0>(lstm_output);
@@ -58,6 +62,8 @@ struct CriticNetwork : torch::nn::Module {
 
         auto hidden_states = std::make_tuple(hx, cx);
         auto lstm_output = lstm->forward(input, hidden_states);
+
+
         auto val = std::get<0>(lstm_output); //get all timesteps of Output
         auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
         auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)

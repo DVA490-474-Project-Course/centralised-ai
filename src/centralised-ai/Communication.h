@@ -39,12 +39,12 @@ struct trajectory {
 
     trajectory()
         : robotID(-1),
-          state(torch::zeros({1, amount_of_players_in_team})), // Initialize state with a 1x6 zero tensor
+          state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
           ht_v(torch::zeros(hidden_size)),
           ct_v(torch::zeros(hidden_size)),
           actions(torch::zeros({amount_of_players_in_team,num_actions})),
           rewards(float{1}), // Initialize rewards as an empty vector
-          new_state(torch::zeros({1, amount_of_players_in_team})) // Initialize new_state with a 1x6 zero tensor
+          new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
     {}
 };
 

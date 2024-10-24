@@ -50,7 +50,7 @@ void MAPPO(std::vector<Agents> Models,CriticNetwork critic ) {
 
 
                 torch::Tensor state = get_states(); //get the state function
-                std::cout << trajectories[timestep-1].hiddenP[0].ht_p << std::endl;
+                //std::cout << trajectories[timestep-1].hiddenP[0].ht_p << std::endl;
                 auto [valNetOutput, V_hx, V_cx] = critic.forward(state, trajectories[timestep-1].hiddenP[0].ht_p, trajectories[timestep-1].hiddenP[0].ct_p);
                     for (auto& agent : Models) {
                         auto [act_prob, hx_new, ct_new] = agent.policyNetwork.forward(state,trajectories[timestep-1].hiddenP[agent.robotId].ht_p,trajectories[timestep-1].hiddenP[agent.robotId].ct_p);
@@ -85,7 +85,7 @@ void MAPPO(std::vector<Agents> Models,CriticNetwork critic ) {
             torch::Tensor R = torch::rand({max_timesteps, 1}); // Random values between 0 and 1
 
             //split to chunks, databuffer[timestep] = {t,A,R}
-            int L = 10;
+            int L = 6;
             for (int l = 0; l < max_timesteps/L; l++) //T/L
             {
                 //Add each trajectory into dat.t value for all timesteps in chunk
@@ -108,21 +108,21 @@ void MAPPO(std::vector<Agents> Models,CriticNetwork critic ) {
         //“gain” refers to the weight initialization gain of the last network layer
 
         int len = data_buffer.size();
-        std::vector<databuffer> min_batch;
-        for (int k = 0; k <= 5; k++) {
+        std::vector<databuffer> min_batch; //b
+        for (int k = 0; k <= 10; k++) {
             int rand_index = torch::randint(0, len, {1}).item<int>();
             min_batch.push_back(data_buffer[rand_index]); //Take random saved chunks
             //Send in the minibatch and update the hidden states by the saved stateds and hidden values.
                 //for each timestep in batch
                 for (int i = 0; i < min_batch[k].t.size(); i++) {
-                    auto state_read = min_batch[k].t[i].state; //get state for teh timestep in minibatch
+                    auto state_read = min_batch[0].t[i].state; //get state for the timestep in minibatch
 
                     //For each agents actions in one timestep //UPDATE SO ALL TIMESTEPS GET SENT AS ONE VECTOR AS STATE
                     for (int agent = 0; agent < amount_of_players_in_team; agent++)
                     {
                         auto hx_read = min_batch[k].t[i].hiddenP[agent].ht_p;
                         auto ct_read = min_batch[k].t[i].hiddenP[agent].ct_p;
-                        std::cout << state_read << std::endl;
+                        //std::cout << state_read << std::endl;
                         //Update all policynetworks
                         Models[agent].policyNetwork.forward(state_read,hx_read,ct_read);
                     }
