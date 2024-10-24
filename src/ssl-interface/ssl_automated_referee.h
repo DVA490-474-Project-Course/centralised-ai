@@ -155,7 +155,7 @@ public:
 
 protected:
   /*!
-    * @brief Private class to represent a point on the field.
+    * @brief Private struct to represent a point on the field.
     */
   struct Point
   {
@@ -163,17 +163,65 @@ protected:
     float y;
   };
 
-  /* Automated referee variables */
+  /*********************/
+  /* Private variables */
+  /*********************/
+
+  /*!
+    * @brief Reference to the vision client.
+    */
   VisionClient& vision_client_;
+
+  /*!
+    * @brief IP address of grSim.
+    */
   std::string grsim_ip;
+
+  /*!
+    * @brief grSim Command listen port.
+    */
   uint16_t grsim_port;
+
+  /*!
+    * @brief distance in mm between robot and ball within which they are considered
+    * to be touching each other.
+    */
   float collision_margin = 12;
+
+  /*!
+    * @brief Time in seconds that the commands PREPARE_KICKOFF_BLUE/YELLOW should
+    * stay at.
+    */
   double prepare_kickoff_duration;
+
+  /*!
+    * @brief Time at which latest PREPARE_KICKOFF_BLUE/YELLOW command is issued.
+    */
   double prepare_kickoff_start_time;
+
+  /*!
+    * @brief Time at which StartGame() was called.
+    */
   double time_at_game_start;
+
+  /*!
+    * @brief Flag indicating wheter Automatic Referee is running.
+    */
   bool game_running;
+
+  /*!
+    * @brief Team that touched the ball last.
+    */
   enum Team last_kicker_team;
+
+  /*!
+    * @brief Remaining stage time.
+    */
   int64_t stage_time_left;
+
+  /*!
+    * @brief Stage time.
+    */
   int64_t stage_time;
 
   /*******************/
