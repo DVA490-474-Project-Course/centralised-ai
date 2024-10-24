@@ -224,10 +224,6 @@ protected:
     */
   int64_t stage_time;
 
-  /*******************/
-  /* Game state data */
-  /*******************/
-
   /*!
     * @brief The latest issued referee command.
     */
