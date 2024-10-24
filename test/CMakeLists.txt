@@ -20,7 +20,6 @@ add_executable(main_test_exe main_test.cc)
 target_link_libraries(
   main_test_exe
   GTest::gtest_main
-  GTest::gmock   # Link against Google Mock
   ssl_interface_lib
   world_lib
   mlp_lib
