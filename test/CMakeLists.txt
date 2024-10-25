@@ -1,15 +1,6 @@
 #===============================================================================
 # Includes
 
-# Fetch pybind11
-include(FetchContent)
-FetchContent_Declare(
-  pybind11
-  GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        v2.10.4  # You can specify the latest version here
-)
-FetchContent_MakeAvailable(pybind11)
-
 # Fetch googletest
 include(FetchContent)
 FetchContent_Declare(
