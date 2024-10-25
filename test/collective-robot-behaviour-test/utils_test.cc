@@ -374,5 +374,74 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[0].item<float>(), 0.975);
   }
 
+  /*!
+    Tests for compute critic loss function.
+  */
+  TEST(ComputeCriticLoss, Test_1)
+  {
+    // Arrange
+    torch::Tensor current_values = torch::ones({1, 6});
+    torch::Tensor previous_values = torch::zeros({1, 6});
+    torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+    float clip_value = 0;
+
+    // Execute
+    torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+
+    // Assert
+    EXPECT_EQ(current_values.size(0), 1);
+    EXPECT_EQ(current_values.size(1), 6);
+    EXPECT_EQ(previous_values.size(0), 1);
+    EXPECT_EQ(previous_values.size(1), 6);
+    EXPECT_EQ(rewards_to_go.size(0), 1);
+    EXPECT_EQ(rewards_to_go.size(1), 1);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 0.81);
+  }
+
+  TEST(ComputeCriticLoss, Test_2)
+  {
+    // Arrange
+    torch::Tensor current_values = torch::ones({1, 6});
+    torch::Tensor previous_values = torch::zeros({1, 6});
+    torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+    float clip_value = 0.2;
+
+    // Execute
+    torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+
+    // Assert
+    EXPECT_EQ(current_values.size(0), 1);
+    EXPECT_EQ(current_values.size(1), 6);
+    EXPECT_EQ(previous_values.size(0), 1);
+    EXPECT_EQ(previous_values.size(1), 6);
+    EXPECT_EQ(rewards_to_go.size(0), 1);
+    EXPECT_EQ(rewards_to_go.size(1), 1);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 0.81);
+  }
+
+  TEST(ComputeCriticLoss, Test_3)
+  {
+    // Arrange
+    torch::Tensor current_values = torch::ones({4, 6}) * 0.5;
+    torch::Tensor previous_values = torch::ones({4, 6}) * 0.2;
+    torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+    float clip_value = 0.2;
+
+    // Execute
+    torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+
+    // Assert
+    EXPECT_EQ(current_values.size(0), 4);
+    EXPECT_EQ(current_values.size(1), 6);
+    EXPECT_EQ(previous_values.size(0), 4);
+    EXPECT_EQ(previous_values.size(1), 6);
+    EXPECT_EQ(rewards_to_go.size(0), 1);
+    EXPECT_EQ(rewards_to_go.size(1), 1);
+    EXPECT_EQ(output.size(0), 1);
+    EXPECT_FLOAT_EQ(output[0].item<float>(), 0.16);
+  }
+
 } /* namespace centralised_ai */
 } /* namespace collective_robot_behaviour */
