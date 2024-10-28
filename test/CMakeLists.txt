@@ -21,7 +21,6 @@ target_link_libraries(
   main_test_exe
   GTest::gtest_main
   world_lib
-  mlp_lib
   utils_lib
 )
 
@@ -32,7 +31,6 @@ target_link_libraries(
 target_sources(main_test_exe PRIVATE
 main_test
 collective-robot-behaviour-test/world_test.cc
-collective-robot-behaviour-test/mlp_test.cc
 collective-robot-behaviour-test/utils_test.cc
 )
 
