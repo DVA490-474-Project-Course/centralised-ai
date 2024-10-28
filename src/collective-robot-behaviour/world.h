@@ -16,27 +16,44 @@ namespace collective_robot_behaviour{
 
 /* Global constants*/
 
-/* Width of the playing field, measured in meters.*/
+/*!
+  @brief Width of the playing field, measured in meters.
+*/
 const int kFieldWidth = 9;
-/* Height of the playing field, measured in meters.*/
+/*!
+  @brief Height of the playing field, measured in meters.
+*/
 const int kFieldHeight = 6;
 
-/* Width of the defense area, measured in meters.*/
+/*!
+  @brief Width of the defense area, measured in meters.
+*/
 const int kDefenseAreaWidth = 2;
-/* Height of the defense area, measured in meters.*/
+/*!
+  @brief Height of the defense area, measured in meters.
+*/
 const int kDefenseAreaHeight = 1;
 
-/* Distance from the opponent's goal center from which a team executes a penalty kick against the opponent goal, measured in meters.*/
+/*!
+  @brief Distance from the opponent's goal center from which a team executes a penalty kick against the opponent goal, measured in meters.
+*/
 const int kPenaltyMarkDistance = 6;
 
-/* Width of the goal, measured in meters.*/
+/*!
+  @brief Width of the goal, measured in meters.
+*/
 const int kGoalWidth = 1;
-/* Depth of the goal, measured in meters.*/
+
+/*!
+  @brief Depth of the goal, measured in meters.
+*/
 const float kGoalDepth = 0.18;
 
 //-------------------
 
-/* Definition of the representation of the state of each individual robot. */
+/*!
+  @brief Definition of the representation of the state of each individual robot.
+*/
 struct Robot {
   float position_x;
   float position_y;
@@ -45,7 +62,9 @@ struct Robot {
   float orientation;
 };
 
-/* Definition of the representation of the state of the ball. */
+/*!
+  @brief Definition of the representation of the state of the ball.
+*/
 struct Ball {
   float position_x;
   float position_y;
@@ -53,19 +72,25 @@ struct Ball {
   float velocity_y;
 };
 
-/* Definition of the representation of the physical field being played on. */
+/*!
+  @brief Definition of the representation of the physical field being played on.
+*/
 struct Field {
   float width;
   float height;
 };
 
-/* Definition of the representation of the state of the game, given by the game controller. */
+/*!
+  @brief Definition of the representation of the state of the game, given by the game controller.
+*/
 enum class GameState {
   kHalted,
   kPlaying,
 };
 
-/* Definition of the representation of the state of the world at any given time. */
+/*!
+  @brief Definition of the representation of the state of the world at any given time.
+*/
 struct World {
   std::vector<Robot> robots;
   Ball ball;
