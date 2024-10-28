@@ -103,9 +103,10 @@ struct World {
 };
 
 /*!
-  @returns a tensor representing the reward given by the average distance between all robots.
+  @returns a tensor representing the reward given by the average distance between all robots, with the shape [num_agents, 1].
   @param positions: A tensor of all the positions of all the robots, with the shape[2, num_agents]
-  
+  @param max_distance: The maximum distance from the average position of all the robots when no reward will be given anymore. @note max_distance cannot be 0!
+  @param max_reward: The maximum reward that will be given when a robot is within the range [0, max_distance].
 */
 torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward);
 
