@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-16
-// Last modified: 2024-10-21 by Jacob Johansson
+// Last modified: 2024-10-29 by Jacob Johansson
 // Description: Stores all tests for the utils.cc and utils.h file.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -14,7 +14,6 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-  /* Tests for reward-to-go function*/
   TEST(ComputeRewardToGoTest, Test_1)
   {
         torch::Tensor input = torch::ones(6);
@@ -65,8 +64,6 @@ namespace collective_robot_behaviour{
     EXPECT_EQ(output[4].item<float>(), 224);
     EXPECT_EQ(output[5].item<float>(), 160);
   }
-
-  /*Tests for general advantage estimation function*/
 
   TEST(ComputeGAETest, Test_1)
   {
@@ -136,7 +133,6 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
   }
 
-  /* Tests for probability ratio function*/
   TEST(ComputeProbabilityRatio, Test_1)
   {
     // Arrange
@@ -173,7 +169,6 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0.5);
   }
 
-  /* Tests for clip probability ratio function*/
   TEST(ClipProbabilityRatio, Test_1)
   {
     // Arrange
@@ -232,7 +227,6 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.5);
   }
 
-  /* Tests for compute policy entropy function*/
   TEST(ComputePolicyEntropy, Test_1)
   {
     // Arrange
@@ -283,7 +277,6 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output.item<float>(), -8*log(0.25));
   }
 
-  /* Tests for compute policy loss function*/
   TEST(ComputePolicyLoss, Test_1)
   {
     // Arrange
@@ -374,9 +367,6 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[0].item<float>(), 0.975);
   }
 
-  /*!
-    Tests for compute critic loss function.
-  */
   TEST(ComputeCriticLoss, Test_1)
   {
     // Arrange
@@ -443,5 +433,5 @@ namespace collective_robot_behaviour{
     EXPECT_FLOAT_EQ(output[0].item<float>(), 0.16);
   }
 
-} /* namespace centralised_ai */
-} /* namespace collective_robot_behaviour */
+}
+}
