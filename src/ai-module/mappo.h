@@ -28,17 +28,19 @@ extern  int steps;
 extern int step_max;
 extern int batch_size;
 extern int amount_of_players_in_team;
+namespace centralised_ai {
+namespace collective_robot_behaviour {
+ /*!
+  *@brief MAPPO algorithm for training and running in the grSim environment.
+  *
+  *@pre The following preconditions must be met before using this class:
+  * - Saved or created models of policy and critic network is needed.
+  *
+  *@param[in] models is the created/loaded models for each agent, the amount of models is the amount_of_player_in_team which can be changed in MAPPO.cc.
+  *@param[in] critic is the created/loaded ctritic network that the MAPPO will be validating from.
+  */
+void Mappo(std::vector<Agents> models,CriticNetwork critic );
 
-/*!
- *@brief MAPPO algorithm for training and running in the grSim environment.
- *
- *@pre The following preconditions must be met before using this class:
- * - Saved or created models of policy and critic network is needed.
- *
- *@param[in] Models is the created/loaded models for each agent, the amount of models is the amount_of_player_in_team which can be changed in MAPPO.cc.
- *@param[in] critic is the created/loaded ctritic network that the MAPPO will be validating from.
- */
-void MAPPO(std::vector<Agents> Models,CriticNetwork critic );
-
-
+}/*namespace centralised_ai*/
+}/*namespace collective_robot_behaviour*/
 #endif //MAPPO_H_

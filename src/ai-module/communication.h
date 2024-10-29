@@ -19,6 +19,8 @@ extern int num_actions;
 extern int amount_of_players_in_team;
 extern int hidden_size;
 
+namespace centralised_ai {
+namespace collective_robot_behaviour {
 
 /*!
  *@brief Get the current state from grSim
@@ -28,7 +30,7 @@ extern int hidden_size;
  *
  *@param[Out] Tensor array of the current state that includes ....
  */
-torch::Tensor get_states();
+torch::Tensor GetStates();
 
 /*!
  *@brief Get the reward for the agent
@@ -38,6 +40,8 @@ torch::Tensor get_states();
  *
  *@param[Out] float of the calculated reward
  */
-float get_rewards();
+float GetRewards();
 
+}/*namespace centralised_ai*/
+}/*namespace collective_robot_behaviour*/
 #endif //COMMUNICATION_H_H

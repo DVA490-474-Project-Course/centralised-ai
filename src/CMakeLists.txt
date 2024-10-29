@@ -9,7 +9,7 @@ add_executable(main_exe main.cc)
 # Where to find source code for libraries etc
 add_subdirectory(collective-robot-behaviour)
 add_subdirectory(ssl-interface)
-add_subdirectory(centralised-ai)
+add_subdirectory(ai-module)
 
 #===============================================================================
 # Dependencies

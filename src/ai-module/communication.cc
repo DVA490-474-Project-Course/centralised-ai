@@ -11,18 +11,20 @@
 #include <torch/torch.h>
 /* Projects .h files. */
 #include "network.h"
-
-/* Get the current state*/
-torch::Tensor get_states() {
+namespace centralised_ai {
+namespace collective_robot_behaviour {
+  /* Get the current state*/
+  torch::Tensor GetStates() {
     /* Example state data stored in a std::vector*/
     torch::Tensor state_vector = torch::randn({1,1,input_size});
     /*Convert the std::vector to a tensor and reshape if needed*/
     return state_vector;
-}
-/*Get the agents reward*/
-float get_rewards() {
+  }
+  /*Get the agents reward*/
+  float GetRewards() {
     float reward = 1.0;
     return reward;
-}
-
+  }
+}/* namespace centralised_ai */
+}/*namespace collective_robot_behaviour*/
 
