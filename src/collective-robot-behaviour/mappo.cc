@@ -74,12 +74,12 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 
     torch::Tensor state = GetStates(); /*Get current state as vector*/
     /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
-    auto [valNetOutput, V_hx, V_cx] = critic.forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
+    auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
 
     /* For each agent in one timestep, get probabilities and hidden states*/
     for (auto& agent : Models) {
       /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-      auto [act_prob, hx_new, ct_new] = agent.policy_network.forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
+      auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
       /*store action probabilities for the agent*/
       exp.actions.index_put_({agent.robotId}, act_prob.squeeze());
       /*Store the higest probablity of the actions*/
@@ -153,7 +153,7 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
         auto hx_read = min_batch[k].t[i].hidden_p[agent].ht_p;
         auto ct_read = min_batch[k].t[i].hidden_p[agent].ct_p;
         /*update LSTM hidden states for policy from first hidden state in data chunk.*/
-        Models[agent].policy_network.forward(state_read,hx_read,ct_read);
+        Models[agent].policy_network.Forward(state_read,hx_read,ct_read);
         std::cerr << state_read << std::endl;
         /*
          * FIX SO WE UPDATE A STATE VECTOR OF MULTIPLE TIMESTEPS INSTEAD OF USING LOOP
@@ -162,7 +162,7 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
       auto hv_read = min_batch[k].t[i].hidden_v.ht_p;
       auto cv_read = min_batch[k].t[i].hidden_v.ct_p;
       /*update LSTM hidden states for critic network from first hidden state in data chunk.*/
-      critic.forward(state_read,hv_read,cv_read);
+      critic.Forward(state_read,hv_read,cv_read);
     }
 } /*end for*/
 

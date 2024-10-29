@@ -35,9 +35,15 @@ Agents::Agents(int id, PolicyNetwork network)
 
 }
 
+
+HiddenStates::HiddenStates()
+    : ht_p(torch::zeros({1, 1, hidden_size})),  /* Hidden state tensor initialized to zeros*/
+      ct_p(torch::zeros({1, 1, hidden_size}))   /*Cell state tensor initialized to zeros*/
+{}
+
 PolicyNetwork::PolicyNetwork()
-  : num_layers(1),                   // Initialize number of LSTM layers
-  output_size(num_actions),        // Initialize number of output actions
+  : num_layers(1),
+  output_size(num_actions),
   lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
   output_layer(torch::nn::Linear(hidden_size, output_size)) {
 
@@ -45,21 +51,21 @@ PolicyNetwork::PolicyNetwork()
   register_module("output_layer", output_layer);
 }
 
-std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::forward(
+std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   torch::Tensor input,
   torch::Tensor hx,
-  torch::Tensor cx) {
-
+  torch::Tensor cx)
+  {
   auto hidden_states = std::make_tuple(hx, cx);
-  auto lstm_output = lstm->forward(input, hidden_states);     // Forward pass through LSTM
-  auto val = std::get<0>(lstm_output);                        // Output from LSTM
-  auto hx_new = std::get<0>(std::get<1>(lstm_output));        // New hidden state
-  auto cx_new = std::get<1>(std::get<1>(lstm_output));        // New cell state
+  auto lstm_output = lstm->forward(input, hidden_states);
+  auto val = std::get<0>(lstm_output);
+  auto hx_new = std::get<0>(std::get<1>(lstm_output));
+  auto cx_new = std::get<1>(std::get<1>(lstm_output));
 
-  auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Select last time step
-  auto value = output_layer(output);                       // Forward pass through output layer
+  auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
+  auto value = output_layer(output);
 
-  return std::make_tuple(value, hx_new, cx_new);           // Return results
+  return std::make_tuple(value, hx_new, cx_new);
 }
 
 
@@ -75,8 +81,7 @@ CriticNetwork::CriticNetwork():
   register_module("value_layer", value_layer);
 }
 
-
-std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> CriticNetwork::forward(
+std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> CriticNetwork::Forward(
   torch::Tensor input,
   torch::Tensor hx,
   torch::Tensor cx) {
