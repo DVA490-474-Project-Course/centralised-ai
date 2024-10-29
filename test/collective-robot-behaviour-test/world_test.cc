@@ -77,5 +77,22 @@ TEST_F(WorldTest, BallMovement)
 	EXPECT_EQ(world.ball.position_y, 23.0);
 }
 
+TEST(ComputeAverageDistanceReward, Test_1)
+{
+	torch::Tensor positions = torch::zeros({2, 6});
+	float max_distance = 1;
+	float max_reward = -0.001;
+
+	torch::Tensor output = compute_average_distance_reward(positions, max_distance, max_reward);
+
+	EXPECT_EQ(output.size(0), 6);
+	EXPECT_FLOAT_EQ(output[0].item<float>(), -0.001);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), -0.001);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), -0.001);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), -0.001);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), -0.001);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), -0.001);
+}
+
 }
 }

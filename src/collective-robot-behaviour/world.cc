@@ -22,7 +22,7 @@ torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max
 
 	torch::Tensor rewards = (-1/max_distance) * distances + 1; /* Linear function for calculating the reward. */
 
-	return torch::clamp(rewards, 0, 1);
+	return torch::clamp(rewards, 0, 1) * max_reward;
 }
 
 }

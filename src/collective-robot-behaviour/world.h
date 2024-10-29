@@ -12,8 +12,10 @@
 #include <vector>
 #include <torch/torch.h>
 
-namespace centralised_ai{
-namespace collective_robot_behaviour{
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
   @brief Width of the playing field, measured in meters.
@@ -25,11 +27,7 @@ const int kFieldWidth = 9;
 const int kFieldHeight = 6;
 
 /*!
-  @brief Width of the defense area, measured in meters.
-*/
-const int kDefenseAreaWidth = 2;
-/*!
-  @brief Height of the defense area, measured in meters.
+torch::Tensor ce area, measured in meters.
 */
 const int kDefenseAreaHeight = 1;
 
