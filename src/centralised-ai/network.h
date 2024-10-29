@@ -1,101 +1,172 @@
-//
-// Created by viktor on 2024-10-23.
+/* network.h
+*==============================================================================
+ * Author: Viktor Eriksson
+ * Creation date: 2024-10-04.
+ * Last modified: 2024-10-24 by Viktor Eriksson
+ * Description: network header files.
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
 
 #ifndef NETWORK_H
 #define NETWORK_H
+/* PyTorch C++ API library  */
 #include <torch/torch.h>
-#include "Communication.h"
+/* Projects .h files for communication functions. */
+#include "communication.h"
 
-struct Policynetwork : torch::nn::Module {
- // Number of features in the hidden state
-    const int num_layers = 1; // Number of LSTM layers on top of eachother
-    const int output_size = num_actions; // Number of output classes
+/*!
+ * @brief Struct is the hidden states used for the networks
+ *
+ * Struct contains the hidden state (ht_p) and the cell state (ct_p)
+ *
+ * Initalised, hidden state and cell state is 3 dim of zeroes in range of the hidden_size
+ * hidden state array: (2 if bidirectional=True otherwise 1, batch size , if proj size > 0 otherwise hidden size )
+ * cell state array: (2 if bidirectional=True otherwise 1 * num layers, batch size , hidden size)
+ *
+ * @note PyTorch LSTM instructions from https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+ */
+struct HiddenStates {
+    torch::Tensor ht_p;
+    torch::Tensor ct_p;
+
+    HiddenStates()
+    :
+    ht_p(torch::zeros({1, 1, hidden_size})), // Initialize action probabilities with a 1x6 zero tensor
+    ct_p(torch::zeros({1, 1, hidden_size})) // Initialize action probabilities with a 1x6 zero tensor
+
+    {}
+};
+
+/*!
+ * @brief Struct representing a trajectory array used during training.
+ *
+ * This struct contains state, action probabilities, rewards, new state,
+ * policy hidden states (HiddenStates struct), and critic hidden states (HiddenStates struct).
+ *
+ * Initalised, state,actions and new_state is zeroes. Rewards is empty float
+ *
+ * @note The concept of a trajectory array is detailed in:
+ * "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games" - https://arxiv.org/pdf/2103.01955
+ */
+struct Trajectory {
+    // State, action probabilities, rewards, new state
+    /*int robotID;*/
+    torch::Tensor state;
+    torch::Tensor actions;
+    float rewards;
+    torch::Tensor new_state;
+    std::vector<HiddenStates> hiddenP;
+    HiddenStates hiddenV;
+
+
+    Trajectory()
+        : /*robotID(-1),*/
+          state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
+          actions(torch::zeros({amount_of_players_in_team,num_actions})),
+          rewards(float{1}), // Initialize rewards as an empty vector
+          new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
+    {}
+};
+
+/*!
+ * @brief DataBuffer Struct representing a data buffer for storing data in chunks during training.
+ *
+ * This struct organizes stored trajectories in chunks.
+ * It contains a vector of Trajectory struct, A (GAE) and R (Compute reward-to-go)
+ * Additional tensors (A and R) represent accumulated advantages and rewards used in training updates.
+ *
+ * @note Referred to as "D" in the paper, "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games" - https://arxiv.org/pdf/2103.01955
+ */
+struct DataBuffer {
+    std::vector<Trajectory> t;
+    torch::Tensor A;
+    torch::Tensor R;
+
+    // Constructor
+    DataBuffer();
+};
+
+/*!
+ * @brief PolicyNetwork struct creates a LSTM network along with a forward function.
+ *
+ *Contains num_layers, output_size, input_size, hidden_size.
+ *Batch first = true, linear output_layer.
+ *
+ */
+struct PolicyNetwork : torch::nn::Module {
+    const int num_layers;
+    const int output_size;
 
     torch::nn::LSTM lstm{nullptr};
     torch::nn::Linear output_layer{nullptr};
 
-    Policynetwork()
-        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
-          output_layer(register_module("output_layer", torch::nn::Linear(hidden_size, output_size))) {
-    }
-
+    PolicyNetwork(); // Constructor
+    /*!
+    * @brief Forward function for the LSTM Policy Network
+    *
+    * @param[in] input state size [samples,1,states]
+    * @param[in] hx hidden state
+    * @param[in] cx memory cell
+    *
+    *@param[out] (Predicted actions, hx new, cx new)
+    */
     std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(
-         torch::Tensor input,
-         torch::Tensor hx,
-         torch::Tensor cx) {
-
-        auto hidden_states = std::make_tuple(hx, cx);
-        auto lstm_output = lstm->forward(input, hidden_states);
-        auto val = std::get<0>(lstm_output);
-        auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
-        auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
-
-        auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
-        auto value = output_layer(output);
-
-        // Return value, hx_new, and cx_new as a flat tuple (no nesting)
-        return std::make_tuple(value, hx_new, cx_new);
-    }
-
+        torch::Tensor input,
+        torch::Tensor hx,
+        torch::Tensor cx
+    );  // Forward method for passing data through network
 };
 
 
+/*!
+ * @brief Struct of the LSTM Critic Network
+ *
+ * @info  ,Linear output.
+ *
+ *Contains robotid, x_pos, y_pos and poliycnetwork
+ */
 struct CriticNetwork : torch::nn::Module {
-     // Number of input features
+    const int num_layers;
+    const int output_size;
 
-    const int num_layers = 1; // Number of LSTM layers
-    const int output_size = 1; // Single value output for critic
-
-    CriticNetwork()
-        : lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
-          value_layer(register_module("value_layer", torch::nn::Linear(hidden_size, output_size))) {
-    }
-
-    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(
-         torch::Tensor input,
-         torch::Tensor hx,
-         torch::Tensor cx) {
-
-        auto hidden_states = std::make_tuple(hx, cx);
-        auto lstm_output = lstm->forward(input, hidden_states);
-        auto val = std::get<0>(lstm_output); //get all timesteps of Output
-        auto hx_new = std::get<0>(std::get<1>(lstm_output)); // Hidden state (hx)
-        auto cx_new = std::get<1>(std::get<1>(lstm_output)); // Cell state (cx)
-        val = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()}); // Last time step output
-
-        // Print the sizes of the tensors for debugging
-        auto value = value_layer(val); // Final output (value estimation)
-
-        // Return value, hx_new, and cx_new as a flat tuple (no nesting)
-        return std::make_tuple(value, hx_new, cx_new);
-    }
-
-private:
     torch::nn::LSTM lstm{nullptr};
     torch::nn::Linear value_layer{nullptr};
+
+    CriticNetwork();
+
+     /*!
+     * @brief Forward function for the LSTM Critic Network
+     *
+     * @param[in] input state size [samples,1,states]
+     * @param[in] hx hidden state
+     * @param[in] cx memory cell
+     *
+     *@param[out] (Predicted actions, hx new, cx new)
+     */
+    std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> forward(
+        torch::Tensor input,
+        torch::Tensor hx,
+        torch::Tensor cx
+    );
 };
 
 
-struct Agents { // Generate two random floats between 0 and 1
-    torch::Tensor random_floats = torch::rand({2});
-
-    // Access and print the random floats
-    /*!
-     * @brief explain each parameter
-     */
+/*!
+ * @brief Agents struct creates a struct of a policy network and robot id to define the robots configuration.
+ *
+ *Contains robotid, x_pos, y_pos and poliycnetwork
+ */
+struct Agents {
     int robotId;
-    float x_pos = random_floats[0].item<float>();
-    float y_pos= random_floats[1].item<float>();
-    Policynetwork policyNetwork;
+    torch::Tensor random_floats; // Declaration only
+    float x_pos;
+    float y_pos;
+    PolicyNetwork policyNetwork;
 
     // Constructor
-    Agents(int id, Policynetwork network)
-        : robotId(id), policyNetwork(std::move(network)) {
-    }
-
-
+    Agents(int id, PolicyNetwork network);
 };
-
 
 /*!
  * @brief short desciption
@@ -107,13 +178,37 @@ struct Agents { // Generate two random floats between 0 and 1
  */
 std::vector<Agents> createAgents(int amount_of_players_in_team);
 
+/*!
+ * @brief Save the agents models and the critic network in models folder.
+ *
+ * This function serializes the parameters of the given agents' policy networks
+ * and the critic network into a file. This allows for the preservation of the
+ * trained models' weights, enabling later recovery or continuation of training.
+ *
+ * @param[in] models A constant reference to a vector of Agents containing the
+ *               individual agent models to be saved.
+ * @param[in] critic A reference to the CriticNetwork instance that will also
+ *               be saved along with the agents' models.
+ */
 void save_models(const std::vector<Agents>& models, CriticNetwork& critic);
 
-void print_parameters(const Agents& agent);
-
+/*!
+ * @brief Load network models via the /models folder.
+ *
+ * @param[in]  player_count amount of players to load in
+ * @param[in] critic A reference to the CriticNetwork
+ * @param[out] Returns Agent vector of all policy networks for each robot.
+ */
 std::vector<Agents> load_agents(int player_count, CriticNetwork& critic);
 
-void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<databuffer> exper_buff);
+/*!
+ * @brief Update all network weights
+ *
+ * @param[in]  agents policy networks of all agents/robots.
+ * @param[in] critic A reference to the CriticNetwork
+ * @param[in] exper_buff experience buffer vector.
+ */
+void update_nets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff);
 
 
 #endif //NETWORK_H
