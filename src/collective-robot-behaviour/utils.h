@@ -12,9 +12,10 @@
 #include <torch/torch.h>
 #include <stdint.h>
 
-namespace centralised_ai{
-namespace collective_robot_behaviour{
-
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
     /*!
     @returns the reward-to-go values with the shape [num_time_steps, 1], where
     @param rewards: The accumulated reward for each time step, with the shape [num_time_steps, 1]

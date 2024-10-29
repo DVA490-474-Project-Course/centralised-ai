@@ -9,16 +9,18 @@
 #include <torch/torch.h>
 #include "world.h"
 
-namespace centralised_ai{
-namespace collective_robot_behaviour{
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward)
 {
-	// Calculate the average position of all the positions.
+	/* Calculate the average position of all the positions. */
 	torch::Tensor average_position = positions.mean(1, true);
-	torch::Tensor distances = (positions - average_position).pow(2).sum(0); // [num_agents].
+	torch::Tensor distances = (positions - average_position).pow(2).sum(0); /* [num_agents]. */
 
-	torch::Tensor rewards = (-1/max_distance) * distances + 1; // Linear function for calculating the reward.
+	torch::Tensor rewards = (-1/max_distance) * distances + 1; /* Linear function for calculating the reward. */
 
 	return torch::clamp(rewards, 0, 1);
 }
