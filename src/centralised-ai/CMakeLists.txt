@@ -1,7 +1,3 @@
-
-find_package(Torch REQUIRED) #move in root cmakelist
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-
 set(PROJECT_HEADERS
         Communication.h
         network.h

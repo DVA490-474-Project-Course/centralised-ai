@@ -9,7 +9,7 @@
 
 // test_vision_client.cc
 #include <gtest/gtest.h>
-#include "ssl_vision_client.h"
+#include "../../src/ssl-interface/ssl_vision_client.h"
 #include <gmock/gmock.h>
 #include "../../src/common_types.h"
 

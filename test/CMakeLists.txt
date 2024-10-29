@@ -1,4 +1,4 @@
-#===============================================================================
+ #===============================================================================
 # Includes
 
 include(FetchContent)
@@ -19,7 +19,7 @@ add_executable(main_test_exe main_test.cc)
 # !!! Add any libraries (MADE BY YOU!) that your tests use here !!!
 target_link_libraries(
   main_test_exe
-  GTest::gtest_main
+  GTest::gmock_main
   ssl_interface_lib
   world_lib
   mlp_lib
@@ -38,10 +38,5 @@ target_sources(main_test_exe PRIVATE
   ssl-interface-test/ssl_game_controller_client_test.cc
   ssl-interface-test/ssl_vision_client_test.cc
 )
-
-#===============================================================================
-# Must be last (I think)
-
-gtest_discover_tests(main_test_exe)
 
 #===============================================================================
