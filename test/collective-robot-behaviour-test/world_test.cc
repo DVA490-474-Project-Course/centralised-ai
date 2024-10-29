@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-01 by Jacob Johansson
+// Last modified: 2024-10-29 by Jacob Johansson
 // Description: Stores all tests for the world.cc and world.h file.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -12,7 +12,6 @@
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
-// Test Fixture for the World structure
 class WorldTest : public ::testing::Test {
 protected:
     World world;
@@ -33,7 +32,6 @@ protected:
     }
 };
 
-// Test to check initial world state
 TEST_F(WorldTest, InitialWorldState) {
     EXPECT_EQ(world.field.width, 100.0);
     EXPECT_EQ(world.field.height, 50.0);
@@ -44,7 +42,6 @@ TEST_F(WorldTest, InitialWorldState) {
     EXPECT_EQ(world.state, GameState::kPlaying);
 }
 
-// Test adding a robot to the world
 TEST_F(WorldTest, AddRobot) {
     Robot robot;
     robot.position_x = 30.0;
@@ -64,13 +61,11 @@ TEST_F(WorldTest, AddRobot) {
     EXPECT_FLOAT_EQ(world.robots[0].orientation, 0.785);
 }
 
-// Test changing game state
 TEST_F(WorldTest, ChangeGameState) {
     world.state = GameState::kHalted;
     EXPECT_EQ(world.state, GameState::kHalted);
 }
 
-// Test the ball's movement
 TEST_F(WorldTest, BallMovement) {
     // Simulate ball movement
     world.ball.position_x += world.ball.velocity_x;
@@ -80,5 +75,5 @@ TEST_F(WorldTest, BallMovement) {
     EXPECT_EQ(world.ball.position_y, 23.0); // 20 + 3
 }
 
-} /* namespace centralised_ai */
-} /* namespace collective_robot_behaviour */
+}
+}

@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-28 by Jacob Johansson
+// Last modified: 2024-10-29 by Jacob Johansson
 // Description: Headers for world.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -14,8 +14,6 @@
 
 namespace centralised_ai{
 namespace collective_robot_behaviour{
-
-/* Global constants*/
 
 /*!
   @brief Width of the playing field, measured in meters.
@@ -98,7 +96,9 @@ struct World {
   Field field;
   GameState state;
 
-  /* Id of the robot that has the ball. -1 if no robot have it.*/
+  /*!
+    @brief Id of the robot that has the ball. -1 if no robot have it.
+  */
   int have_ball_id;
 };
 
@@ -110,7 +110,7 @@ struct World {
 */
 torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward);
 
-} /* namespace collective_robot_behaviour */
-} /* namespace centralised_ai */
+}
+}
 
-#endif  /* WORLD_H */
+#endif

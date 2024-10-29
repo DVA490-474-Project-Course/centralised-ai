@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-08
-// Last modified: 2024-10-23 by Jacob Johansson
+// Last modified: 2024-10-29 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -83,9 +83,8 @@ namespace collective_robot_behaviour{
     @param entropy_coefficient: The parameter used to determine the weight of the entropy
     */
     torch::Tensor compute_policy_entropy(const torch::Tensor & actions_probabilities, float entropy_coefficient);
-} /* namespace centralised_ai */
-} /* namespace collective_robot_behaviour */
+}
+}
 
-
-#endif /* UTILS_H */
+#endif
 

@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-25 by Jacob Johansson
+// Last modified: 2024-10-29 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -155,5 +155,5 @@ namespace collective_robot_behaviour{
         return entropy_coefficient * entropy.sum().div(num_time_steps * num_agents);
     }
 
-    } /* namespace collective_robot_behaviour */
-} /* namespace centralised_ai */
+    }
+}

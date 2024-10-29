@@ -23,5 +23,5 @@ torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max
 	return torch::clamp(rewards, 0, 1);
 }
 
-} /* namespace centralised_ai */
-} /* namespace collective_robot_behaviour */
+}
+}
