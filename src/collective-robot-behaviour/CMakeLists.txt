@@ -2,10 +2,7 @@
 # World
 
 add_library(world_lib world.cc)
-#===============================================================================
-# MLP
-
-add_library(mlp_lib mlp.cc)
+target_link_libraries(world_lib "${TORCH_LIBRARIES}")
 #===============================================================================
 # Utils
 

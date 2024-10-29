@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-11 by Jacob Johansson
+// Last modified: 2024-10-28 by Jacob Johansson
 // Description: Headers for world.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -10,33 +10,51 @@
 #define WORLD_H
 
 #include <vector>
+#include <torch/torch.h>
 
 namespace centralised_ai{
 namespace collective_robot_behaviour{
 
 /* Global constants*/
 
-/* Width of the playing field, measured in meters.*/
+/*!
+  @brief Width of the playing field, measured in meters.
+*/
 const int kFieldWidth = 9;
-/* Height of the playing field, measured in meters.*/
+/*!
+  @brief Height of the playing field, measured in meters.
+*/
 const int kFieldHeight = 6;
 
-/* Width of the defense area, measured in meters.*/
+/*!
+  @brief Width of the defense area, measured in meters.
+*/
 const int kDefenseAreaWidth = 2;
-/* Height of the defense area, measured in meters.*/
+/*!
+  @brief Height of the defense area, measured in meters.
+*/
 const int kDefenseAreaHeight = 1;
 
-/* Distance from the opponent's goal center from which a team executes a penalty kick against the opponent goal, measured in meters.*/
+/*!
+  @brief Distance from the opponent's goal center from which a team executes a penalty kick against the opponent goal, measured in meters.
+*/
 const int kPenaltyMarkDistance = 6;
 
-/* Width of the goal, measured in meters.*/
+/*!
+  @brief Width of the goal, measured in meters.
+*/
 const int kGoalWidth = 1;
-/* Depth of the goal, measured in meters.*/
+
+/*!
+  @brief Depth of the goal, measured in meters.
+*/
 const float kGoalDepth = 0.18;
 
 //-------------------
 
-/* Definition of the representation of the state of each individual robot. */
+/*!
+  @brief Definition of the representation of the state of each individual robot.
+*/
 struct Robot {
   float position_x;
   float position_y;
@@ -45,7 +63,9 @@ struct Robot {
   float orientation;
 };
 
-/* Definition of the representation of the state of the ball. */
+/*!
+  @brief Definition of the representation of the state of the ball.
+*/
 struct Ball {
   float position_x;
   float position_y;
@@ -53,19 +73,25 @@ struct Ball {
   float velocity_y;
 };
 
-/* Definition of the representation of the physical field being played on. */
+/*!
+  @brief Definition of the representation of the physical field being played on.
+*/
 struct Field {
   float width;
   float height;
 };
 
-/* Definition of the representation of the state of the game, given by the game controller. */
+/*!
+  @brief Definition of the representation of the state of the game, given by the game controller.
+*/
 enum class GameState {
   kHalted,
   kPlaying,
 };
 
-/* Definition of the representation of the state of the world at any given time. */
+/*!
+  @brief Definition of the representation of the state of the world at any given time.
+*/
 struct World {
   std::vector<Robot> robots;
   Ball ball;
@@ -75,6 +101,14 @@ struct World {
   /* Id of the robot that has the ball. -1 if no robot have it.*/
   int have_ball_id;
 };
+
+/*!
+  @returns a tensor representing the reward given by the average distance between all robots, with the shape [num_agents, 1].
+  @param positions: A tensor of all the positions of all the robots, with the shape[2, num_agents]
+  @param max_distance: The maximum distance from the average position of all the robots when no reward will be given anymore. @note max_distance cannot be 0!
+  @param max_reward: The maximum reward that will be given when a robot is within the range [0, max_distance].
+*/
+torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward);
 
 } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */

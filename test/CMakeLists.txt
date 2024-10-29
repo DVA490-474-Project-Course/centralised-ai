@@ -1,6 +1,7 @@
  #===============================================================================
 # Includes
 
+# Fetch googletest
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -22,7 +23,6 @@ target_link_libraries(
   GTest::gmock_main
   ssl_interface_lib
   world_lib
-  mlp_lib
   utils_lib
 )
 
@@ -33,7 +33,6 @@ target_link_libraries(
 target_sources(main_test_exe PRIVATE
   main_test.cc
   collective-robot-behaviour-test/world_test.cc
-  collective-robot-behaviour-test/mlp_test.cc
   collective-robot-behaviour-test/utils_test.cc
   ssl-interface-test/ssl_game_controller_client_test.cc
   ssl-interface-test/ssl_vision_client_test.cc

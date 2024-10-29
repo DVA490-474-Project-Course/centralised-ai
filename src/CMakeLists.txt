@@ -17,7 +17,6 @@ add_subdirectory(centralised-ai)
 # Libraries used by main
 target_link_libraries(main_exe
     world_lib
-    mlp_lib
     utils_lib
 )
 

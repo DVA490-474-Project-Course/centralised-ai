@@ -10,7 +10,7 @@
 
 /* Project .h files */
 #include "collective-robot-behaviour/world.h"
-#include "collective-robot-behaviour/mlp.h"
+#include "collective-robot-behaviour/utils.h"
 
 int main(int argc, char **argv)
 {

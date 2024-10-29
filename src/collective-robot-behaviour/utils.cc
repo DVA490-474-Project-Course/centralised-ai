@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-23 by Jacob Johansson
+// Last modified: 2024-10-25 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "utils.h"
 #include <cmath>
+#include <iostream>
 
 namespace centralised_ai{
 namespace collective_robot_behaviour{
@@ -103,11 +104,8 @@ namespace collective_robot_behaviour{
         // Calculate the loss.
         int32_t num_time_steps = general_advantage_estimation.size(0);
         int32_t num_agents = general_advantage_estimation.size(1);
-
-        torch::Tensor  probability_ratio_gae_product_agent_sum = torch::sum(probability_ratio_gae_product, 1);
-        torch::Tensor  probability_ratio_gae_product_batch_sum = torch::sum(probability_ratio_gae_product_agent_sum, 0);
         
-        return probability_ratio_gae_product_batch_sum.div(num_time_steps * num_agents) + policy_entropy;
+        return probability_ratio_gae_product.sum().div(num_time_steps * num_agents) + policy_entropy;
     }
 
     torch::Tensor compute_critic_loss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value){
@@ -122,16 +120,15 @@ namespace collective_robot_behaviour{
         torch::Tensor  current_values_clipped = torch::clamp(current_values, clipping_min, clipping_max);
 
         // Calculate Mean Squared Error.
-        torch::Tensor  reward_to_go_expanded = reward_to_go.expand({-1, num_agents});
-        torch::Tensor  current_values_mse = torch::pow(current_values - reward_to_go, 2);
+        torch::Tensor  reward_to_go_expanded = reward_to_go.expand({num_time_steps, num_agents});
+        torch::Tensor  current_values_mse = torch::pow(current_values - reward_to_go_expanded, 2);
 
-        torch::Tensor  current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go, 2);
+        torch::Tensor  current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go_expanded, 2);
 
         // Calculate the loss.
         torch::Tensor  max_values = torch::max(current_values_mse, current_values_clipped_mse);
-        torch::Tensor  max_values_agent_sum = torch::sum(max_values, 1);
-        torch::Tensor  max_values_batch_sum = torch::sum(max_values_agent_sum, 0);
-        return max_values_batch_sum.div(num_time_steps * num_agents);
+
+        return max_values.sum().div(num_time_steps * num_agents).unsqueeze(0);
     }
 
     torch::Tensor compute_policy_entropy(const torch::Tensor & actions_probabilities, float entropy_coefficient){
