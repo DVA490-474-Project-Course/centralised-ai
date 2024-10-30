@@ -14,7 +14,6 @@
 #include <torch/torch.h>
 /* Projects .h files for communication functions. */
 #include "communication.h"
-#include "../collective-robot-behaviour/mlp.h"
 
 namespace centralised_ai {
 namespace collective_robot_behaviour
