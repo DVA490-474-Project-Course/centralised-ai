@@ -20,7 +20,7 @@ TEST(ComputeRewardToGoTest, Test_1)
 {
   torch::Tensor input = torch::ones(6);
 
-  torch::Tensor output = compute_reward_to_go(input, 1);
+  torch::Tensor output = ComputeRewardToGo(input, 1);
   EXPECT_EQ(input.size(0), 6);
   EXPECT_EQ(output.size(0), 6);
 
@@ -36,7 +36,7 @@ TEST(ComputeRewardToGoTest, Test_2)
 {
   torch::Tensor input = torch::zeros(6);
 
-  torch::Tensor output = compute_reward_to_go(input, 1);
+  torch::Tensor output = ComputeRewardToGo(input, 1);
   for (int32_t i = 0; i < 6; i++)
   {
     EXPECT_FLOAT_EQ(output[i].item<float>(), 0);
@@ -58,7 +58,7 @@ TEST(ComputeRewardToGoTest, Test_3)
   EXPECT_EQ(input[4].item<float>(), 4);
   EXPECT_EQ(input[5].item<float>(), 5);
 
-  torch::Tensor output = compute_reward_to_go(input, 2);
+  torch::Tensor output = ComputeRewardToGo(input, 2);
   EXPECT_EQ(output[0].item<float>(), 258);
   EXPECT_EQ(output[1].item<float>(), 258);
   EXPECT_EQ(output[2].item<float>(), 256);
@@ -73,7 +73,7 @@ TEST(ComputeGAETest, Test_1)
   double discount = 2;
   double gae_parameter = 2;
 
-  torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
+  torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
   EXPECT_EQ(temporaldiffs.size(0), 1);
   EXPECT_EQ(temporaldiffs.size(1), 4);
@@ -96,7 +96,7 @@ TEST(ComputeGAETest, Test_2)
   double discount = 2;
   double gae_parameter = 2;
 
-  torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
+  torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
   EXPECT_EQ(temporaldiffs.size(0), 1);
   EXPECT_EQ(temporaldiffs.size(1), 4);
@@ -115,7 +115,7 @@ TEST(ComputeGAETest, Test_3)
   double discount = 1;
   double gae_parameter = 1;
 
-  torch::Tensor output = compute_general_advantage_estimation(temporaldiffs, discount, gae_parameter);
+  torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
   EXPECT_EQ(temporaldiffs.size(1), 4);
   EXPECT_EQ(output.size(0), 1);
@@ -131,7 +131,7 @@ TEST(ComputeProbabilityRatio, Test_1)
   torch::Tensor currrentprobs = torch::ones({1, 4});
   torch::Tensor previousprobs = torch::ones({1, 4});
 
-  torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
+  torch::Tensor output = ComputeProbabilityRatio(currrentprobs, previousprobs);
 
   EXPECT_EQ(output.size(0), 1);
   EXPECT_EQ(output.size(1), 4);
@@ -146,7 +146,7 @@ TEST(ComputeProbabilityRatio, Test_2)
   torch::Tensor currrentprobs = torch::ones({1, 4});
   torch::Tensor previousprobs = torch::ones({1, 4}) * 2;
 
-  torch::Tensor output = compute_probability_ratio(currrentprobs, previousprobs);
+  torch::Tensor output = ComputeProbabilityRatio(currrentprobs, previousprobs);
 
   EXPECT_EQ(output.size(0), 1);
   EXPECT_EQ(output.size(1), 4);
@@ -161,7 +161,7 @@ TEST(ClipProbabilityRatio, Test_1)
   torch::Tensor probabilities = torch::ones({1, 4});
   float clip_value = 2;
 
-  torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
 
   EXPECT_EQ(output.size(0), 1);
   EXPECT_EQ(output.size(1), 4);
@@ -176,7 +176,7 @@ TEST(ClipProbabilityRatio, Test_2)
   torch::Tensor probabilities = torch::ones({1, 4}) * 2;
   float clip_value = 0.5;
 
-  torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
 
   EXPECT_EQ(output.size(0), 1);
   EXPECT_EQ(output.size(1), 4);
@@ -191,7 +191,7 @@ TEST(ClipProbabilityRatio, Test_3)
   torch::Tensor probabilities = torch::ones({2, 4}) * 2;
   float clip_value = 0.5;
 
-  torch::Tensor output = clip_probability_ratio(probabilities, clip_value);
+  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
 
   EXPECT_EQ(output.size(0), 2);
   EXPECT_EQ(output.size(1), 4);
@@ -210,7 +210,7 @@ TEST(ComputePolicyEntropy, Test_1)
   torch::Tensor actions_probabilities = torch::ones({2, 4, 4});
   float entropy_coefficient = 1;
 
-  torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+  torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
   EXPECT_EQ(actions_probabilities.size(0), 2);
   EXPECT_EQ(actions_probabilities.size(1), 4);
@@ -223,7 +223,7 @@ TEST(ComputePolicyEntropy, Test_2)
   torch::Tensor actions_probabilities = torch::ones({2, 4, 4}) * 0.5;
   float entropy_coefficient = 1;
 
-  torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+  torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
   EXPECT_EQ(actions_probabilities.size(0), 2);
   EXPECT_EQ(actions_probabilities.size(1), 4);
@@ -237,7 +237,7 @@ TEST(ComputePolicyEntropy, Test_3)
   torch::Tensor actions_probabilities = torch::ones({4, 4, 4}) * 0.25;
   float entropy_coefficient = 2;
 
-  torch::Tensor output = compute_policy_entropy(actions_probabilities, entropy_coefficient);
+  torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
   EXPECT_EQ(actions_probabilities.size(0), 4);
   EXPECT_EQ(actions_probabilities.size(1), 4);
@@ -253,7 +253,7 @@ TEST(ComputePolicyLoss, Test_1)
   float clip_value = 1;
   torch::Tensor entropy = torch::zeros(1);
 
-  torch::Tensor output = compute_policy_loss(gae, probability_ratios, clip_value, entropy);
+  torch::Tensor output = ComputePolicyLoss(gae, probability_ratios, clip_value, entropy);
 
   EXPECT_EQ(gae.size(0), 4);
   EXPECT_EQ(gae.size(1), 4);
@@ -271,7 +271,7 @@ TEST(ComputePolicyLoss, Test_2)
   float clip_value = 0;
   torch::Tensor entropy = torch::zeros(1);
 
-  torch::Tensor output = compute_policy_loss(gae, probability_ratios, clip_value, entropy);
+  torch::Tensor output = ComputePolicyLoss(gae, probability_ratios, clip_value, entropy);
 
   EXPECT_EQ(gae.size(0), 4);
   EXPECT_EQ(gae.size(1), 4);
@@ -289,7 +289,7 @@ TEST(ComputePolicyLoss, Test_3)
   float clip_value = 1;
   torch::Tensor entropy = torch::ones(1);
 
-  torch::Tensor output = compute_policy_loss(gae, probability_ratios, clip_value, entropy);
+  torch::Tensor output = ComputePolicyLoss(gae, probability_ratios, clip_value, entropy);
 
   EXPECT_EQ(gae.size(0), 4);
   EXPECT_EQ(gae.size(1), 4);
@@ -313,7 +313,7 @@ TEST(ComputePolicyLoss, Test_4)
   float clip_value = 0.2;
   torch::Tensor entropy = torch::ones(1) * 0.1;
 
-  torch::Tensor output = compute_policy_loss(gae, probability_ratios, clip_value, entropy);
+  torch::Tensor output = ComputePolicyLoss(gae, probability_ratios, clip_value, entropy);
 
   EXPECT_EQ(gae.size(0), 1);
   EXPECT_EQ(gae.size(1), 6);
@@ -331,7 +331,7 @@ TEST(ComputeCriticLoss, Test_1)
   torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
   float clip_value = 0;
 
-  torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+  torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
   EXPECT_EQ(current_values.size(0), 1);
   EXPECT_EQ(current_values.size(1), 6);
@@ -350,7 +350,7 @@ TEST(ComputeCriticLoss, Test_2)
   torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
   float clip_value = 0.2;
 
-  torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+  torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
   EXPECT_EQ(current_values.size(0), 1);
   EXPECT_EQ(current_values.size(1), 6);
@@ -369,7 +369,7 @@ TEST(ComputeCriticLoss, Test_3)
   torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
   float clip_value = 0.2;
 
-  torch::Tensor output = compute_critic_loss(current_values, previous_values, rewards_to_go, clip_value);
+  torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
   EXPECT_EQ(current_values.size(0), 4);
   EXPECT_EQ(current_values.size(1), 6);

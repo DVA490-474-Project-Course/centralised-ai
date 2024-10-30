@@ -12,8 +12,10 @@
 #include <vector>
 #include <torch/torch.h>
 
-namespace centralised_ai{
-namespace collective_robot_behaviour{
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
   @brief Width of the playing field, measured in meters.
@@ -25,11 +27,7 @@ const int kFieldWidth = 9;
 const int kFieldHeight = 6;
 
 /*!
-  @brief Width of the defense area, measured in meters.
-*/
-const int kDefenseAreaWidth = 2;
-/*!
-  @brief Height of the defense area, measured in meters.
+torch::Tensor ce area, measured in meters.
 */
 const int kDefenseAreaHeight = 1;
 
@@ -108,7 +106,7 @@ struct World {
   @param max_distance: The maximum distance from the average position of all the robots when no reward will be given anymore. @note max_distance cannot be 0!
   @param max_reward: The maximum reward that will be given when a robot is within the range [0, max_distance].
 */
-torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward);
+torch::Tensor ComputeAverageDistanceReward(torch::Tensor positions, float max_distance, float max_reward);
 
 }
 }
