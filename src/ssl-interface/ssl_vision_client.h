@@ -185,6 +185,12 @@ protected:
    * @brief Y coordinate of the ball.
    */
   float ball_position_y;
+
+  /**************************/
+  /* Private methods */
+  /**************************/
+
+  void ReadVisionData(SSL_WrapperPacket packet);
 };
 
 } /* namespace ssl_interface */
