@@ -17,8 +17,6 @@
 #include "ssl_vision_client.h"
 #include "../common_types.h"
 
-using namespace centralised_ai::ssl_interface;
-
 int main()
 {
   /* Define the IP and port for the VisionClient */
@@ -34,10 +32,11 @@ int main()
   vision_client.ReceivePacket();
 
   /* Create the AutomatedReferee instance with the VisionClient */
-  AutomatedReferee referee(vision_client, grsim_ip, grsim_port);
+  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip,
+    grsim_port);
 
   /* Start the automated referee */
-  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kBlue, 3.0F, 300);
+  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow, 3.0F, 300);
 
   while (true)
   {

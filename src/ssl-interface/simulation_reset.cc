@@ -62,7 +62,7 @@ void SendPacket(grSim_Packet packet, std::string ip, uint16_t port)
 }
 
 /* Reset ball and all robots position and other attributes */
-void ResetRobotsAndBall(std::string ip, uint16_t port)
+void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positive_half)
 {
   grSim_Packet packet;
   grSim_Robot_Command *command;
@@ -74,7 +74,7 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
 
   /* Loop through each robot index to reset the positions and other attributes
   of blue and yellow team*/
-  for (int k = 0; k < 6; k++)
+  for (int k = 0; k < team_size; k++)
   {
     /* Reset blue team robots (yellowteam = false) */
     command = packet.mutable_commands()->add_robot_commands();
@@ -90,9 +90,17 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
     /* Set up the replacement packet for blue team */
     replacement = packet.mutable_replacement()->add_robots();
     replacement->set_id(k);
-    replacement->set_x(-initial_position_x[k]);          /* Set new x position */
+    if (team_on_positive_half == Team::kYellow)
+    {
+      replacement->set_x(-initial_position_x[k]);          /* Set new x position */
+      replacement->set_dir(0.0F);
+    }
+    else
+    {
+      replacement->set_x(initial_position_x[k]);          /* Set new x position */
+      replacement->set_dir(180.0F);
+    }
     replacement->set_y(initial_position_y[k]);           /* Set new y position */
-    replacement->set_dir(0.0F);         /* Set direction (angle in radians) */
     replacement->set_yellowteam(false); /* Set to blue team (yellowteam = false) */
 
     /* Reset yellow team robots (yellowteam = true) */
@@ -109,9 +117,17 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
     /* Set up the replacement packet for yellow team */
     replacement = packet.mutable_replacement()->add_robots();
     replacement->set_id(k);
-    replacement->set_x(initial_position_x[k]);
+    if (team_on_positive_half == Team::kYellow)
+    {
+      replacement->set_x(initial_position_x[k]);          /* Set new x position */
+      replacement->set_dir(180.0F);
+    }
+    else
+    {
+      replacement->set_x(-initial_position_x[k]);          /* Set new x position */
+      replacement->set_dir(0.0F);
+    }
     replacement->set_y(initial_position_y[k]);
-    replacement->set_dir(0.0F);
     replacement->set_yellowteam(true);
   }
 

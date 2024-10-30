@@ -14,13 +14,17 @@
 /* C++ standard library headers */
 #include <string>
 
+/* Project .h files */
+#include "../common_types.h"
+
 namespace centralised_ai
 {
 namespace ssl_interface
 {
 
 /* Reset ball and all robots position and other attributes */
-void ResetRobotsAndBall(std::string ip, uint16_t port);
+void ResetRobotsAndBall(std::string ip, uint16_t port,
+  enum Team team_on_positive_half);
 
 } /* namespace ssl_interface */
 } /* namespace centralised_ai */

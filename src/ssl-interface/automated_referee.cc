@@ -22,8 +22,10 @@
 #include "simulation_reset.h"
 #include "../common_types.h"
 
-namespace centralised_ai {
-namespace ssl_interface {
+namespace centralised_ai
+{
+namespace ssl_interface
+{
 
 /* Constructor */
 AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
@@ -35,10 +37,12 @@ AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
 
 /* Analyze the game state by using VisionClient to access robot and ball
    positions */
-void AutomatedReferee::AnalyzeGameState() {
+void AutomatedReferee::AnalyzeGameState()
+{
   enum Team touching_ball;
 
-  if (game_running) {
+  if (game_running)
+  {
     /* Keep track of which team touched ball last */
     touching_ball = CheckForCollision();
     if (touching_ball != Team::kUnknown)
@@ -57,50 +61,60 @@ void AutomatedReferee::AnalyzeGameState() {
 
 /* Updates the current referee command, designated position, score and
  * resets ball and robot position when a goal is scored. */
-void AutomatedReferee::RefereeStateHandler() {
-  float current_time = vision_client_.GetTimestamp();
+void AutomatedReferee::RefereeStateHandler()
+{
+  float current_time;
+  current_time = vision_client_.GetTimestamp();
 
-  switch (referee_command) {
+  switch (referee_command)
+  {
     case RefereeCommand::PREPARE_KICKOFF_YELLOW:
     case RefereeCommand::PREPARE_KICKOFF_BLUE:
-      if (current_time - prepare_kickoff_start_time >= prepare_kickoff_duration) {
+      if (current_time - prepare_kickoff_start_time >= prepare_kickoff_duration)
+      {
         referee_command = RefereeCommand::NORMAL_START;
       }
       break;
     case RefereeCommand::BALL_PLACEMENT_BLUE:
-      if (BallSuccessfullyPlaced()) {
+      if (BallSuccessfullyPlaced())
+      {
         referee_command = RefereeCommand::DIRECT_FREE_BLUE;
       }
       break;
     case RefereeCommand::BALL_PLACEMENT_YELLOW:
-      if (BallSuccessfullyPlaced()) {
+      if (BallSuccessfullyPlaced())
+      {
         referee_command = RefereeCommand::DIRECT_FREE_YELLOW;
       }
       break;
     case RefereeCommand::DIRECT_FREE_BLUE:
     case RefereeCommand::DIRECT_FREE_YELLOW:
     case RefereeCommand::NORMAL_START:
-      if (IsBallInBlueGoal(vision_client_.GetBallPositionX(),
-        vision_client_.GetBallPositionY())) {
+      if (IsBallInGoal(Team::kBlue))
+      {
         yellow_team_score++;
         referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
         prepare_kickoff_start_time = current_time;
-        ResetRobotsAndBall(grsim_ip, grsim_port);
+        ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
       }
-      else if (IsBallInYellowGoal(vision_client_.GetBallPositionX(),
-        vision_client_.GetBallPositionY())) {
+      else if (IsBallInGoal(Team::kYellow))
+      {
         blue_team_score++;
         referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
         prepare_kickoff_start_time = current_time;
-        ResetRobotsAndBall(grsim_ip, grsim_port);
+        ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
       }
       else if (IsBallOutOfField(vision_client_.GetBallPositionX(),
-        vision_client_.GetBallPositionY())) {
+        vision_client_.GetBallPositionY()))
+      {
         designated_position = CalcBallDesignatedPosition();
-        if (last_kicker_team == Team::kYellow) {
+        if (last_kicker_team == Team::kYellow)
+        {
           /* Free kick for blue team */
           referee_command = RefereeCommand::BALL_PLACEMENT_BLUE;
-        } else if (last_kicker_team == Team::kBlue) {
+        }
+        else if (last_kicker_team == Team::kBlue)
+        {
           /* Free kick for yellow team */
           referee_command = RefereeCommand::BALL_PLACEMENT_YELLOW;
         }
@@ -116,7 +130,8 @@ void AutomatedReferee::RefereeStateHandler() {
  * robot and ball positions. */
 void AutomatedReferee::StartGame(enum Team starting_team,
   enum Team team_on_positive_half, double prepare_kickoff_duration,
-  int64_t stage_time) {
+  int64_t stage_time)
+{
   yellow_team_score = 0;
   blue_team_score = 0;
   designated_position.x = 0.0;
@@ -130,50 +145,71 @@ void AutomatedReferee::StartGame(enum Team starting_team,
   this->stage_time = stage_time;
   stage_time_left = stage_time;
 
-  if (starting_team == Team::kBlue) {
+  if (starting_team == Team::kBlue)
+  {
     referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
   }
-  else {
+  else
+  {
     referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
   }
 
-  ResetRobotsAndBall(grsim_ip, grsim_port);
+  ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
 }
 
 /* Stops the automated referee, outputs will no longer be updated. */
-void AutomatedReferee::StopGame() {
+void AutomatedReferee::StopGame()
+{
   game_running = false;
 }
 
 /* Print the current command and score */
-void AutomatedReferee::Print() {
+void AutomatedReferee::Print()
+{
   printf("referee command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
     RefereeCommandToString(referee_command).c_str(),
     blue_team_score, yellow_team_score, designated_position.x, designated_position.y,
     stage_time_left);
 }
 
-/* Returns true if ball is in blue teams goal */
-bool AutomatedReferee::IsBallInBlueGoal(float ball_x, float ball_y) {
-  return (ball_x > 4500 && ball_y > -500 && ball_y < 500);
+/* Returns true if ball is in the goal of the specified team */
+bool AutomatedReferee::IsBallInGoal(enum Team team)
+{
+  float ball_x = vision_client_.GetBallPositionX();
+  float ball_y = vision_client_.GetBallPositionY();
+
+  if (team_on_positive_half == team)
+  {
+    return (ball_x > 4500 && ball_y > -500 && ball_y < 500);
+  }
+  else
+  {
+    return (ball_x < -4500 && ball_y > -500 && ball_y < 500);
+  }
 }
 
 /* Returns true if ball is in yellow teams goal */
-bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y) {
+bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y)
+{
   return (ball_x < -4500 && ball_y > -500 && ball_y < 500);
 }
 
 /* Check if the ball has gone out of field */
-bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y) {
+bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
+{
   return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
 }
 
 /* Returns which team is currently touching the ball, returns kUnknow if no
  * team is currently in contact with the ball. */
-enum Team AutomatedReferee::CheckForCollision() {
-  for (auto team : {Team::kYellow, Team::kBlue}) {
-    for (int id = 0; id < team_size; id++) {
-      if (DistanceToBall(id, team) <= ball_radius + collision_margin) {
+enum Team AutomatedReferee::CheckForCollision()
+{
+  for (auto team : {Team::kYellow, Team::kBlue})
+  {
+    for (int id = 0; id < team_size; id++)
+    {
+      if (DistanceToBall(id, team) <= ball_radius + collision_margin)
+      {
         return team;
       }
     }
@@ -183,7 +219,8 @@ enum Team AutomatedReferee::CheckForCollision() {
 }
 
 /* Return distance to ball and specified robot */
-float AutomatedReferee::DistanceToBall(int id, enum Team team) {
+float AutomatedReferee::DistanceToBall(int id, enum Team team)
+{
   return std::sqrt(
     std::pow((vision_client_.GetBallPositionX() -
       vision_client_.GetRobotPositionX(id, team)), 2) +
@@ -193,18 +230,23 @@ float AutomatedReferee::DistanceToBall(int id, enum Team team) {
 }
 
 /* Return distance to ball and specified point */
-float AutomatedReferee::DistanceToBall(float x, float y) {
+float AutomatedReferee::DistanceToBall(float x, float y)
+{
   return std::sqrt(
     std::pow((vision_client_.GetBallPositionX() - x), 2) +
     std::pow((vision_client_.GetBallPositionY() - y), 2));
 }
 
 /* Returns true if ball is considered sucessfully placed according to SSL rules */
-bool AutomatedReferee::BallSuccessfullyPlaced() {
+bool AutomatedReferee::BallSuccessfullyPlaced()
+{
   /* there is no robot within 0.05 meters distance to the ball */
-  for (auto team : {Team::kYellow, Team::kBlue}) {
-    for (int id = 0; id < team_size; id++) {
-      if (DistanceToBall(id, team) <= 50) {
+  for (auto team : {Team::kYellow, Team::kBlue})
+  {
+    for (int id = 0; id < team_size; id++)
+    {
+      if (DistanceToBall(id, team) <= 50)
+      {
         return false;
       }
     }
@@ -212,7 +254,8 @@ bool AutomatedReferee::BallSuccessfullyPlaced() {
 
   /* the ball is at a position within 0.15 meters radius from the requested position */
   if (DistanceToBall(designated_position.x, designated_position.y)
-    > 150) {
+    > 150)
+  {
     return false;
   }
 
@@ -221,30 +264,37 @@ bool AutomatedReferee::BallSuccessfullyPlaced() {
 
 /* Assuming ball is out of field, returns the point of where ball should be
    placed for freekick/cornerkick. */
-struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition() {
+struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition()
+{
   struct Point local_designated_position;
   float ball_x = vision_client_.GetBallPositionX();
   float ball_y = vision_client_.GetBallPositionY();
 
-  if ((ball_x > 4500 && ball_y > 500) || (ball_x >= 4300 && ball_y > 3000)) {
+  if ((ball_x > 4500 && ball_y > 500) || (ball_x >= 4300 && ball_y > 3000))
+  {
     local_designated_position.x = 4300;
     local_designated_position.y = 2800;
   } else if ((ball_x > 4500 && ball_y < -0500) ||
-             (ball_x >= 4300 && ball_y < -3000)) {
+             (ball_x >= 4300 && ball_y < -3000))
+  {
     local_designated_position.x = 4300;
     local_designated_position.y = -2800;
   } else if ((ball_x < -4500 && ball_y > 0500) ||
-             (ball_x <= -4300 && ball_y > 3000)) {
+             (ball_x <= -4300 && ball_y > 3000))
+  {
     local_designated_position.x = -4300;
     local_designated_position.y = 2800;
   } else if ((ball_x < -4500 && ball_y < -0500) ||
-             (ball_x <= -4300 && ball_y < -3000)) {
+             (ball_x <= -4300 && ball_y < -3000))
+  {
     local_designated_position.x = -4300;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 && ball_y < -3000) {
+  } else if (ball_x > -4300 && ball_x < 4300 && ball_y < -3000)
+  {
     local_designated_position.x = ball_x;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 && ball_y > 3000) {
+  } else if (ball_x > -4300 && ball_x < 4300 && ball_y > 3000)
+  {
     local_designated_position.x = ball_x;
     local_designated_position.y = 2800;
   }
@@ -254,8 +304,10 @@ struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition() {
 
 /* Translate RefereeCommand enumerator to string */
 std::string
-AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command) {
-  switch (referee_command) {
+AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command)
+{
+  switch (referee_command)
+  {
   case RefereeCommand::HALT: return "HALT";
   case RefereeCommand::STOP: return "STOP";
   case RefereeCommand::NORMAL_START: return "NORMAL_START";

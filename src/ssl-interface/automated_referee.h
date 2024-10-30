@@ -276,14 +276,14 @@ protected:
   float DistanceToBall(int id, enum Team team);
 
   /*!
-    * @brief Returns the distance to ball and specified point
+    * @brief Returns the distance to ball and specified point.
     */
   float DistanceToBall(float x, float y);
 
   /*!
-    * @brief Returns true when ball is in blue teams goal.
+    * @brief Returns true when ball is in the goal of the specified team.
     */
-  bool IsBallInBlueGoal(float ball_x, float ball_y);
+  bool IsBallInGoal(enum Team team);
 
   /*!
     * @brief Returns true when ball is in yellow teams goal.
