@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Emil Åberg
  * Creation date: 2024-09-16
- * Last modified: 2024-09-19 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: demo of the ssl vision client
  * License: See LICENSE file for license details.
  *==============================================================================

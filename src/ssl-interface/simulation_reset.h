@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Emil Åberg
  * Creation date: 2024-10-21
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: Provides function to reset robots and ball in grSim
  * License: See LICENSE file for license details.
  *==============================================================================

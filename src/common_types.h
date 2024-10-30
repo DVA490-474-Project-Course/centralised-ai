@@ -2,16 +2,14 @@
  *==============================================================================
  * Author: Emil Åberg
  * Creation date: 2024-09-24
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: Common types used by the centralized ai program.
  * License: See LICENSE file for license details.
  *==============================================================================
  */
 
-
 #ifndef CENTRALISEDAI_COMMONTYPES_H_
 #define CENTRALISEDAI_COMMONTYPES_H_
-
 
 /* Related .h files */
 

@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Emil Åberg, Aaiza A. Khan
  * Creation date: 2024-10-01
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: A client for receiveing game state from ssl game controller
  * License: See LICENSE file for license details.
  *=============================================================================

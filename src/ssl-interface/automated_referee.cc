@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
- * Last modified: 2024-10-23 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: Automates referee commands based on robot and ball positions.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -12,10 +12,10 @@
 #include "automated_referee.h"
 
 /* C++ standard library headers */
+#include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
-#include <cmath>
 
 /* Project .h files */
 #include "ssl_vision_client.h"
