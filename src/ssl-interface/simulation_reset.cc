@@ -21,8 +21,8 @@
 #include <string>
 
 /* Project .h files */
-#include "grSim_Commands.pb.h"
-#include "grSim_Packet.pb.h"
+#include "generated/grSim_Commands.pb.h"
+#include "generated/grSim_Packet.pb.h"
 
 namespace centralised_ai
 {

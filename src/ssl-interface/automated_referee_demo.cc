@@ -1,8 +1,20 @@
-#include "ssl_automated_referee.h"
-#include "ssl_vision_client.h"
+/* automated_referee_demo.cc
+ *==============================================================================
+ * Author: Emil Åberg
+ * Creation date: 2024-10-23
+ * Last modified: 2024-10-30 by Emil Åberg
+ * Description: demo of the automated referee
+ * License: See LICENSE file for license details.
+ *==============================================================================
+ */
+
+/* C++ standard library headers */
 #include <iostream>
 #include <string>
 
+/* Project .h files */
+#include "automated_referee.h"
+#include "ssl_vision_client.h"
 #include "../common_types.h"
 
 using namespace centralised_ai::ssl_interface;

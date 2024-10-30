@@ -8,9 +8,12 @@
  *==============================================================================
  */
 
+/* C system headers */
 #include <iostream>
 #include <fstream>
 #include <string>
+
+/* Project .h files */
 #include "ssl_game_controller_client.h"
 
 int main(int argc, char *argv[])

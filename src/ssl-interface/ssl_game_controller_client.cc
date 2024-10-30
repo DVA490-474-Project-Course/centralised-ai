@@ -18,7 +18,7 @@
 #include <string> 
 
 /* Project .h files */
-#include "ssl_gc_referee_message.pb.h"
+#include "generated/ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai

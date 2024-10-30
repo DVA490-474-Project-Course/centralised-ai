@@ -1,4 +1,4 @@
-/* ssl_automated_referee.h
+/* automated_referee.h
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
@@ -9,7 +9,7 @@
  */
 
 /* Related .h files */
-#include "ssl_automated_referee.h"
+#include "automated_referee.h"
 
 /* C++ standard library headers */
 #include <iostream>
@@ -19,8 +19,8 @@
 
 /* Project .h files */
 #include "ssl_vision_client.h"
-#include "../common_types.h"
 #include "simulation_reset.h"
+#include "../common_types.h"
 
 namespace centralised_ai {
 namespace ssl_interface {
@@ -199,6 +199,7 @@ float AutomatedReferee::DistanceToBall(float x, float y) {
     std::pow((vision_client_.GetBallPositionY() - y), 2));
 }
 
+/* Returns true if ball is considered sucessfully placed according to SSL rules */
 bool AutomatedReferee::BallSuccessfullyPlaced() {
   /* there is no robot within 0.05 meters distance to the ball */
   for (auto team : {Team::kYellow, Team::kBlue}) {

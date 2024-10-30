@@ -1,4 +1,4 @@
-/* ssl_automated_referee.h
+/* automated_referee.h
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef SSL_AUTOMATED_REFEREE_H
-#define SSL_AUTOMATED_REFEREE_H
+#ifndef automated_referee_H
+#define automated_referee_H
 
 /* C++ standard library headers */
 #include <string>
@@ -312,4 +312,4 @@ protected:
 } /* namespace ssl_interface */
 } /* namespace centralised_ai */
 
-#endif /* SSL_AUTOMATED_REFEREE_H */
+#endif /* automated_referee_H */

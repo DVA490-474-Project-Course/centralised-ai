@@ -18,7 +18,7 @@
 #include <string> 
 
 /* Project .h files */
-#include "ssl_gc_referee_message.pb.h"
+#include "generated/ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
@@ -26,6 +26,9 @@ namespace centralised_ai
 namespace ssl_interface
 {
 
+/*
+ * @brief Max datagram size of received UDP packets
+ */
 const int max_datagram_size = 65536;
 
 /*!
