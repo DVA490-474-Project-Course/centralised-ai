@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
   /* Demo the sslvision client */
-  centralized_ai::ssl_interface::VisionClient vision_client("127.0.0.1", 10006);
+  centralised_ai::ssl_interface::VisionClient vision_client("127.0.0.1", 10006);
   while (true)
   {
     vision_client.ReceivePacket();

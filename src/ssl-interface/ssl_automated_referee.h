@@ -18,7 +18,7 @@
 #include "ssl_vision_client.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -310,6 +310,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */
 
 #endif /* SSL_AUTOMATED_REFEREE_H */

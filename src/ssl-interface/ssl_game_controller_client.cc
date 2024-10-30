@@ -21,7 +21,7 @@
 #include "ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -179,4 +179,4 @@ enum Team GameControllerClient::GetTeamOnPositiveHalf() {return team_on_positive
 /* enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;} */
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */

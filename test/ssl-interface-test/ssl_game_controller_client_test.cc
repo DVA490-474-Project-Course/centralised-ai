@@ -12,7 +12,7 @@
 #include "../../src/ssl-interface/generated/ssl_gc_referee_message.pb.h" // Protobuf file
 #include "../../src/common_types.h"
 
-using namespace centralized_ai::ssl_interface;
+using namespace centralised_ai::ssl_interface;
 using ::testing::Return;
 using ::testing::_;
 
@@ -22,13 +22,13 @@ public:
     MockGameControllerClient(std::string ip, int port) : GameControllerClient(ip, port) {}
 
     MOCK_METHOD(void, ReceivePacket, (), (override));
-    MOCK_METHOD(centralized_ai::RefereeCommand, GetRefereeCommand, (), (override));
+    MOCK_METHOD(centralised_ai::RefereeCommand, GetRefereeCommand, (), (override));
     MOCK_METHOD(int, GetBlueTeamScore, (), (override));
     MOCK_METHOD(int, GetYellowTeamScore, (), (override));
     MOCK_METHOD(float, GetBallDesignatedPositionX, (), (override));
     MOCK_METHOD(float, GetBallDesignatedPositionY, (), (override));
     MOCK_METHOD(int64_t, GetStageTimeLeft, (), (override));
-    MOCK_METHOD(centralized_ai::Team, GetTeamOnPositiveHalf, (), (override));
+    MOCK_METHOD(centralised_ai::Team, GetTeamOnPositiveHalf, (), (override));
 };
 
 // Test Fixture
@@ -50,10 +50,10 @@ protected:
 // Test for checking referee command reception
 TEST_F(GameControllerClientTest, TestGetRefereeCommand) {
     EXPECT_CALL(mock_client, GetRefereeCommand())
-        //.WillOnce(Return(centralized_ai::ssl_interface::RefereeCommand::NORMAL_START));
-        .WillOnce(Return(centralized_ai::RefereeCommand::NORMAL_START));
+        //.WillOnce(Return(centralised_ai::ssl_interface::RefereeCommand::NORMAL_START));
+        .WillOnce(Return(centralised_ai::RefereeCommand::NORMAL_START));
 
-    ASSERT_EQ(mock_client.GetRefereeCommand(), centralized_ai::RefereeCommand::NORMAL_START);
+    ASSERT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::NORMAL_START);
 }
 
 // Test for blue team score
@@ -99,9 +99,9 @@ TEST_F(GameControllerClientTest, TestGetStageTimeLeft) {
 // Test for team assigned to positive half of the field
 TEST_F(GameControllerClientTest, TestGetTeamOnPositiveHalf) {
     EXPECT_CALL(mock_client, GetTeamOnPositiveHalf())
-        .WillOnce(Return(centralized_ai::Team::kBlue));
+        .WillOnce(Return(centralised_ai::Team::kBlue));
 
-    ASSERT_EQ(mock_client.GetTeamOnPositiveHalf(), centralized_ai::Team::kBlue);
+    ASSERT_EQ(mock_client.GetTeamOnPositiveHalf(), centralised_ai::Team::kBlue);
 }
 
 // Test for packet reception

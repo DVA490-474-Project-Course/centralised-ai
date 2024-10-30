@@ -25,7 +25,7 @@
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -203,4 +203,4 @@ float VisionClient::GetBallPositionY()
 }
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */

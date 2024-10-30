@@ -14,7 +14,7 @@
 #include "../../src/common_types.h"
 
 // Mock VisionClient class
-class MockVisionClient : public centralized_ai::ssl_interface::VisionClient {
+class MockVisionClient : public centralised_ai::ssl_interface::VisionClient {
 public:
     MockVisionClient(std::string ip, int port) : VisionClient(ip, port) {}
 
@@ -31,7 +31,7 @@ public:
     void SetBallPositionY(float value) {ball_position_y = value;}
 };
 
-class VisionClientDerived : public centralized_ai::ssl_interface::VisionClient
+class VisionClientDerived : public centralised_ai::ssl_interface::VisionClient
 {
 public:
   using VisionClient::VisionClient;
@@ -131,9 +131,9 @@ TEST(VisionClientTest, ReceivesAndParsesPacket) {
             }));
     // Call the method and verify the results
     mock_client.ReceivePacket();
-    EXPECT_EQ(mock_client.GetRobotPositionX(1, centralized_ai::Team::kBlue), 50.0f);
-    EXPECT_EQ(mock_client.GetRobotPositionY(1, centralized_ai::Team::kBlue), 100.0f);
-    EXPECT_EQ(mock_client.GetRobotOrientation(1, centralized_ai::Team::kBlue), 1.57f);
+    EXPECT_EQ(mock_client.GetRobotPositionX(1, centralised_ai::Team::kBlue), 50.0f);
+    EXPECT_EQ(mock_client.GetRobotPositionY(1, centralised_ai::Team::kBlue), 100.0f);
+    EXPECT_EQ(mock_client.GetRobotOrientation(1, centralised_ai::Team::kBlue), 1.57f);
     EXPECT_EQ(mock_client.GetBallPositionX(), 75.0f);
     EXPECT_EQ(mock_client.GetBallPositionY(), 150.0f);
 }
@@ -169,8 +169,8 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
     mock_client.ReceivePacket();
 
     // Verify that no robots or balls were detected
-    EXPECT_EQ(mock_client.GetRobotPositionX(0, centralized_ai::Team::kBlue), 0.0f);
-    EXPECT_EQ(mock_client.GetRobotPositionY(0, centralized_ai::Team::kBlue), 0.0f);
+    EXPECT_EQ(mock_client.GetRobotPositionX(0, centralised_ai::Team::kBlue), 0.0f);
+    EXPECT_EQ(mock_client.GetRobotPositionY(0, centralised_ai::Team::kBlue), 0.0f);
     EXPECT_EQ(mock_client.GetBallPositionX(), 0.0f);
     EXPECT_EQ(mock_client.GetBallPositionY(), 0.0f);
 }
@@ -217,9 +217,9 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
     mock_client.ReceivePacket();
 
     // Verify the position and orientation of the robot
-    EXPECT_EQ(mock_client.GetRobotPositionX(0, centralized_ai::Team::kBlue), 50.0f);
-    EXPECT_EQ(mock_client.GetRobotPositionY(0,centralized_ai::Team::kBlue), 100.0f);
-    EXPECT_EQ(mock_client.GetRobotOrientation(0, centralized_ai::Team::kBlue), 0.0f); // Check default orientation
+    EXPECT_EQ(mock_client.GetRobotPositionX(0, centralised_ai::Team::kBlue), 50.0f);
+    EXPECT_EQ(mock_client.GetRobotPositionY(0,centralised_ai::Team::kBlue), 100.0f);
+    EXPECT_EQ(mock_client.GetRobotOrientation(0, centralised_ai::Team::kBlue), 0.0f); // Check default orientation
 }
 
 // Test case 5: Handles multiple robots and a ball
@@ -280,9 +280,9 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
 
     // Verify the positions and orientations of the robots
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(mock_client.GetRobotPositionX(i, centralized_ai::Team::kBlue), 50.0f + i * 10.0f);
-        EXPECT_EQ(mock_client.GetRobotPositionY(i, centralized_ai::Team::kBlue), 100.0f + i * 5.0f);
-        EXPECT_EQ(mock_client.GetRobotOrientation(i, centralized_ai::Team::kBlue), 1.0f + i * 0.5f);
+        EXPECT_EQ(mock_client.GetRobotPositionX(i, centralised_ai::Team::kBlue), 50.0f + i * 10.0f);
+        EXPECT_EQ(mock_client.GetRobotPositionY(i, centralised_ai::Team::kBlue), 100.0f + i * 5.0f);
+        EXPECT_EQ(mock_client.GetRobotOrientation(i, centralised_ai::Team::kBlue), 1.0f + i * 0.5f);
     }
 
     // Verify the position of the single tracked ball

@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef CENTRALIZEDAI_SSLVISIONCLIENT_H_
-#define CENTRALIZEDAI_SSLVISIONCLIENT_H_
+#ifndef CENTRALISEDAI_SSLVISIONCLIENT_H_
+#define CENTRALISEDAI_SSLVISIONCLIENT_H_
 
 /* C system headers */
 #include <arpa/inet.h>
@@ -22,7 +22,7 @@
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -185,6 +185,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */
 
-#endif /* CENTRALIZEDAI_SSLVISIONCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLVISIONCLIENT_H_ */

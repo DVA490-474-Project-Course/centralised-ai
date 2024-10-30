@@ -22,7 +22,7 @@
 #include "../common_types.h"
 #include "simulation_reset.h"
 
-namespace centralized_ai {
+namespace centralised_ai {
 namespace ssl_interface {
 
 /* Constructor */
@@ -283,4 +283,4 @@ enum Team AutomatedReferee::TeamOnPositiveHalf() {return team_on_positive_half;}
 int64_t AutomatedReferee::GetStageTimeLeft() {return stage_time_left;};
 
 } /* namespace ssl_interface */
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */

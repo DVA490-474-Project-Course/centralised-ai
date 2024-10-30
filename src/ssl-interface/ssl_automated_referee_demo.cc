@@ -5,7 +5,7 @@
 
 #include "../common_types.h"
 
-using namespace centralized_ai::ssl_interface;
+using namespace centralised_ai::ssl_interface;
 
 int main()
 {
@@ -18,14 +18,14 @@ int main()
   int grsim_port = 20011;
 
   /* Create the VisionClient instance with IP and port */
-  centralized_ai::ssl_interface::VisionClient vision_client(vision_ip, vision_port);
+  centralised_ai::ssl_interface::VisionClient vision_client(vision_ip, vision_port);
   vision_client.ReceivePacket();
 
   /* Create the AutomatedReferee instance with the VisionClient */
   AutomatedReferee referee(vision_client, grsim_ip, grsim_port);
 
   /* Start the automated referee */
-  referee.StartGame(centralized_ai::Team::kBlue, centralized_ai::Team::kBlue, 3.0F, 300);
+  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kBlue, 3.0F, 300);
 
   while (true)
   {

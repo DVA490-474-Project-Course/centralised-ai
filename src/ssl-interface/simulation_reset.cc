@@ -24,7 +24,7 @@
 #include "grSim_Commands.pb.h"
 #include "grSim_Packet.pb.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -127,4 +127,4 @@ void ResetRobotsAndBall(std::string ip, uint16_t port)
 }
 
 } /* namespace ssl_interface */
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */

@@ -8,8 +8,8 @@
  *=============================================================================
  */
 
-#ifndef CENTRALIZEDAI_SSLGMAECONTROLLERCLIENT_H_
-#define CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_
+#ifndef CENTRALISEDAI_SSLGMAECONTROLLERCLIENT_H_
+#define CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_
 
 /* C system headers */
 #include <arpa/inet.h>
@@ -21,7 +21,7 @@
 #include "ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -170,6 +170,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */
 
-#endif /* CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_ */

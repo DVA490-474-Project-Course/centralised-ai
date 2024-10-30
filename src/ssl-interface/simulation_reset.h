@@ -14,7 +14,7 @@
 /* C++ standard library headers */
 #include <string>
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -23,6 +23,6 @@ namespace ssl_interface
 void ResetRobotsAndBall(std::string ip, uint16_t port);
 
 } /* namespace ssl_interface */
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */
 
 #endif /* SIMULATION_RESET_H */
