@@ -91,7 +91,7 @@ protected:
 TEST_F(VisionClientDerived, InitializesCorrectly) {
 
     EXPECT_EQ(mock_client.GetClientAddress().sin_family, AF_INET);
-    EXPECT_EQ(ntohs(mock_client.GetClientAddress().sin_port), 10001);
+    EXPECT_EQ(ntohs(mock_client.GetClientAddress().sin_port), 10006);
     EXPECT_EQ(mock_client.GetClientAddress().sin_addr.s_addr, inet_addr("127.0.0.1"));
     /* socket should be valid (>= 0)*/
     EXPECT_GE(mock_client.GetSocket(), 0);
