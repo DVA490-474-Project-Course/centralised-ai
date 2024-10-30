@@ -106,7 +106,7 @@ struct World {
   @param max_distance: The maximum distance from the average position of all the robots when no reward will be given anymore. @note max_distance cannot be 0!
   @param max_reward: The maximum reward that will be given when a robot is within the range [0, max_distance].
 */
-torch::Tensor compute_average_distance_reward(torch::Tensor positions, float max_distance, float max_reward);
+torch::Tensor ComputeAverageDistanceReward(torch::Tensor positions, float max_distance, float max_reward);
 
 }
 }
