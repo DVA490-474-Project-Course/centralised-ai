@@ -190,6 +190,10 @@ protected:
   /* Private methods */
   /**************************/
 
+  /*!
+   * @brief Read the data from the protobuf data in the argument and store it locally
+   * in the class instance.
+   */
   void ReadVisionData(SSL_WrapperPacket packet);
 };
 
