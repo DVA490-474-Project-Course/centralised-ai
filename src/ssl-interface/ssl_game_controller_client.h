@@ -2,14 +2,14 @@
  *==============================================================================
  * Author: Emil Åberg, Aaiza A. Khan
  * Creation date: 2024-10-01
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: A client for receiveing game state from ssl game controller
  * License: See LICENSE file for license details.
  *=============================================================================
  */
 
-#ifndef CENTRALIZEDAI_SSLGMAECONTROLLERCLIENT_H_
-#define CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_
+#ifndef CENTRALISEDAI_SSLGMAECONTROLLERCLIENT_H_
+#define CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_
 
 /* C system headers */
 #include <arpa/inet.h>
@@ -18,14 +18,17 @@
 #include <string> 
 
 /* Project .h files */
-#include "ssl_gc_referee_message.pb.h"
+#include "generated/ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
 
+/*
+ * @brief Max datagram size of received UDP packets
+ */
 const int max_datagram_size = 65536;
 
 /*!
@@ -170,6 +173,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */
 
-#endif /* CENTRALIZEDAI_SSLGAMECONTROLLERCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_ */

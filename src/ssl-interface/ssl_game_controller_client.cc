@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Emil Åberg, Aaiza A. Khan
  * Creation date: 2024-10-01
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: A client for receiveing game state from ssl game controller
  * License: See LICENSE file for license details.
  *=============================================================================
@@ -18,10 +18,10 @@
 #include <string> 
 
 /* Project .h files */
-#include "ssl_gc_referee_message.pb.h"
+#include "generated/ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -172,11 +172,11 @@ void GameControllerClient::Print()
 enum RefereeCommand GameControllerClient::GetRefereeCommand() {return referee_command;}
 int GameControllerClient::GetBlueTeamScore() {return blue_team_score;}
 int GameControllerClient::GetYellowTeamScore() {return yellow_team_score;}
-float GameControllerClient::GetBallDesignatedPositionX() {return blue_team_score;}
-float GameControllerClient::GetBallDesignatedPositionY() {return yellow_team_score;}
+float GameControllerClient::GetBallDesignatedPositionX() {return ball_designated_position_x;}
+float GameControllerClient::GetBallDesignatedPositionY() {return ball_designated_position_y;}
 int64_t GameControllerClient::GetStageTimeLeft() {return stage_time_left;}
 enum Team GameControllerClient::GetTeamOnPositiveHalf() {return team_on_positive_half;}
 /* enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;} */
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */
