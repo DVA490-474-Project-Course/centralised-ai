@@ -185,6 +185,16 @@ protected:
    * @brief Y coordinate of the ball.
    */
   float ball_position_y;
+
+  /**************************/
+  /* Private methods */
+  /**************************/
+
+  /*!
+   * @brief Read the data from the protobuf data in the argument and store it locally
+   * in the class instance.
+   */
+  void ReadVisionData(SSL_WrapperPacket packet);
 };
 
 } /* namespace ssl_interface */
