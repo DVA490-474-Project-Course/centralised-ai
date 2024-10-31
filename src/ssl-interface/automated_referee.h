@@ -67,7 +67,7 @@ public:
     * @param[in] stage_time The stage time duration.
     */
   void StartGame(enum Team starting_team, enum Team team_on_positive_half,
-    double prepare_kickoff_start_time, int64_t stage_time);
+    double prepare_kickoff_duration, int64_t stage_time);
 
   /*!
     * @brief Stop the automated referee, outputs will no longer be updated.
