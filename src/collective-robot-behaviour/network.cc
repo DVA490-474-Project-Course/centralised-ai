@@ -20,11 +20,11 @@ extern int num_actions;
 extern int amount_of_players_in_team;
 extern int hidden_size;
 namespace centralised_ai {
-namespace collective_robot_behaviour
-{
+namespace collective_robot_behaviour{
+
 DataBuffer::DataBuffer()
-    : A(torch::zeros({1, hidden_size})),
-      R(torch::zeros({1, hidden_size})) {
+    : A(torch::zeros({1, amount_of_players_in_team})),
+      R(torch::zeros({1, amount_of_players_in_team})) {
 }
 
 Agents::Agents(int id, PolicyNetwork network)

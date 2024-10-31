@@ -21,9 +21,10 @@ namespace collective_robot_behaviour {
     return state_vector;
   }
   /*Get the agents reward*/
-  float GetRewards() {
-    float reward = 1.0;
-    return reward;
+  torch::Tensor GetRewards() {
+    // Generate a tensor of shape [1, 6] with random values
+    auto rewards = torch::randn({1, amount_of_players_in_team}); // Adjust the second dimension if your number of players changes
+    return rewards; // Return the rewards tensor
   }
 }/* namespace centralised_ai */
 }/*namespace collective_robot_behaviour*/

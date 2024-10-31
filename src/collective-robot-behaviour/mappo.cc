@@ -19,6 +19,7 @@
 /* Projects .h files for communication functions. */
 #include "communication.h"
 #include "network.h"
+#include "utils.h"
 
 /*Configuration values*/
 extern int max_timesteps;
@@ -49,20 +50,30 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
 };
 
 
+void orthogonalInit(torch::Tensor& tensor) {
+  torch::nn::init::orthogonal_(tensor);
+}
+
 /*
 * The full Mappo function for robot decision-making and training.
 * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
 * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
 */
-void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
+  void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 
-/*Amount of steps the model will be trained for*/
+  auto param_p_old = torch::nn::init::orthogonal_(torch::empty({4, 3}));
+  std::cout << Models[0].policy_network.parameters() << std::endl;
+  std::cout << param_p_old << std::endl;
+
+  /*Amount of steps the model will be trained for*/
   while (steps < step_max) {
   std::vector<DataBuffer> data_buffer; /*Initialise data buffer D. Reset each step*/
   /* Gain enough batch for training */
   for (int i = 1; i <= batch_size; i++) {
     /*Reset/initialise hidden states for timestep 0*/
     auto[trajectories,act_prob,action] = ResetHidden();
+    std::vector<torch::Tensor> criticvalues = {torch::zeros({1,1})};
+    std::cout << criticvalues << std::endl;
     /*Loop for amount of timestamps in each bach */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
 
@@ -71,11 +82,10 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
     std::vector<float> rewards;
     Trajectory exp;
     HiddenStates new_states;
-
     torch::Tensor state = GetStates(); /*Get current state as vector*/
     /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
     auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
-
+    criticvalues.push_back(valNetOutput);
     /* For each agent in one timestep, get probabilities and hidden states*/
     for (auto& agent : Models) {
       /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
@@ -108,9 +118,20 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 
     } /*end for timestep*/
 
+  std::vector<torch::Tensor> reward_arr;
+  for (auto& trajectory: trajectories) {
+    std::cerr << trajectory.rewards << std::endl;
+    reward_arr.push_back(trajectory.rewards);
+  }
+  torch::Tensor rewards_tensor = torch::cat(reward_arr, /*dim=*/0);
+  torch::Tensor critic_values_array = torch::cat(criticvalues, /*dim=*/0);
+
   /*compute GAE and reward-go-to*/
-  torch::Tensor A = torch::rand({max_timesteps, 1});
-  torch::Tensor R = torch::rand({max_timesteps, 1});
+  auto TemporalDifference = ComputeTemporalDifference(critic_values_array,rewards_tensor,0.9);
+  torch::Tensor A =  ComputeGeneralAdvantageEstimation(TemporalDifference,0.99, 0.95);
+
+  torch::Tensor rew_sum = rewards_tensor.sum(1);
+  torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
   /*Split trajectories into chunks of lenght L*/
   int L = 6;
@@ -167,8 +188,10 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 } /*end for*/
 
 
-/*ADAM UPDATE NETWORKS*/
+  /*ADAM UPDATE NETWORKS*/
+  //Critic
 
+  //ComputeProbabilityRatio()
   UpdateNets(Models, critic,data_buffer); /*update networks*/
   SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
 

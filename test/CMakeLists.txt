@@ -15,7 +15,8 @@ enable_testing()
 #===============================================================================
 # Setup gtest with main_test
 
-add_executable(main_test_exe main_test.cc)
+add_executable(main_test_exe main_test.cc
+        collective-robot-behaviour-test/mappo_test.c)
 
 # !!! Add any libraries (MADE BY YOU!) that your tests use here !!!
 target_link_libraries(

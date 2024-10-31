@@ -40,7 +40,7 @@ torch::Tensor GetStates();
  *
  *@param[Out] float of the calculated reward
  */
-float GetRewards();
+  torch::Tensor GetRewards();
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
