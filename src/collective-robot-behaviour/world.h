@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-29 by Jacob Johansson
+// Last modified: 2024-11-01 by Jacob Johansson
 // Description: Headers for world.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -107,6 +107,13 @@ struct World {
   @param max_reward: The maximum reward that will be given when a robot is within the range [0, max_distance].
 */
 torch::Tensor ComputeAverageDistanceReward(torch::Tensor positions, float max_distance, float max_reward);
+
+/*!
+  @returns a tensor representing the reward given by when the robot either has the ball or not, with the shape [num_agents, 1].
+  @param reward: The reward given when the robot has the ball.
+*/
+torch::Tensor ComputeHaveBallReward(torch::Tensor & have_ball_flags, float reward);
+
 
 }
 }
