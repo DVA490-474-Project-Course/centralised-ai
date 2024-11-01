@@ -47,6 +47,5 @@ int main()
     referee.Print();
   }
 
-
   return 0;
 }

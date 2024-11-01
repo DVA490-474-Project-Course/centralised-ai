@@ -153,6 +153,21 @@ public:
     */
   int64_t GetStageTimeLeft();
 
+  /*!
+    * @brief Returns true if the specified robot is currently touching the ball.
+    * 
+    * Returns true if the srobot with the given id and team is currently touching
+    * the ball.
+    * 
+    * @param[in] ID of the robot.
+    * 
+    * @param[in] Team color of the robot.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
+  bool IsTouchingBall(int id, enum Team team);
+
 protected:
   /*!
     * @brief Private struct to represent a point on the field.
