@@ -14,7 +14,7 @@ namespace centralised_ai
 namespace collective_robot_behaviour
 {
 
-torch::Tensor ComputeAverageDistanceReward(torch::Tensor positions, float max_distance, float max_reward)
+torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_distance, float max_reward)
 {
 	/* Calculate the average position of all the positions. */
 	torch::Tensor average_position = positions.mean(1, true);
