@@ -20,8 +20,6 @@ torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_
 	torch::Tensor average_position = positions.mean(1, true);
 	torch::Tensor distances = (positions - average_position).pow(2).sum(0); /* [num_agents]. */
 
-	std::cout <<"Average position: " << average_position[0].item<float>() << average_position[1].item<float>() << std::endl;
-
 	torch::Tensor rewards = (-1/pow(max_distance, 2)) * distances + 1; /* Linear function for calculating the reward. */
 
 	return torch::clamp(rewards, 0, 1) * max_reward;
