@@ -61,7 +61,7 @@ namespace collective_robot_behaviour
     Trajectory()
       : /*robotID(-1),*/
         state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
-        actions(torch::zeros({amount_of_players_in_team,num_actions})),
+        actions(torch::zeros({num_actions})),
         rewards(torch::zeros({1,amount_of_players_in_team})),
         new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
 

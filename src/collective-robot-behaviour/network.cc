@@ -19,6 +19,7 @@ extern int input_size; // Number of input features
 extern int num_actions;
 extern int amount_of_players_in_team;
 extern int hidden_size;
+
 namespace centralised_ai {
 namespace collective_robot_behaviour{
 
@@ -34,7 +35,6 @@ Agents::Agents(int id, PolicyNetwork network)
       y_pos(random_floats[1].item<float>()){
 
 }
-
 
 HiddenStates::HiddenStates()
     : ht_p(torch::zeros({1, 1, hidden_size})),  /* Hidden state tensor initialized to zeros*/
@@ -64,6 +64,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
 
   auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
   auto value = output_layer(output);
+
+  //auto probabilities = torch::nn::functional::softmax(value, /*dim=*/1); // Apply softmax on the last dimension
 
   return std::make_tuple(value, hx_new, cx_new);
 }

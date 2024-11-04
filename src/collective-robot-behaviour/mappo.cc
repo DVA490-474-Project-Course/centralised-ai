@@ -43,16 +43,14 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
 
   trajectories.push_back(initial_trajectory);
 
-  torch::Tensor act_prob = torch::zeros({amount_of_players_in_team, num_actions});
+  torch::Tensor act_prob = torch::zeros({num_actions});
   torch::Tensor action;
 
   return std::make_tuple(trajectories, act_prob, action);
 };
 
 
-void orthogonalInit(torch::Tensor& tensor) {
-  torch::nn::init::orthogonal_(tensor);
-}
+
 
 /*
 * The full Mappo function for robot decision-making and training.
@@ -61,9 +59,8 @@ void orthogonalInit(torch::Tensor& tensor) {
 */
   void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 
-  auto param_p_old = torch::nn::init::orthogonal_(torch::empty({4, 3}));
-  std::cout << Models[0].policy_network.parameters() << std::endl;
-  std::cout << param_p_old << std::endl;
+  auto old_net = Models; /*Initalise old network*/
+
 
   /*Amount of steps the model will be trained for*/
   while (steps < step_max) {
@@ -91,7 +88,7 @@ void orthogonalInit(torch::Tensor& tensor) {
       /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
       auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
       /*store action probabilities for the agent*/
-      exp.actions.index_put_({agent.robotId}, act_prob.squeeze());
+      exp.actions = act_prob.reshape({num_actions});;
       /*Store the higest probablity of the actions*/
       actions_agents.push_back(torch::argmax(act_prob).item().toInt());
 
@@ -189,7 +186,32 @@ void orthogonalInit(torch::Tensor& tensor) {
 
 
   /*ADAM UPDATE NETWORKS*/
-  //Critic
+
+  torch::Tensor old_predicts=torch::zeros({sizeof(data_buffer),amount_of_players_in_team});
+  torch::Tensor new_predicts=torch::zeros({sizeof(data_buffer),amount_of_players_in_team});;
+    for (int t = 0; t < sizeof(data_buffer); ++t) {
+      for (int agent = 0; agent < amount_of_players_in_team; ++agent) {
+        // Pass each agent's state at the current timestep through the policy network
+        auto state = data_buffer[t].t[agent].state; /*Get saved state*/
+        auto hc = data_buffer[t].t[agent].hidden_p[agent].ht_p; /*Get saved hidden state*/
+        auto ct = data_buffer[t].t[agent].hidden_p[agent].ct_p; /*Get saved memory cell*/
+        auto old_pi = old_net[agent].policy_network.Forward(state,hc,ct); /*Make new predictions*/
+
+        torch::Tensor output_old = std::get<0>(old_pi); /*Output from old_net*/
+        auto act = torch::argmax(data_buffer[t].t[agent].actions); /*Get the done action from previously*/
+        old_predicts[t][agent] = output_old.index({0,act});
+        //new_predicts[t][agent] = data_buffer[t].t[agent].actions[act];
+        //std::cout << act << std::endl;
+        //std::cout << data_buffer[t].t[agent].actions  << std::endl;
+        //std::cout << data_buffer[t].t[agent].actions[act] << "act value" << std::endl;
+        /*SIZE IS DIFFERENT FOR ACTIONS SOMEHOW!!??? 1,9 and 9 at start*/
+        std::cout << "Shape: " << data_buffer[t].t[agent].actions.sizes() << std::endl;
+        //std::cout << old_predicts << std::endl;
+        //std::cout << new_predicts << std::endl;
+
+
+      }
+    }
 
   //ComputeProbabilityRatio()
   UpdateNets(Models, critic,data_buffer); /*update networks*/
