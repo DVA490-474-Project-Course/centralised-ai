@@ -2,16 +2,14 @@
  *==============================================================================
  * Author: Emil Åberg
  * Creation date: 2024-09-24
- * Last modified: 2024-10-21 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: Common types used by the centralized ai program.
  * License: See LICENSE file for license details.
  *==============================================================================
  */
 
-
-#ifndef CENTRALIZEDAI_COMMONTYPES_H_
-#define CENTRALIZEDAI_COMMONTYPES_H_
-
+#ifndef CENTRALISEDAI_COMMONTYPES_H_
+#define CENTRALISEDAI_COMMONTYPES_H_
 
 /* Related .h files */
 
@@ -21,7 +19,7 @@
 
 /* Project .h files */
 
-namespace centralized_ai
+namespace centralised_ai
 {
 
 /*! 
@@ -89,6 +87,6 @@ enum class RefereeCommand
   UNKNOWN_COMMAND = -1
 };
 
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */
 
-#endif /* CENTRALIZEDAI_COMMONTYPES_H_ */
+#endif /* CENTRALISEDAI_COMMONTYPES_H_ */

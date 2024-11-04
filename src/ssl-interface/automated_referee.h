@@ -1,15 +1,15 @@
-/* ssl_automated_referee.h
+/* automated_referee.h
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
- * Last modified: 2024-10-23 by Emil Åberg
+ * Last modified: 2024-10-30 by Emil Åberg
  * Description: Automates referee commands based on robot and ball positions.
  * License: See LICENSE file for license details.
  *==============================================================================
  */
 
-#ifndef SSL_AUTOMATED_REFEREE_H
-#define SSL_AUTOMATED_REFEREE_H
+#ifndef automated_referee_H
+#define automated_referee_H
 
 /* C++ standard library headers */
 #include <string>
@@ -18,7 +18,7 @@
 #include "ssl_vision_client.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
@@ -67,7 +67,7 @@ public:
     * @param[in] stage_time The stage time duration.
     */
   void StartGame(enum Team starting_team, enum Team team_on_positive_half,
-    double prepare_kickoff_start_time, int64_t stage_time);
+    double prepare_kickoff_duration, int64_t stage_time);
 
   /*!
     * @brief Stop the automated referee, outputs will no longer be updated.
@@ -152,6 +152,21 @@ public:
     * continously.
     */
   int64_t GetStageTimeLeft();
+
+  /*!
+    * @brief Returns true if the specified robot is currently touching the ball.
+    * 
+    * Returns true if the srobot with the given id and team is currently touching
+    * the ball.
+    * 
+    * @param[in] ID of the robot.
+    * 
+    * @param[in] Team color of the robot.
+    * 
+    * @pre In order to have the data available AnalyzeGameState() needs to be called
+    * continously.
+    */
+  bool IsTouchingBall(int id, enum Team team);
 
 protected:
   /*!
@@ -276,14 +291,14 @@ protected:
   float DistanceToBall(int id, enum Team team);
 
   /*!
-    * @brief Returns the distance to ball and specified point
+    * @brief Returns the distance to ball and specified point.
     */
   float DistanceToBall(float x, float y);
 
   /*!
-    * @brief Returns true when ball is in blue teams goal.
+    * @brief Returns true when ball is in the goal of the specified team.
     */
-  bool IsBallInBlueGoal(float ball_x, float ball_y);
+  bool IsBallInGoal(enum Team team);
 
   /*!
     * @brief Returns true when ball is in yellow teams goal.
@@ -310,6 +325,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namespace centralized_ai */
+} /* namespace centralised_ai */
 
-#endif /* SSL_AUTOMATED_REFEREE_H */
+#endif /* automated_referee_H */
