@@ -63,9 +63,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   auto cx_new = std::get<1>(std::get<1>(lstm_output));
 
   auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
-  auto value = output_layer(output);
-
-  //auto probabilities = torch::nn::functional::softmax(value, /*dim=*/1); // Apply softmax on the last dimension
+  auto value = torch::nn::functional::softmax(output_layer(output), /*dim=*/1); // Apply softmax on the last dimension
 
   return std::make_tuple(value, hx_new, cx_new);
 }
@@ -180,10 +178,10 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   return agents;
 }
 
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff) {
+void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff, torch::Tensor policy_loss) {
 
   torch::Tensor targets = torch::tensor({{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, torch::dtype(torch::kFloat));
-  torch::Tensor loss = torch::tensor(0.004, torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor loss = torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
 
   //update each agent
   for (auto& agent : agents)
