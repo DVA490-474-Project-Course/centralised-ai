@@ -2,14 +2,14 @@
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi Puthiya Kunnon, Emil Åberg
  * Creation date: 2024-09-20
- * Last modified: 2024-10-21 by Shruthi Puthiya Kunnon
+ * Last modified: 2024-10-30 by Shruthi Puthiya Kunnon
  * Description: A UDP client receiving ball and robots positions from ssl-vision
  * License: See LICENSE file for license details.
  *==============================================================================
  */
 
-#ifndef CENTRALIZEDAI_SSLVISIONCLIENT_H_
-#define CENTRALIZEDAI_SSLVISIONCLIENT_H_
+#ifndef CENTRALISEDAI_SSLVISIONCLIENT_H_
+#define CENTRALISEDAI_SSLVISIONCLIENT_H_
 
 /* C system headers */
 #include <arpa/inet.h>
@@ -18,15 +18,18 @@
 #include <string> 
 
 /* Project .h files */
-#include "messages_robocup_ssl_detection.pb.h"
-#include "messages_robocup_ssl_wrapper.pb.h"
+#include "generated/messages_robocup_ssl_detection.pb.h"
+#include "generated/messages_robocup_ssl_wrapper.pb.h"
 #include "../common_types.h"
 
-namespace centralized_ai
+namespace centralised_ai
 {
 namespace ssl_interface
 {
 
+/*
+ * @brief Max datagram size of received UDP packets
+ */
 const int max_datagram_size = 65536;
 
 /*!
@@ -182,9 +185,19 @@ protected:
    * @brief Y coordinate of the ball.
    */
   float ball_position_y;
+
+  /**************************/
+  /* Private methods */
+  /**************************/
+
+  /*!
+   * @brief Read the data from the protobuf data in the argument and store it locally
+   * in the class instance.
+   */
+  void ReadVisionData(SSL_WrapperPacket packet);
 };
 
 } /* namespace ssl_interface */
-} /* namesapce centralized_ai */
+} /* namesapce centralised_ai */
 
-#endif /* CENTRALIZEDAI_SSLVISIONCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLVISIONCLIENT_H_ */
