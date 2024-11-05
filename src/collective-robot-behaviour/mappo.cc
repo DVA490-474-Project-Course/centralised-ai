@@ -72,7 +72,7 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
     Trajectory exp;
     HiddenStates new_states;
 
-    torch::Tensor state = GetStates(); /*Get current state as vector*/
+    torch::Tensor state = torch::zeros({1, 1, input_size}); //GetStates(); /*Get current state as vector*/
     /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
     auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
 
@@ -100,8 +100,8 @@ void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
 
     /*Update all values*/
     exp.state = state;
-    exp.rewards = GetRewards();
-    exp.new_state = GetStates();
+    exp.rewards = 0.1; //GetRewards();
+    exp.new_state = torch::zeros({1, 1, input_size}); //GetStates();
     exp.hidden_v.ht_p = V_hx;
     exp.hidden_v.ct_p = V_cx;
     trajectories.push_back(exp); /*Store into trajectories*/

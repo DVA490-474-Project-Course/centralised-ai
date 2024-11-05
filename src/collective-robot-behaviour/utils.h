@@ -80,7 +80,7 @@ namespace collective_robot_behaviour
 
     /*!
     @returns the policy entropy.
-    @param[In] actions_probabilities: Probabilities of choosing actions for each agent and time step, with the shape [num_time_steps, num_agents, num_actions].
+    @param[In] actions_probabilities: Probabilities of all the actions for each agent and time step, with the shape [num_time_steps, num_agents, num_actions].
     @param[In] entropy_coefficient: The parameter used to determine the weight of the entropy.
     */
     torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, float entropy_coefficient);

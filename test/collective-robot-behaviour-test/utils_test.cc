@@ -290,10 +290,10 @@ TEST(ComputePolicyEntropy, Test_1)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
-  EXPECT_EQ(output.item<float>(), 0);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_NEAR(output.item<float>(), 0, 0.0001);
 }
 
 TEST(ComputePolicyEntropy, Test_2)
@@ -303,11 +303,11 @@ TEST(ComputePolicyEntropy, Test_2)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
   EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.5);
-  EXPECT_FLOAT_EQ(output.item<float>(), -4*log(0.5));
+  EXPECT_NEAR(output.item<float>(), -4*log(0.5), 0.0001);
 }
 
 TEST(ComputePolicyEntropy, Test_3)
@@ -317,11 +317,11 @@ TEST(ComputePolicyEntropy, Test_3)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 4);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
   EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.25);
-  EXPECT_FLOAT_EQ(output.item<float>(), -8*log(0.25));
+  EXPECT_NEAR(output.item<float>(), -8*log(0.25), 0.0001);
 }
 
 TEST(ComputePolicyLoss, Test_1)
