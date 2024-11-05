@@ -13,6 +13,7 @@
 #include <torch/torch.h>
 #include "../ssl-interface/automated_referee.h"
 #include "../common_types.h"
+#include "world.h"
 
 /*Extern values*/
 extern int input_size;

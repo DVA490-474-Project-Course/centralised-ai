@@ -79,7 +79,7 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
     std::vector<float> rewards;
     Trajectory exp;
     HiddenStates new_states;
-    torch::Tensor state = GetStates(); /*Get current state as vector*/
+    torch::Tensor state = torch::zeros(40); //GetStates(); /*Get current state as vector*/
     torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team}));
 
     /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
@@ -115,8 +115,8 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
     exp.actions = actions_agents;
     exp.state = state;
     exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-    exp.rewards = GetRewards();
-    exp.new_state = GetStates();
+    exp.rewards = torch::zeros(6); //GetRewards();
+    exp.new_state = torch::zeros(40); //GetStates();
     exp.hidden_v.ht_p = V_hx;
     exp.hidden_v.ct_p = V_cx;
     trajectories.push_back(exp); /*Store into trajectories*/

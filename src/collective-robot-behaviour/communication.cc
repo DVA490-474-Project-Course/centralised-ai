@@ -38,7 +38,7 @@ namespace collective_robot_behaviour
 
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
-    torch::Tensor states = torch::empty(40);
+    torch::Tensor states = torch::empty(41);
     states[0] = 0; /* Reserved for the robot id. */
 
     /* Ball position */
@@ -115,9 +115,10 @@ namespace collective_robot_behaviour
     positions[1][5] = states[14];
 
     torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, 1, reward_configuration.average_distance_reward);
-    torch::Tensor have_ball = states.slice(0, 28, 33).expand({6, 1});
-
+    
+    torch::Tensor have_ball = states.slice(0, 28, 34);
     torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
+    
     torch::Tensor total_reward = average_distance_reward + have_ball_reward;
 
     return total_reward;

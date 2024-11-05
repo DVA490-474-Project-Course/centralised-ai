@@ -137,40 +137,36 @@ TEST(ComputeAverageDistanceReward, Test_3)
 
 TEST(ComputeHaveBallReward, Test_1)
 {
-	torch::Tensor have_ball_flags = torch::zeros({6, 1});
+	torch::Tensor have_ball_flags = torch::zeros(6);
 	float reward = 1;
 
 	torch::Tensor output = ComputeHaveBallReward(have_ball_flags, reward);
 
 	EXPECT_EQ(output.size(0), 6);
-	EXPECT_EQ(output.size(1), 1);
 	EXPECT_EQ(have_ball_flags.size(0), 6);
-	EXPECT_EQ(have_ball_flags.size(1), 1);
-	EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0);
-	EXPECT_FLOAT_EQ(output[1][0].item<float>(), 0);
-	EXPECT_FLOAT_EQ(output[2][0].item<float>(), 0);
-	EXPECT_FLOAT_EQ(output[3][0].item<float>(), 0);
-	EXPECT_FLOAT_EQ(output[4][0].item<float>(), 0);
-	EXPECT_FLOAT_EQ(output[5][0].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[0].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), 0);
 }
 
 TEST(ComputeHaveBallReward, Test_2)
 {
-	torch::Tensor have_ball_flags = torch::ones({6, 1});
+	torch::Tensor have_ball_flags = torch::ones(6);
 	float reward = 1;
 
 	torch::Tensor output = ComputeHaveBallReward(have_ball_flags, reward);
 
 	EXPECT_EQ(output.size(0), 6);
-	EXPECT_EQ(output.size(1), 1);
 	EXPECT_EQ(have_ball_flags.size(0), 6);
-	EXPECT_EQ(have_ball_flags.size(1), 1);
-	EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
-	EXPECT_FLOAT_EQ(output[1][0].item<float>(), 1);
-	EXPECT_FLOAT_EQ(output[2][0].item<float>(), 1);
-	EXPECT_FLOAT_EQ(output[3][0].item<float>(), 1);
-	EXPECT_FLOAT_EQ(output[4][0].item<float>(), 1);
-	EXPECT_FLOAT_EQ(output[5][0].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), 1);
 }
 
 }
