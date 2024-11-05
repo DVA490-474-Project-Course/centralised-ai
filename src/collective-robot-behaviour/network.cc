@@ -178,23 +178,33 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   return agents;
 }
 
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff, torch::Tensor policy_loss) {
+void UpdateNets(std::vector<Agents>& agents,
+  CriticNetwork& critic,
+  torch::Tensor policy_loss,
+  torch::Tensor critic_loss) {
 
-  torch::Tensor targets = torch::tensor({{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, torch::dtype(torch::kFloat));
-  torch::Tensor loss = torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor pol_loss = torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor cri_loss = torch::tensor(critic_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
 
-  //update each agent
+  /*Update each policy network*/
   for (auto& agent : agents)
   {
     agent.policy_network.train();
-    torch::optim::Adam optimizer(agent.policy_network.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+    torch::optim::Adam policynet(agent.policy_network.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
 
-    optimizer.zero_grad();
-    loss.backward();
-    optimizer.step();
+    policynet.zero_grad();
+    pol_loss.backward();
+    policynet.step();
 
-    std::cout << "Loss: " << loss.item<float>() << std::endl;
   }
+
+  /*Update critic network*/
+  critic.train();
+  torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+  critnet.zero_grad();
+  cri_loss.backward();
+  critnet.step();
+
 }
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

@@ -52,7 +52,7 @@ namespace collective_robot_behaviour
     /*int robotID;*/
     torch::Tensor state;
     torch::Tensor actions_prob;
-    std::vector<torch::Tensor> all_actions;
+    torch::Tensor all_actions;
     torch::Tensor actions;
     torch::Tensor rewards;
     torch::Tensor new_state;
@@ -67,8 +67,8 @@ namespace collective_robot_behaviour
         actions_prob(torch::zeros({num_actions})),
         rewards(torch::zeros({1,amount_of_players_in_team})),
         actions(torch::zeros({amount_of_players_in_team})),
-        new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
-
+        new_state(torch::zeros({1, 1, input_size})), // New state, wrote to same as state dimension
+        all_actions{torch::zeros({1, amount_of_players_in_team, num_actions})}
     {}
   };
 
@@ -211,7 +211,7 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
  * @param[in] critic A reference to the CriticNetwork
  * @param[in] exper_buff experience buffer vector.
  */
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff,torch::Tensor policy_loss);
+void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //NETWORK_H

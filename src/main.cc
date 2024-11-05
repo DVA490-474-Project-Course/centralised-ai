@@ -18,14 +18,14 @@
 #include "collective-robot-behaviour/mappo.h"
 
 /*Configuration values*/
-int max_timesteps = 100;
+int max_timesteps = 500;
 int steps = 0; /*move into mappo------------------------*/
-int step_max = 5;
+int step_max = 5000;
 int batch_size = 10;
 int amount_of_players_in_team = 6;
-int input_size = 7; // Number of input features
-int num_actions = 9;
-int hidden_size = 5;
+int input_size = 40; // Number of input features
+int num_actions = 25;
+int hidden_size = 7;
 
 int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
