@@ -96,9 +96,19 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 * [25] - The x-coordinate of the opponent robot 5.
 * [26] - The y-coordinate of the opponent robot 5.
 * [27] - The goal difference.
-* [28] - The team id of the robot that owns the ball.
-* [29] - The robot id of the robot that owns the ball.
-* [30] - The time remaining in the current stage.
+* [28] - The teammate robot 0 have ball boolean.
+* [29] - The teammate robot 1 have ball boolean.
+* [30] - The teammate robot 2 have ball boolean.
+* [31] - The teammate robot 3 have ball boolean.
+* [32] - The teammate robot 4 have ball boolean.
+* [33] - The teammate robot 5 have ball boolean.
+* [34] - The opponent robot 0 have ball boolean.
+* [35] - The opponent robot 1 have ball boolean.
+* [36] - The opponent robot 2 have ball boolean.
+* [37] - The opponent robot 3 have ball boolean.
+* [38] - The opponent robot 4 have ball boolean.
+* [39] - The opponent robot 5 have ball boolean.
+* [40] - The remaining time in the current stage.
 *
 *@pre The following preconditions must be met before using this class:
 * - A connection to grSim.

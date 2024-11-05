@@ -70,14 +70,14 @@ namespace collective_robot_behaviour
 
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
-    torch::Tensor states = torch::empty(30);
+    torch::Tensor states = torch::empty(40);
     states[0] = 0; /* Reserved for the robot id. */
 
     /* Ball position */
     states[1] = vision_client.GetBallPositionX();
     states[2] = vision_client.GetBallPositionY();
 
-    /* own team positions */
+    /* Own team positions */
     states[3] = vision_client.GetRobotPositionX(0, own_team);
     states[4] = vision_client.GetRobotPositionY(0, own_team);
     states[5] = vision_client.GetRobotPositionX(1, own_team);
@@ -91,7 +91,7 @@ namespace collective_robot_behaviour
     states[13] = vision_client.GetRobotPositionX(5, own_team);
     states[14] = vision_client.GetRobotPositionY(5, own_team);
 
-    /* opponent team positions */
+    /* Opponent team positions */
     states[15] = vision_client.GetRobotPositionX(0, opponent_team);
     states[16] = vision_client.GetRobotPositionY(0, opponent_team);
     states[17] = vision_client.GetRobotPositionX(1, opponent_team);
@@ -108,13 +108,24 @@ namespace collective_robot_behaviour
     /* Goal difference */
     states[27] = ComputeGoalDifference(referee, own_team);
 
-    /* Ball owner */
-    BallOwner ball_owner = ComputeBallOwner(referee, own_team, opponent_team, 6);
-    states[28] = ball_owner.team_id;
-    states[29] = ball_owner.robot_id;
+    /* Own team ball owner */
+    states[28] = referee.IsTouchingBall(0, own_team);
+    states[29] = referee.IsTouchingBall(1, own_team);
+    states[30] = referee.IsTouchingBall(2, own_team);
+    states[31] = referee.IsTouchingBall(3, own_team);
+    states[32] = referee.IsTouchingBall(4, own_team);
+    states[33] = referee.IsTouchingBall(5, own_team);
+
+    /* Opponent team ball owner */
+    states[34] = referee.IsTouchingBall(0, opponent_team);
+    states[35] = referee.IsTouchingBall(1, opponent_team);
+    states[36] = referee.IsTouchingBall(2, opponent_team);
+    states[37] = referee.IsTouchingBall(3, opponent_team);
+    states[38] = referee.IsTouchingBall(4, opponent_team);
+    states[39] = referee.IsTouchingBall(5, opponent_team);
 
     /* Remaining time */
-    states[30] = referee.GetStageTimeLeft();
+    states[40] = referee.GetStageTimeLeft();
 
     return states;
   }
