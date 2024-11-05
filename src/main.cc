@@ -38,5 +38,7 @@ int main() {
   /*Run Mappo Agent algorithm by Policy Models and critic network*/
   centralised_ai::collective_robot_behaviour::Mappo(models,critic);
 
+  auto states = centralised_ai::collective_robot_behaviour::GetStates();
+
   return 0;
 }
