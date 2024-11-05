@@ -80,7 +80,9 @@ TEST(GetStateTest, TestShape)
 
     torch::Tensor states = GetStates(automated_referee, vision_client, Team::kBlue, Team::kYellow);
 
-    EXPECT_EQ(states.size(0), 41);
+    EXPECT_EQ(states.size(0), 1);
+    EXPECT_EQ(states.size(1), 1);
+    EXPECT_EQ(states.size(2), 41);
 }
 
 }

@@ -67,7 +67,7 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 /*!
 *@brief Get the current state from grSim
 *
-*@returns A tensor representing the states of the world, with the shape [num_states].
+*@returns A tensor representing the states of the world, with the shape [1, 1, num_states].
 * The states are as follows:
 * [0] - Reserved for the robot id as input to each policy network.
 * [1] - The x-coordinate of the ball.

@@ -95,7 +95,8 @@ namespace collective_robot_behaviour
     /* Remaining time */
     states[40] = referee.GetStageTimeLeft();
 
-    return states;
+    /* Reshape the states to [1, 1, 41], but keeping the data in the third dimension. */
+    return states.view({1, 1, 41});
   }
 
   torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team)
