@@ -161,7 +161,7 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 	{
 		for(int32_t k = 0; k < num_agents; k++)
 		{
-			torch::Tensor probabitilies = actions_probabilities[t][k];
+			torch::Tensor probabitilies = actions_probabilities[t][k] + 0.000001;
 
 			entropy[t][k] = -torch::sum(probabitilies.log());
 		}
