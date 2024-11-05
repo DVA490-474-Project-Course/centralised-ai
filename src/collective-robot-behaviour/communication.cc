@@ -36,38 +36,6 @@ namespace collective_robot_behaviour
     }
   }
 
-  static BallOwner ComputeBallOwner(ssl_interface::AutomatedReferee referee, Team teammates, Team opponent, int32_t num_robots)
-  {
-
-    for (int32_t id = 0; id < num_robots; id++)
-    {
-      if (referee.IsTouchingBall(id, teammates))
-      {
-        return BallOwner{team_id : 1, robot_id : id};
-      }
-      else if (referee.IsTouchingBall(id, opponent))
-      {
-        return BallOwner{team_id : 0, robot_id : id};
-      }
-    }
-
-    return BallOwner{team_id : -1, robot_id : -1};
-  }
-
-  static torch::Tensor ComputeHaveBall(ssl_interface::AutomatedReferee referee, Team team, int32_t num_robots)
-  {
-    torch::Tensor have_ball = torch::zeros({num_robots, 1});
-    for(int32_t i = 0; i < num_robots; i++)
-    {
-      if(!referee.IsTouchingBall(i, team))
-      {
-        have_ball[i] = 1;
-      }
-    }
-
-    return have_ball;
-  }
-
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
     torch::Tensor states = torch::empty(40);
@@ -130,7 +98,7 @@ namespace collective_robot_behaviour
     return states;
   }
 
-  torch::Tensor ComputeRewards(ssl_interface::AutomatedReferee & referee, torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team)
+  torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team)
   {
     torch::Tensor positions = torch::zeros({2, 6});
     positions[0][0] = states[3];
@@ -147,7 +115,8 @@ namespace collective_robot_behaviour
     positions[1][5] = states[14];
 
     torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, 1, reward_configuration.average_distance_reward);
-    torch::Tensor have_ball = ComputeHaveBall(referee, own_team, 6);
+    torch::Tensor have_ball = states.slice(0, 28, 33).expand({6, 1});
+
     torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
     torch::Tensor total_reward = average_distance_reward + have_ball_reward;
 
@@ -182,7 +151,7 @@ namespace collective_robot_behaviour
     torch::Tensor states = GetStates(referee, vision_client, teammate, opponent);
 
     /* Compute the rewards for each agent. */
-    torch::Tensor rewards = ComputeRewards(referee, states, reward_configuration, teammate);
+    torch::Tensor rewards = ComputeRewards(states, reward_configuration, teammate);
 
     return Observation{rewards : rewards, state : states};
   }

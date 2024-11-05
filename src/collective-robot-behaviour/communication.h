@@ -125,12 +125,11 @@ torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface
 *@brief Computes the rewards for each agent.
 *
 *@returns A tensor representing the rewards for each agent, with the shape [num_agents].
-*@param[In] referee: The automated referee, which is the source of the current state of the world.
 *@param[In] states: The states of the world, with the shape [num_states].
 *@param[In] reward_configuration: The configuration of the rewards.
 *@param[In] own_team: The team that the agents are on.
 */
-torch::Tensor ComputeRewards(ssl_interface::AutomatedReferee & referee, torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team);
+torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
