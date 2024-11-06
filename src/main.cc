@@ -23,7 +23,7 @@ int steps = 0; /*move into mappo------------------------*/
 int step_max = 5000;
 int batch_size = 10;
 int amount_of_players_in_team = 6;
-int input_size = 40; // Number of input features
+int input_size = 41; // Number of input features
 int num_actions = 25;
 int hidden_size = 7;
 

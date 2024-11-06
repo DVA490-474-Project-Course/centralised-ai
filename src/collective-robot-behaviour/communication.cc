@@ -17,14 +17,14 @@ namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-  struct BallOwner
-  {
-    int32_t team_id;
-    int32_t robot_id;
-  };
+struct BallOwner
+{
+  int32_t team_id;
+  int32_t robot_id;
+};
 
-  static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Team team)
-  {
+static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Team team)
+{
     switch (team)
     {
     case Team::kBlue:
@@ -34,7 +34,7 @@ namespace collective_robot_behaviour
     default:
       return 0;
     }
-  }
+}
 
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
