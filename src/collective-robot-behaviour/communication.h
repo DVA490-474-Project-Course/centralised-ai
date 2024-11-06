@@ -52,6 +52,12 @@ struct RewardConfiguration
 };
 
 /*!
+* @brief Calculates the opponent team from the own team.
+* @returns The opponent team.
+*/
+Team ComputeOpponentTeam(Team own_team);
+
+/*!
  *@brief Get the current state from grSim
  *
  *@pre The following preconditions must be met before using this class:

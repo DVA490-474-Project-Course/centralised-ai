@@ -126,6 +126,21 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     return total_reward;
   }
 
+  Team ComputeOpponentTeam(Team own_team)
+  {
+    switch (own_team)
+    {
+    case Team::kBlue:
+      return Team::kYellow;
+    case Team::kYellow:
+      return Team::kBlue;
+    case Team::kUnknown:
+      return Team::kUnknown;
+    default:
+      return Team::kUnknown;
+    }
+  }
+
   Observation GetObservations(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, RewardConfiguration reward_configuration, Team team)
   {
     /* Correct the dessignated teams.*/

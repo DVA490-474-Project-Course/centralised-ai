@@ -85,5 +85,22 @@ TEST(GetStateTest, TestShape)
     EXPECT_EQ(states.size(2), 43);
 }
 
+TEST(ComputeOpponentTeamTest, TestOpponentTeam_1)
+{
+    Team own_team = Team::kBlue;
+    Team opponent_team = ComputeOpponentTeam(own_team);
+
+    EXPECT_EQ(own_team, Team::kBlue);
+    EXPECT_EQ(opponent_team, Team::kYellow);
+}
+
+TEST(ComputeOpponentTeamTest, TestOpponentTeam_2)
+{
+    Team own_team = Team::kYellow;
+    Team opponent_team = ComputeOpponentTeam(own_team);
+
+    EXPECT_EQ(own_team, Team::kYellow);
+    EXPECT_EQ(opponent_team, Team::kBlue);
+}
 }
 }
