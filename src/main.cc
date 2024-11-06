@@ -24,7 +24,7 @@ int step_max = 5000;
 int batch_size = 10;
 int amount_of_players_in_team = 6;
 int input_size = 41; // Number of input features
-int num_actions = 25;
+int num_actions = 4;
 int hidden_size = 7;
 
 int main() {
@@ -35,8 +35,12 @@ int main() {
   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
   //Models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
-  /*Run Mappo Agent algorithm by Policy Models and critic network*/
-  centralised_ai::collective_robot_behaviour::Mappo(models,critic);
+  while (true) {
+    /*run actions and save  to buffer*/
+    auto trajectories = MappoRun(models,critic);
 
+    /*Run Mappo Agent algorithm by Policy Models and critic network*/
+    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,trajectories);
+  }
   return 0;
 }

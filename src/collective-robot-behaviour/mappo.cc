@@ -49,87 +49,98 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
   return std::make_tuple(trajectories, act_prob, action);
 };
 
+std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork critic) {
 
-
-
-/*
-* The full Mappo function for robot decision-making and training.
-* Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
-* Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
-*/
-  void Mappo(std::vector<Agents> Models,CriticNetwork critic ) {
-
-  auto old_net = Models; /*Initalise old network*/
-  auto old_net_critic = critic;
-
-  /*Amount of steps the model will be trained for*/
-  while (steps < step_max) {
-  std::vector<DataBuffer> data_buffer; /*Initialise data buffer D. Reset each step*/
   /* Gain enough batch for training */
+  std::vector<Trajectory> trajectories;
   for (int i = 1; i <= batch_size; i++) {
     /*Reset/initialise hidden states for timestep 0*/
     auto[trajectories,act_prob,action] = ResetHidden();
-    std::vector<torch::Tensor> criticvalues = {torch::zeros({1,1})};
+
 
     /*Loop for amount of timestamps in each bach */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
 
-    /*Initialise values*/
-    torch::Tensor actions_agents = torch::zeros({amount_of_players_in_team});
-    std::vector<float> rewards;
-    Trajectory exp;
-    HiddenStates new_states;
-    torch::Tensor state = torch::zeros({1,1,input_size}); //GetStates(); /*Get current state as vector*/
-    torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team}));
+      /*Initialise values*/
+      torch::Tensor actions_agents = torch::zeros({amount_of_players_in_team});
+      std::vector<float> rewards;
+      Trajectory exp;
+      HiddenStates new_states;
+      torch::Tensor state = torch::zeros({1,1,input_size}); //GetStates(); /*Get current state as vector*/
+      /*GET GAMESTATE*/
+      torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team,num_actions}));
 
-    /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
-    auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
-    criticvalues.push_back(valNetOutput);
-    /* For each agent in one timestep, get probabilities and hidden states*/
-    for (auto& agent : Models) {
-      /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-      auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
-      act_prob = act_prob.squeeze();
-      int act = argmax(act_prob).item().toInt();
-      prob_actions_stored[agent.robotId] = act_prob[act];
-      //exp.all_actions.push_back(act_prob.squeeze());
-      exp.all_actions[0][agent.robotId] = act_prob;
-      /*Store the higest probablity of the actions_prob*/
-      actions_agents[agent.robotId] = act;
+      /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
+      auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectories[timestep-1].hidden_p[0].ht_p, trajectories[timestep-1].hidden_p[0].ct_p);
 
-      /*Save hidden states*/
-      new_states.ht_p = hx_new;
-      new_states.ct_p = ct_new;
-      exp.hidden_p.push_back(new_states); /*Store hidden states*/
+      /* For each agent in one timestep, get probabilities and hidden states*/
+      for (auto& agent : Models) {
+        /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
+        auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
+
+        prob_actions_stored.index_put_({agent.robotId}, act_prob);
+        //std::cout << act_prob << std::endl;
+        //std::cout << prob_actions_stored << std::endl;
+
+        /*Save hidden states*/
+        new_states.ht_p = hx_new;
+        new_states.ct_p = ct_new;
+        exp.hidden_p.push_back(new_states); /*Store hidden states*/
 
       } /*end for agent*/
 
-    /*
-    *NEEDS TO ME IMPLEMENTED:
-    *execute actions_prob
-    *from actions_agents
-    */
+      //std::cout << prob_actions_stored << std::endl;
+      /*Act*/
+      exp.actions = (torch::zeros({amount_of_players_in_team}));
+      /*
+      *NEEDS TO ME IMPLEMENTED:
+      *execute actions_prob
+      *from actions_agents
+      *actionmask
+      */
+      // Decalare in actions_agents which actions each agent does
+      /*Update all values*/
 
-    /*Update all values*/
-    exp.actions_prob = prob_actions_stored;
-    exp.actions = actions_agents;
-    exp.state = state;
-    exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-    exp.rewards = torch::zeros({1,6}); //GetRewards();
-    exp.new_state = torch::zeros({1,1,input_size}); //GetStates();
-    exp.hidden_v.ht_p = V_hx;
-    exp.hidden_v.ct_p = V_cx;
-    trajectories.push_back(exp); /*Store into trajectories*/
+      exp.actions_prob = prob_actions_stored;
+      exp.actions = actions_agents;
+      exp.state = state;
+      exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
+      exp.rewards = torch::zeros({1,amount_of_players_in_team}); //GetRewards();
+      exp.new_state = torch::zeros({1,1,input_size}); //GetStates();
+      exp.hidden_v.ht_p = V_hx;
+      exp.hidden_v.ct_p = V_cx;
+      trajectories.push_back(exp); /*Store into trajectories*/
 
     } /*end for timestep*/
+    /*Erase the first initalise values, were only used for start*/
+    trajectories.erase(trajectories.begin());
+    return trajectories;
+  }
+}
 
+
+  /*
+  * The full Mappo function for robot decision-making and training.
+  * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
+  * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
+  */
+void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<Trajectory> trajectories) {
+  auto old_net = Models; /*Initalise old network*/
+  auto old_net_critic = critic;
+
+  /*Amount of steps the model will be trained for*/
+  //while (steps < step_max) {
+  std::vector<DataBuffer> data_buffer; /*Initialise data buffer D. Reset each step*/
+  std::vector<torch::Tensor> criticvalues;
   std::vector<torch::Tensor> reward_arr;
+
   for (auto& trajectory: trajectories) {
     reward_arr.push_back(trajectory.rewards);
+    torch::Tensor single_critic_value = trajectory.criticvalues[0].view({1,1});
+    criticvalues.push_back(single_critic_value); /*Reformat to use in function*/
   }
   torch::Tensor rewards_tensor = torch::cat(reward_arr, /*dim=*/0);
   torch::Tensor critic_values_array = torch::cat(criticvalues, /*dim=*/0);
-
   /*compute GAE and reward-go-to*/
   auto TemporalDifference = ComputeTemporalDifference(critic_values_array,rewards_tensor,0.9);
   torch::Tensor A =  ComputeGeneralAdvantageEstimation(TemporalDifference,0.99, 0.95);
@@ -139,7 +150,7 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
 
   /*Split trajectories into chunks of lenght L*/
   int L = 2;
-  for (int l = 1; l < max_timesteps/L; l++) /* T/L */
+  for (int l = 0; l < max_timesteps/L; l++) /* T/L */
   {
     /*Add each Trajectory into dat.t value for all timesteps in chunk*/
     DataBuffer dat;
@@ -153,13 +164,13 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
 
     data_buffer.push_back(dat); /*Store [t, A,R] in D (DataBuffer)*/
   } /*end for*/
-} /*end for batch_size*/
+  //} /*end for batch_size*/
 
   int len = data_buffer.size();
   std::vector<DataBuffer> min_batch; /*b (minbatch)*/
   /* Random mini-batch from D with all agent data*/
   for (int k = 1; k <= 1; k++) { /*should be k = 1*/
-    int rand_index = torch::randint(1, len, {1}).item<int>();
+    int rand_index = torch::randint(0, len, {1}).item<int>();
     auto rand_batch = data_buffer[rand_index];/*Take random saved chunks*/
     /*Send in the minibatch and update the hidden states by the saved states and hidden values.*/
     /*for each timestep in batch*/
@@ -169,8 +180,8 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
       *For each agents actions_prob in one timestep
       *UPDATE SO ALL TIMESTEPS GET SENT AS ONE VECTOR AS STATE
       */
-        /*Update the hidden stated for policy and critic networks
-       *for each data chunk in the mini-batch b*/
+      /*Update the hidden stated for policy and critic networks
+     *for each data chunk in the mini-batch b*/
       for (int agent = 0; agent < amount_of_players_in_team; agent++)
       {
         auto hx_read = rand_batch.t[i].hidden_p[agent].ht_p;
@@ -203,9 +214,10 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
   torch::Tensor old_predicts_c=torch::zeros({length,amount_of_players_in_team});
   torch::Tensor new_predicts_c=torch::zeros({length,amount_of_players_in_team});
   torch::Tensor critic_values = torch::zeros({length,amount_of_players_in_team});
-  torch::Tensor reward_arr = torch::zeros({length,1});
+  torch::Tensor reward_arr_minbatch = torch::zeros({length,1});
 
-  for (int samp_i = 0; samp_i < min_batch.size(); samp_i++) { /*Each sample in mini batch*/
+  for (int samp_i = 0; samp_i < min_batch.size(); samp_i++) {
+    /*Each sample in mini batch*/
     for (int t = 0; t < min_batch[samp_i].t.size(); ++t) { /*each timestep in batch*/
       for (int agent = 0; agent < amount_of_players_in_team; ++agent) { /*each agent in timestep*/
 
@@ -222,33 +234,35 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze(); /*Output from old_net*/
         auto act = min_batch[samp_i].t[t].actions[agent].item<int>();
         old_predicts_p[t][agent] = output_old_p[act];
-        new_predicts_p[t][agent] = min_batch[samp_i].t[t].actions_prob[agent];
+        new_predicts_p[t][agent] = min_batch[samp_i].t[t].actions_prob[agent][act];
 
-        all_actions_probs[t] = min_batch[samp_i].t[t].all_actions[0];
+        all_actions_probs[t] = min_batch[samp_i].t[t].actions_prob[0];
 
         torch::Tensor output_old_c = std::get<0>(old_ci).squeeze();
         old_predicts_c[t][agent] = output_old_c;
       } /*end agent loop*/
+
       new_predicts_c[t] = min_batch[samp_i].t[t].criticvalues;
-      reward_arr[t] = min_batch[samp_i].R[t];
+      reward_arr_minbatch[t] = min_batch[samp_i].R[t];
     }
   }
-  auto probratio = ComputeProbabilityRatio(new_predicts_p,old_predicts_p);
-  auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
-  auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
+    auto probratio = ComputeProbabilityRatio(new_predicts_p,old_predicts_p);
+    auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
+    auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
 
 
 
-  auto norm_rew = NormalizeRewardToGo(reward_arr);
-  auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
+    auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
+    auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
 
 
-  UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
-  SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
-  std::cout << "Step is done: " << steps << std::endl;
-  steps++;
-  } /*end while*/
+    UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
+    SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
+    std::cout << "Training of buffer done! " << std::endl;
+    std::cout << "==============================================" << std::endl;
+
 }
+
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

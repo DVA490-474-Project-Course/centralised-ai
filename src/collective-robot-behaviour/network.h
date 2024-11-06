@@ -52,7 +52,6 @@ namespace collective_robot_behaviour
     /*int robotID;*/
     torch::Tensor state;
     torch::Tensor actions_prob;
-    torch::Tensor all_actions;
     torch::Tensor actions;
     torch::Tensor rewards;
     torch::Tensor new_state;
@@ -62,13 +61,13 @@ namespace collective_robot_behaviour
 
 
     Trajectory()
-      : /*robotID(-1),*/
-        state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
-        actions_prob(torch::zeros({num_actions})),
-        rewards(torch::zeros({1,amount_of_players_in_team})),
-        actions(torch::zeros({amount_of_players_in_team})),
-        new_state(torch::zeros({1, 1, input_size})), // New state, wrote to same as state dimension
-        all_actions{torch::zeros({1, amount_of_players_in_team, num_actions})}
+    : /*robotID(-1),*/
+      state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
+      actions_prob(torch::zeros({num_actions})),
+      rewards(torch::zeros({1,amount_of_players_in_team})),
+      actions(torch::zeros({amount_of_players_in_team})),
+      new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
+
     {}
   };
 
