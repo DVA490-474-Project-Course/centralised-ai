@@ -38,7 +38,8 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
 
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
-    torch::Tensor states = torch::empty(41);
+    int32_t num_states = 43;
+    torch::Tensor states = torch::empty(num_states);
     states[0] = 0; /* Reserved for the robot id. */
 
     /* Ball position */
@@ -95,8 +96,8 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     /* Remaining time */
     states[40] = referee.GetStageTimeLeft();
 
-    /* Reshape the states to [1, 1, 41], but keeping the data in the third dimension. */
-    return states.view({1, 1, 41});
+    /* Reshape the states to [1, 1, num_states], but keeping the data in the third dimension. */
+    return states.view({1, 1, num_states});
   }
 
   torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team)

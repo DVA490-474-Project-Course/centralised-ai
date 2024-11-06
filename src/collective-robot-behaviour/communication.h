@@ -110,6 +110,8 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 * [38] - The opponent robot 4 have ball boolean.
 * [39] - The opponent robot 5 have ball boolean.
 * [40] - The remaining time in the current stage.
+* [41] - The referee command.
+* [42] - The remaining time until the next referee command (if applicable, i.e. from kickoff to start).
 *
 *@pre The following preconditions must be met before using this class:
 * - A connection to grSim.
