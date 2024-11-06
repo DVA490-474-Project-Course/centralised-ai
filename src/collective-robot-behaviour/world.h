@@ -101,6 +101,22 @@ struct World {
 };
 
 /*!
+* @brief Base class for all game states which are responsible for calculating the legal actions and reward per agent for the given state.
+*/
+class GameStateBase
+{
+  public:
+  /*!
+  * @brief Calculates the action mask for the given state.
+  */
+    virtual torch::Tensor ComputeActionMask(const torch::Tensor & states);
+    /*!
+    * @brief Calculates the reward for the given state.
+    */
+    virtual torch::Tensor ComputeReward(const torch::Tensor & states);
+};
+
+/*!
   @returns a tensor representing the reward given by the average distance between all robots, with the shape [num_agents].
   @param[In] positions: A tensor of all the positions of all the robots, with the shape[2, num_agents].
   @param[In] max_distance: The maximum distance from the average position of all the robots when no reward will be given anymore. @note max_distance cannot be 0!
