@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-11-05 by Jacob Johansson
+// Last modified: 2024-11-06 by Jacob Johansson
 // Description: Headers for world.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -106,16 +106,19 @@ struct World {
 class GameStateBase
 {
   public:
+    /* Virtual destructor intended for this polymorphic base class.*/
+    virtual ~GameStateBase() = default;
+
   /*!
   * @brief Calculates the action masks for the given state.
   * @returns A tensor representing the action mask for the given state, with the shape [num_agents, num_actions].
   */
-    virtual torch::Tensor ComputeActionMasks(const torch::Tensor & states);
+    virtual torch::Tensor ComputeActionMasks(const torch::Tensor & states) = 0;
     /*!
     * @brief Calculates the rewards for the given state.
     * @returns A tensor representing the reward for the given state, with the shape [num_agents].
     */
-    virtual torch::Tensor ComputeRewards(const torch::Tensor & states);
+    virtual torch::Tensor ComputeRewards(const torch::Tensor & states) = 0;
 };
 
 /*!
