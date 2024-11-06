@@ -49,14 +49,14 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
   return std::make_tuple(trajectories, act_prob, action);
 };
 
-std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork critic) {
+std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team) {
 
   /* Gain enough batch for training */
   std::vector<Trajectory> trajectories;
   for (int i = 1; i <= batch_size; i++) {
     /*Reset/initialise hidden states for timestep 0*/
     auto[trajectories,act_prob,action] = ResetHidden();
-
+    torch::Tensor state = GetStates(referee,vision_client,own_team); /*Get current state as vector*/
 
     /*Loop for amount of timestamps in each bach */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
@@ -66,7 +66,6 @@ std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       std::vector<float> rewards;
       Trajectory exp;
       HiddenStates new_states;
-      torch::Tensor state = torch::zeros({1,1,input_size}); //GetStates(); /*Get current state as vector*/
       /*GET GAMESTATE*/
       torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team,num_actions}));
 
@@ -91,6 +90,7 @@ std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 
       //std::cout << prob_actions_stored << std::endl;
       /*Act*/
+
       exp.actions = (torch::zeros({amount_of_players_in_team}));
       /*
       *NEEDS TO ME IMPLEMENTED:
@@ -106,12 +106,13 @@ std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.rewards = torch::zeros({1,amount_of_players_in_team}); //GetRewards();
-      exp.new_state = torch::zeros({1,1,input_size}); //GetStates();
+      state = GetStates(referee,vision_client,own_team);
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
 
     } /*end for timestep*/
+
     /*Erase the first initalise values, were only used for start*/
     trajectories.erase(trajectories.begin());
     return trajectories;

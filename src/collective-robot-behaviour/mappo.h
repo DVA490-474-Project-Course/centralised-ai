@@ -41,7 +41,7 @@ namespace collective_robot_behaviour {
   */
 void Mappo_Update(std::vector<Agents> models,CriticNetwork critic, std::vector<Trajectory> trajectories);
 
-std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork critic);
+std::vector<Trajectory> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

@@ -16,6 +16,7 @@
 #include "collective-robot-behaviour/utils.h"
 #include "collective-robot-behaviour/network.h"
 #include "collective-robot-behaviour/mappo.h"
+#include "ssl-interface/ssl_vision_client.h"
 
 /*Configuration values*/
 int max_timesteps = 500;
@@ -35,12 +36,36 @@ int main() {
   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
   //Models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
+  /* Define the IP and port for the VisionClient */
+  std::string vision_ip = "127.0.0.1";
+  int vision_port = 10006;
+
+  /* Define the IP and command listen port for grSim */
+  std::string grsim_ip = "127.0.0.1";
+  int grsim_port = 20011;
+
+  /* Create the VisionClient instance with IP and port */
+  centralised_ai::ssl_interface::VisionClient vision_client(vision_ip, vision_port);
+  vision_client.ReceivePacket();
+
+  /* Create the AutomatedReferee instance with the VisionClient */
+  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip,
+    grsim_port);
+
+  /* Start the automated referee */
+  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
+
   while (true) {
     /*run actions and save  to buffer*/
-    auto trajectories = MappoRun(models,critic);
+    auto trajectories = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,trajectories);
+
+    vision_client.Print();
+    /* Call AnalyzeGameState to check the goal logic */
+    referee.AnalyzeGameState();
+
   }
   return 0;
 }
