@@ -107,13 +107,15 @@ class GameStateBase
 {
   public:
   /*!
-  * @brief Calculates the action mask for the given state.
+  * @brief Calculates the action masks for the given state.
+  * @returns A tensor representing the action mask for the given state, with the shape [num_agents, num_actions].
   */
-    virtual torch::Tensor ComputeActionMask(const torch::Tensor & states);
+    virtual torch::Tensor ComputeActionMasks(const torch::Tensor & states);
     /*!
-    * @brief Calculates the reward for the given state.
+    * @brief Calculates the rewards for the given state.
+    * @returns A tensor representing the reward for the given state, with the shape [num_agents].
     */
-    virtual torch::Tensor ComputeReward(const torch::Tensor & states);
+    virtual torch::Tensor ComputeRewards(const torch::Tensor & states);
 };
 
 /*!
