@@ -82,7 +82,7 @@ TEST(GetStateTest, TestShape)
 
     EXPECT_EQ(states.size(0), 1);
     EXPECT_EQ(states.size(1), 1);
-    EXPECT_EQ(states.size(2), 41);
+    EXPECT_EQ(states.size(2), 43);
 }
 
 }
