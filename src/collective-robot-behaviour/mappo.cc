@@ -20,6 +20,7 @@
 #include "communication.h"
 #include "network.h"
 #include "utils.h"
+#include "run_state.h"
 
 /*Configuration values*/
 extern int max_timesteps;
@@ -59,6 +60,9 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
   std::vector<Trajectory> trajectories;
   torch::Tensor act_prob;
   torch::Tensor action;
+
+  RunState run_state;
+
   /* Gain enough batch for training */
   for (int i = 1; i <= batch_size; i++) {
     /*Reset/initialise hidden states for timestep 0*/
@@ -111,7 +115,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.actions = actions_agents;
       exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-      exp.rewards = torch::zeros({1,amount_of_players_in_team}); //GetRewards();
+      exp.rewards = run_state.ComputeRewards(state, {-0.00001, 0.5, 0.001}).expand({1, amount_of_players_in_team});
       state = GetStates(referee,vision_client,own_team,opponent_team);
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
