@@ -53,7 +53,7 @@ public:
 };
 
 /* Sets all robot and ball posiitons to zero */
-void SetAllPositionsToZero(VisionClientDerived& vision_client)
+static void SetAllPositionsToZero(VisionClientDerived& vision_client)
 {
   for (int id = 0; id < centralised_ai::team_size; id++)
   {

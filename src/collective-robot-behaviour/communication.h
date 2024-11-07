@@ -2,7 +2,7 @@
 *==============================================================================
  * Author: Viktor Eriksson
  * Creation date: 2024-10-23.
- * Last modified: 2024-11-05 by Jacob Johansson
+ * Last modified: 2024-11-06 by Jacob Johansson
  * Description: Communication header file.
  * License: See LICENSE file for license details.
  *==============================================================================
