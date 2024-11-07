@@ -40,7 +40,7 @@ struct Observation
 /*!
 *@brief Struct representing the configuration of the rewards.
 */
-struct RewardConfiguration
+typedef struct RewardConfiguration
 {
     /* The reward that will be given to the robot when within max_distance_from_center. */
     float average_distance_reward;
@@ -49,7 +49,7 @@ struct RewardConfiguration
 
     /* The reward that will be given to the robot when it has the ball. */
     float have_ball_reward;
-};
+} RewardConfiguration;
 
 /*!
 * @brief Calculates the opponent team from the own team.
@@ -68,7 +68,7 @@ Team ComputeOpponentTeam(Team own_team);
  *@param[In] Team: The team that the agents are on.
  *@param[Out] Tensor array of the current state that includes ....
  */
-Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interface::VisionClient vision_client, RewardConfiguration reward_configuration, RewardConfiguration, Team team);
+Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interface::VisionClient vision_client, struct RewardConfiguration reward_configuration, Team team);
 
 /*!
 *@brief Get the current state from grSim
@@ -138,7 +138,7 @@ torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface
 *@param[In] reward_configuration: The configuration of the rewards.
 *@param[In] own_team: The team that the agents are on.
 */
-torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team);
+torch::Tensor ComputeRewards(torch::Tensor & states, struct RewardConfiguration reward_configuration, Team own_team);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

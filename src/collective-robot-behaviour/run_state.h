@@ -11,6 +11,7 @@
 
 #include "world.h"
 #include <torch/torch.h>
+#include "communication.h"
 
 namespace centralised_ai
 {
@@ -20,7 +21,7 @@ namespace collective_robot_behaviour
     {
         public:
             torch::Tensor ComputeActionMasks(const torch::Tensor & states) override;
-            torch::Tensor ComputeRewards(const torch::Tensor & states) override;
+            torch::Tensor ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration) override;
     };
 }
 }

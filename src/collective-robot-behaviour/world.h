@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <torch/torch.h>
+#include "communication.h"
 
 namespace centralised_ai
 {
@@ -117,8 +118,10 @@ class GameStateBase
     /*!
     * @brief Calculates the rewards for the given state.
     * @returns A tensor representing the reward for the given state, with the shape [num_agents].
+    * @param[In] states: The states of the world, with the shape [num_states].
+    * @param[In] reward_configuration: The configuration of the rewards.
     */
-    virtual torch::Tensor ComputeRewards(const torch::Tensor & states) = 0;
+    virtual torch::Tensor ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration) = 0;
 };
 
 /*!

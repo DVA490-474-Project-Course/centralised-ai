@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <torch/torch.h>
 #include "../../src/collective-robot-behaviour/run_state.h"
+#include "../../src/collective-robot-behaviour/communication.h"
 
 namespace centralised_ai
 {
@@ -20,7 +21,7 @@ TEST(RunStateTest, ShapeTest)
     RunState state;
 
     torch::Tensor action_masks = state.ComputeActionMasks(torch::randn({4, 4}));
-    torch::Tensor rewards = state.ComputeRewards(torch::randn({4, 4}));
+    torch::Tensor rewards = state.ComputeRewards(torch::randn({4, 4}), {1, 1, 1});
 
     EXPECT_EQ(action_masks.size(0), 6);
     EXPECT_EQ(action_masks.size(1), 10);
