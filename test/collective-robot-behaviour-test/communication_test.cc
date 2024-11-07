@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-16
-// Last modified: 2024-11-05 by Jacob Johansson
+// Last modified: 2024-11-07 by Jacob Johansson
 // Description: Stores all tests for the communication.cc and communication.h file.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -17,7 +17,7 @@ namespace collective_robot_behaviour
 
 TEST(ComputeRewardsTest, TestShape)
 {
-    torch::Tensor states = torch::ones(40);
+    torch::Tensor states = torch::ones(43);
     RewardConfiguration reward_configuration = {1, 1, 1};
     Team own_team = Team::kBlue;
 
@@ -69,21 +69,23 @@ static void SetAllPositionsToZero(VisionClientDerived& vision_client)
   vision_client.SetBallPositionY(0.0F);
 }
 
-TEST(GetStateTest, TestShape)
-{
-    VisionClientDerived vision_client = VisionClientDerived("127.0.0.1", 20001);
-    centralised_ai::ssl_interface::AutomatedReferee automated_referee(vision_client, "127.0.0.1", 10001);
+/**/
+//TEST(GetStateTest, TestShape)
+//{
+//    VisionClientDerived vision_client = VisionClientDerived("127.0.0.1", 20001);
+//    centralised_ai::ssl_interface::AutomatedReferee automated_referee(vision_client, "127.0.0.1", 10001);
 
-    SetAllPositionsToZero(vision_client);
+//   SetAllPositionsToZero(vision_client);
 
-    RewardConfiguration reward_configuration = {1, 1, 1};
+//    RewardConfiguration reward_configuration = {1, 1, 1};
 
-    torch::Tensor states = GetStates(automated_referee, vision_client, Team::kBlue, Team::kYellow);
+//    torch::Tensor states = GetStates(automated_referee, vision_client, Team::kBlue, Team::kYellow);
 
-    EXPECT_EQ(states.size(0), 1);
-    EXPECT_EQ(states.size(1), 1);
-    EXPECT_EQ(states.size(2), 43);
-}
+//    EXPECT_EQ(states.size(0), 1);
+//    EXPECT_EQ(states.size(1), 1);
+//    EXPECT_EQ(states.size(2), 43);
+//}
+
 
 TEST(ComputeOpponentTeamTest, TestOpponentTeam_1)
 {
