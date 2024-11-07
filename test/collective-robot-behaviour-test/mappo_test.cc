@@ -12,6 +12,7 @@ namespace collective_robot_behaviour
 
 TEST(RunStateTest, ShapeTest)
 {
+  /*Make test of Mappo functions*/
 
 }
 

@@ -1,6 +1,6 @@
 /* main.cc
  *==============================================================================
- * Author: Jacob Johansson, Emil Åberg
+ * Author: Jacob Johansson, Emil Åberg, Viktor Eriksson
  * Creation date: 2024-09-16
  * Last modified: 2024-10-01 by Jacob Johansson
  * Description: Main function.
