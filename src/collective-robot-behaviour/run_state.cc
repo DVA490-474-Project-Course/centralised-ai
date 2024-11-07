@@ -9,6 +9,7 @@
 #include "world.h"
 #include "run_state.h"
 #include <torch/torch.h>
+#include "communication.h"
 
 namespace centralised_ai
 {
@@ -19,7 +20,7 @@ namespace collective_robot_behaviour
         return torch::ones({6, 10});
     }
 
-    torch::Tensor RunState::ComputeRewards(const torch::Tensor & states)
+    torch::Tensor RunState::ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration)
     {
         return torch::ones(6);
     }
