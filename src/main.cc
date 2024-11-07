@@ -19,12 +19,12 @@
 #include "ssl-interface/ssl_vision_client.h"
 
 /*Configuration values*/
-int max_timesteps = 500;
+int max_timesteps = 20;
 int steps = 0; /*move into mappo------------------------*/
-int step_max = 5000;
-int batch_size = 10;
+int step_max = 0;
+int batch_size = 30;
 int amount_of_players_in_team = 6;
-int input_size = 41; // Number of input features
+int input_size = 43; // Number of input features
 int num_actions = 4;
 int hidden_size = 7;
 
@@ -57,15 +57,12 @@ int main() {
 
   while (true) {
     /*run actions and save  to buffer*/
-    auto trajectories = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue);
+    auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,trajectories);
-
-    vision_client.Print();
-    /* Call AnalyzeGameState to check the goal logic */
-    referee.AnalyzeGameState();
-
+    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
   }
+
+
   return 0;
 }

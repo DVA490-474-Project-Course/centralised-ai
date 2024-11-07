@@ -38,6 +38,9 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
 
   torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
   {
+    vision_client.ReceivePacket();
+    referee.AnalyzeGameState();
+
     int32_t num_states = 43;
     torch::Tensor states = torch::empty(num_states);
     states[0] = 0; /* Reserved for the robot id. */
