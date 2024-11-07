@@ -65,7 +65,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     std::tie(trajectories,act_prob,action) = ResetHidden();
     torch::Tensor state = GetStates(referee,vision_client,own_team,opponent_team); /*Get current state as vector*/
 
-    /*Loop for amount of timestamps in each bach */
+    /*Loop for amount of tifdfddfmestamps in each bach */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
       /*Initialise values*/
       torch::Tensor actions_agents = torch::zeros({amount_of_players_in_team});
