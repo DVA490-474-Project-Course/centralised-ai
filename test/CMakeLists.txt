@@ -31,6 +31,7 @@ target_link_libraries(
 # Test source files
 target_sources(main_test_exe PRIVATE
   main_test.cc
+  collective-robot-behaviour-test/mappo_test.cc
   collective-robot-behaviour-test/world_test.cc
   collective-robot-behaviour-test/utils_test.cc
   collective-robot-behaviour-test/communication_test.cc
@@ -38,6 +39,7 @@ target_sources(main_test_exe PRIVATE
   ssl-interface-test/ssl_game_controller_client_test.cc
   ssl-interface-test/ssl_vision_client_test.cc
   ssl-interface-test/automated_referee_test.cc
+
 )
 
 #===============================================================================

@@ -19,7 +19,7 @@
 #include "ssl-interface/ssl_vision_client.h"
 
 /*Configuration values*/
-int max_timesteps = 20;
+int max_timesteps = 100;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
 int batch_size = 30;

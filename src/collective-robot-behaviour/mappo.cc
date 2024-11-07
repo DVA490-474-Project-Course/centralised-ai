@@ -65,7 +65,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     std::tie(trajectories,act_prob,action) = ResetHidden();
     torch::Tensor state = GetStates(referee,vision_client,own_team,opponent_team); /*Get current state as vector*/
 
-    /*Loop for amount of tifdfddfmestamps in each bach */
+    /*Loop for amount of timestamps in each bach */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
       /*Initialise values*/
       torch::Tensor actions_agents = torch::zeros({amount_of_players_in_team});
@@ -140,8 +140,8 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
     /*Split trajectories into chunks of lenght L*/
-    int L = 0.5;
-    for (int l = 0; l < max_timesteps * L; l++) /* T/L */ {
+    int L = max_timesteps*0.5;
+    for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;
       for (int i = l; i < l+L; i++) {
@@ -171,7 +171,7 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
   int len = data_buffer.size();
   std::vector<DataBuffer> min_batch; /*b (minbatch)*/
   /* Random mini-batch from D with all agent data*/
-  for (int k = 1; k <= 1; k++) { /*should be k = 1*/
+  for (int k = 1; k <= 8; k++) { /*should be k = 1*/
     int rand_index = torch::randint(0, len, {1}).item<int>();
     auto rand_batch = data_buffer[rand_index];/*Take random saved chunks*/
     /*Send in the minibatch and update the hidden states by the saved states and hidden values.*/
@@ -202,7 +202,7 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
     }
     min_batch.push_back(rand_batch); //push rand_batch to minbatch
   } /*end for*/
-
+  std::cerr << "min batch size: " << min_batch.size() << std::endl;
 
   /*ADAM UPDATE NETWORKS*/
 
