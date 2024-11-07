@@ -200,6 +200,12 @@ bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
   return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
 }
 
+/* Returns true if the specified robot is currently touching the ball */
+bool AutomatedReferee::IsTouchingBall(int id, enum Team team)
+{
+  return (DistanceToBall(id, team) <= ball_radius + collision_margin);
+}
+
 /* Returns which team is currently touching the ball, returns kUnknow if no
  * team is currently in contact with the ball. */
 enum Team AutomatedReferee::CheckForCollision()
@@ -208,7 +214,7 @@ enum Team AutomatedReferee::CheckForCollision()
   {
     for (int id = 0; id < team_size; id++)
     {
-      if (DistanceToBall(id, team) <= ball_radius + collision_margin)
+      if (IsTouchingBall(id, team))
       {
         return team;
       }

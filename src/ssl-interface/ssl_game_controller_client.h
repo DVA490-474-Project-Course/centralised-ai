@@ -85,7 +85,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual enum RefereeCommand GetRefereeCommand();
+  enum RefereeCommand GetRefereeCommand();
 
   /*!
     * @brief Returns the blue team score.
@@ -93,7 +93,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual int GetBlueTeamScore();
+  int GetBlueTeamScore();
 
   /*!
     * @brief Returns the yellow team score.
@@ -101,7 +101,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual int GetYellowTeamScore();
+  int GetYellowTeamScore();
 
   /*!
     * @brief Returns the X coordinate of the ball designated position.
@@ -114,7 +114,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual float GetBallDesignatedPositionX();
+  float GetBallDesignatedPositionX();
 
   /*!
     * @brief Returns the Y coordinate of the ball designated position.
@@ -127,7 +127,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual float GetBallDesignatedPositionY();
+  float GetBallDesignatedPositionY();
 
   /*!
     * @brief Returns the remaining stage time left.
@@ -138,7 +138,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual int64_t GetStageTimeLeft();
+  int64_t GetStageTimeLeft();
 
   /*!
     * @brief Returns the team that has been assigned to the positive half of the field.
@@ -146,7 +146,7 @@ public:
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
-  virtual enum Team GetTeamOnPositiveHalf();
+  enum Team GetTeamOnPositiveHalf();
   virtual ~GameControllerClient() = default;
 
   /* enum RefereeCommand GetNextRefereeCommand(); */
