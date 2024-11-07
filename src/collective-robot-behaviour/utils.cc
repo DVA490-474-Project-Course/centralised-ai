@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-10-30 by Jacob Johansson
+// Last modified: 2024-11-01 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -62,7 +62,7 @@ torch::Tensor  ComputeTemporalDifference(const torch::Tensor & critic_values, co
 	torch::Tensor  critic_values_expanded = critic_values.expand({-1, num_agents});
 
 	/* Calculate the temporal differences for all but the last time step. */
-	torch::Tensor  output = torch::empty((num_time_steps, num_agents));
+	torch::Tensor  output = torch::empty({num_time_steps, num_agents});
 	for (uint32_t t = 0; t < num_time_steps - 1; t++)
 	{
 		output[t] = rewards[t] + discount * critic_values_expanded[t + 1] - critic_values_expanded[t];
@@ -161,7 +161,7 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 	{
 		for(int32_t k = 0; k < num_agents; k++)
 		{
-			torch::Tensor probabitilies = actions_probabilities[t][k];
+			torch::Tensor probabitilies = actions_probabilities[t][k] + 0.000001;
 
 			entropy[t][k] = -torch::sum(probabitilies.log());
 		}

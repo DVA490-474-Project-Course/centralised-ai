@@ -19,12 +19,13 @@ extern int input_size; // Number of input features
 extern int num_actions;
 extern int amount_of_players_in_team;
 extern int hidden_size;
+
 namespace centralised_ai {
-namespace collective_robot_behaviour
-{
+namespace collective_robot_behaviour{
+
 DataBuffer::DataBuffer()
-    : A(torch::zeros({1, hidden_size})),
-      R(torch::zeros({1, hidden_size})) {
+    : A(torch::zeros({1, amount_of_players_in_team})),
+      R(torch::zeros({1, amount_of_players_in_team})) {
 }
 
 Agents::Agents(int id, PolicyNetwork network)
@@ -34,7 +35,6 @@ Agents::Agents(int id, PolicyNetwork network)
       y_pos(random_floats[1].item<float>()){
 
 }
-
 
 HiddenStates::HiddenStates()
     : ht_p(torch::zeros({1, 1, hidden_size})),  /* Hidden state tensor initialized to zeros*/
@@ -63,7 +63,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   auto cx_new = std::get<1>(std::get<1>(lstm_output));
 
   auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
-  auto value = output_layer(output);
+  auto value = torch::nn::functional::softmax(output_layer(output), /*dim=*/1); // Apply softmax on the last dimension
 
   return std::make_tuple(value, hx_new, cx_new);
 }
@@ -178,23 +178,33 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   return agents;
 }
 
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff) {
+void UpdateNets(std::vector<Agents>& agents,
+  CriticNetwork& critic,
+  torch::Tensor policy_loss,
+  torch::Tensor critic_loss) {
 
-  torch::Tensor targets = torch::tensor({{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}}, torch::dtype(torch::kFloat));
-  torch::Tensor loss = torch::tensor(0.004, torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor pol_loss = torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor cri_loss = torch::tensor(critic_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
 
-  //update each agent
+  /*Update each policy network*/
   for (auto& agent : agents)
   {
     agent.policy_network.train();
-    torch::optim::Adam optimizer(agent.policy_network.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+    torch::optim::Adam policynet(agent.policy_network.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
 
-    optimizer.zero_grad();
-    loss.backward();
-    optimizer.step();
+    policynet.zero_grad();
+    pol_loss.backward();
+    policynet.step();
 
-    std::cout << "Loss: " << loss.item<float>() << std::endl;
   }
+
+  /*Update critic network*/
+  critic.train();
+  torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+  critnet.zero_grad();
+  cri_loss.backward();
+  critnet.step();
+
 }
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

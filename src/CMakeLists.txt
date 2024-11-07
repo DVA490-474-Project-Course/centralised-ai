@@ -16,9 +16,8 @@ add_subdirectory(ssl-interface)
 
 # Libraries used by main
 target_link_libraries(main_exe
-    world_lib
-    utils_lib
     mappo_lib
+    ssl_interface_lib
 )
 
 #===============================================================================
