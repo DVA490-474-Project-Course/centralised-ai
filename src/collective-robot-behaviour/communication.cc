@@ -132,10 +132,10 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
         break;
       case 1:
-        robot_interfaces[i].SetVelocity(1.0F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(0.5F, 0.0F, 0.0F);
         break;
       case 2:
-        robot_interfaces[i].SetVelocity(-1.0F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
         break;
       default:
         break;

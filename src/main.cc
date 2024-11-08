@@ -26,8 +26,8 @@ int step_max = 0;
 int batch_size = 30;
 int amount_of_players_in_team = 6;
 int input_size = 43; // Number of input features
-int num_actions = 4;
-int hidden_size = 7;
+int num_actions = 3;
+int hidden_size = 64;
 
 int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
