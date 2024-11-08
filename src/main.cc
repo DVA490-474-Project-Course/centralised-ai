@@ -56,6 +56,7 @@ int main() {
   referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
 
   while (true) {
+    std::cout << "Running" << std::endl;
     /*run actions and save  to buffer*/
     auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue);
 

@@ -158,7 +158,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 
       data_buffer.push_back(dat); /*Store [t, A,R] in D (DataBuffer)*/
     } /*end chunks loop*/
-    std::cerr <<"Batch size is"<< i << std::endl;
+    //std::cerr <<"Batch size is"<< i << std::endl;
   }/*end for batch_size*/
   return data_buffer;
 }
@@ -266,6 +266,9 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
     SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
     std::cout << "Training of buffer done! " << std::endl;
     std::cout << "==============================================" << std::endl;
+
+    std::cout << "Policy loss: " << policyloss << std::endl;
+    std::cout << "Critic loss: " << critic_loss << std::endl;
 
 }
 
