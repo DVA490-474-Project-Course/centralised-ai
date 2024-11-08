@@ -89,4 +89,17 @@ enum class RefereeCommand
 
 } /* namespace centralised_ai */
 
+namespace robot_controller_interface
+{
+  /*! 
+ * @brief Enum representing player team selection.
+ */
+  enum class Team
+  {
+    kBlue = 0,
+    kYellow = 1,
+    kUnknown = -1
+  };
+}
+
 #endif /* CENTRALISEDAI_COMMONTYPES_H_ */

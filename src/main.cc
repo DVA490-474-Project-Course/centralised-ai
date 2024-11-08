@@ -17,6 +17,7 @@
 #include "collective-robot-behaviour/network.h"
 #include "collective-robot-behaviour/mappo.h"
 #include "ssl-interface/ssl_vision_client.h"
+#include "simulation-interface/simulation_interface.h"
 
 /*Configuration values*/
 int max_timesteps = 100;
@@ -55,6 +56,15 @@ int main() {
   /* Start the automated referee */
   referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
 
+  std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces;
+  for (int32_t id = 0; id < 6; id++)
+  {
+    simulation_interfaces.push_back(robot_controller_interface::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, robot_controller_interface::Team::kBlue));
+    simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
+  }
+  
+
+
   while (true) {
     std::cout << "Running" << std::endl;
     /*run actions and save  to buffer*/
@@ -62,6 +72,12 @@ int main() {
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
+
+    for (int32_t id = 0; id < 6; id++)
+    {
+      simulation_interfaces[id].SendPacket();
+      std::cout << "Robot " << id << " sent packet" << std::endl;
+    }
   }
 
 
