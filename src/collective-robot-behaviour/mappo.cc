@@ -18,6 +18,7 @@
 
 /* Projects .h files for communication functions. */
 #include "communication.h"
+#include <chrono>
 #include "network.h"
 #include "utils.h"
 #include "run_state.h"
@@ -29,6 +30,7 @@ extern int steps; /*move into mappo------------------------*/
 extern int step_max;
 extern int batch_size;
 extern int amount_of_players_in_team;
+
 
 namespace centralised_ai {
 namespace collective_robot_behaviour {
@@ -88,7 +90,11 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       /* For each agent in one timestep, get probabilities and hidden states*/
       for (auto& agent : Models) {
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-        auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(state,trajectories[timestep-1].hidden_p[agent.robotId].ht_p,trajectories[timestep-1].hidden_p[agent.robotId].ct_p);
+
+        state.index({0, 0, 0}) = agent.robotId;
+        auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(
+          state, trajectories[timestep - 1].hidden_p[agent.robotId].ht_p,
+          trajectories[timestep - 1].hidden_p[agent.robotId].ct_p);
 
         prob_actions_stored.index_put_({agent.robotId}, act_prob);
         //std::cout << act_prob << std::endl;
@@ -117,14 +123,17 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 
       exp.actions_prob = prob_actions_stored;
       exp.actions = actions_agents;
-      //exp.state = state;
+      exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
       state = GetStates(referee,vision_client,own_team,opponent_team);
+
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
 
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(4));
     } /*end for timestep*/
 
     /*Erase initial trajectory*/
@@ -148,7 +157,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
     /*Split trajectories into chunks of lenght L*/
-    int L = max_timesteps*0.5;
+    int L = 4;
     for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;
@@ -177,8 +186,9 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
 
   int len = data_buffer.size();
   std::vector<DataBuffer> min_batch; /*b (minbatch)*/
+
   /* Random mini-batch from D with all agent data*/
-  for (int k = 1; k <= 8; k++) { /*should be k = 1*/
+  for (int k = 1; k <= 1; k++) { /*should be k = 1*/
     int rand_index = torch::randint(0, len, {1}).item<int>();
     auto rand_batch = data_buffer[rand_index];/*Take random saved chunks*/
     /*Send in the minibatch and update the hidden states by the saved states and hidden values.*/
@@ -209,12 +219,10 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
     }
     min_batch.push_back(rand_batch); //push rand_batch to minbatch
   } /*end for*/
-  std::cerr << "min batch size: " << min_batch.size() << std::endl;
 
-  /*ADAM UPDATE NETWORKS*/
 
   /*Make the arrays fit update functions*/
-  int64_t length = static_cast<int64_t>(min_batch[0].t.size()); /*Timesteps*/
+  int64_t length = static_cast<int64_t>(min_batch[0].t.size()); /*Timesteps in batch*/
   torch::Tensor old_predicts_p=torch::zeros({length,amount_of_players_in_team});
   torch::Tensor new_predicts_p=torch::zeros({length,amount_of_players_in_team});
   torch::Tensor general_arr=torch::zeros({length,amount_of_players_in_team});
@@ -255,25 +263,25 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
       reward_arr_minbatch[t] = min_batch[samp_i].R[t];
     }
   }
-    auto probratio = ComputeProbabilityRatio(new_predicts_p,old_predicts_p);
-    auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
-    auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
 
+  auto probratio = ComputeProbabilityRatio(new_predicts_p,old_predicts_p);
+  auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
 
-    auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
-    auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
+  auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
+  auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
+  auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
 
-    /*Update the network and save the old networks*/
-    //old_net = Models;
-    //old_net_critic.parameters()= critic.parameters();
+  /*Update the network and save the old networks*/
+  //old_net = Models;
+  //old_net_critic.parameters()= critic.parameters();
 
-    UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
-    SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
-    std::cout << "Training of buffer done! " << std::endl;
-    std::cout << "==============================================" << std::endl;
+  UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
+  SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
+  std::cout << "Training of buffer done! " << std::endl;
+  std::cout << "==============================================" << std::endl;
 
-    //std::cout << "Policy loss: " << policyloss << std::endl;
-    //std::cout << "Critic loss: " << critic_loss << std::endl;
+  std::cout << "Policy loss: " << policyloss << std::endl;
+  std::cout << "Critic loss: " << critic_loss << std::endl;
 
 }
 

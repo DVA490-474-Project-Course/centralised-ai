@@ -125,6 +125,7 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     for (int32_t i = 0; i < action_ids.size(0); i++)
     {
       // 0: Stop, 1: Forward, 2: Backward
+      //std::cout << "Robot: " << i  << "Did action" << action_ids[i] << std::endl;
       switch (action_ids[i].item<int>())
       {
       case 0:
