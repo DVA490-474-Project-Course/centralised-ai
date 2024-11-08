@@ -120,7 +120,6 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       //exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 1, 0.001}).expand({1, amount_of_players_in_team});
-      std::cerr << exp.rewards << std::endl;
       state = GetStates(referee,vision_client,own_team,opponent_team);
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
@@ -266,7 +265,7 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
 
     /*Update the network and save the old networks*/
     //old_net = Models;
-    //old_net_critic = critic;
+    //old_net_critic.parameters()= critic.parameters();
 
     UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
     SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
