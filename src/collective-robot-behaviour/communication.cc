@@ -121,8 +121,9 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     positions[0][5] = states[13];
     positions[1][5] = states[14];
 
-    torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, 1, reward_configuration.average_distance_reward);
-    
+    torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
+    std::cout << average_distance_reward << std::endl;
+
     torch::Tensor have_ball = states.slice(0, 28, 34);
     torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
     
