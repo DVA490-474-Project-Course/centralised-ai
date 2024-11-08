@@ -11,7 +11,9 @@
 #include <torch/torch.h>
 #include "network.h"
 #include "../ssl-interface/automated_referee.h"
+#include "../simulation-interface/simulation_interface.h"
 #include "world.h"
+#include <vector>
 
 namespace centralised_ai
 {
@@ -176,6 +178,32 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
 
     return Observation{rewards : rewards, state : states};
   }
+
+  void SendActions(std::vector<robot_controller_interface::simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids)
+  {
+    for (int32_t i = 0; i < action_ids.size(0); i++)
+    {
+      // 0: Stop, 1: Forward, 2: Backward
+      switch (action_ids[0].item<int>())
+      {
+      case 0:
+        robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
+        break;
+      case 1:
+        robot_interfaces[i].SetVelocity(5.0F, 0.0F, 0.0F);
+        break;
+      case 2:
+        robot_interfaces[i].SetVelocity(-5.0F, 0.0F, 0.0F);
+        break;
+      default:
+        break;
+      }
+
+      robot_interfaces[i].SendPacket();
+    }
+  }
+
+
 }/* namespace centralised_ai */
 }/*namespace collective_robot_behaviour*/
 

@@ -72,12 +72,6 @@ int main() {
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
-
-    for (int32_t id = 0; id < 6; id++)
-    {
-      simulation_interfaces[id].SendPacket();
-      std::cout << "Robot " << id << " sent packet" << std::endl;
-    }
   }
 
 

@@ -19,7 +19,7 @@
 #include <string>
 
 /* Project .h files */
-#include "grSim_Packet.pb.h"
+#include "generated/grSim_Packet.pb.h"
 #include "../common_types.h"
 
 namespace robot_controller_interface
