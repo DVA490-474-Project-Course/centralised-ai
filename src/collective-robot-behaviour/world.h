@@ -133,6 +133,14 @@ class GameStateBase
 torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_distance, float max_reward);
 
 /*!
+* @returns a tensor representing the reward given by the distance between the robots and the ball, with the shape [num_agents].
+* @param[In] positions: A tensor of all the positions of all the robots, with the shape[2, num_agents].
+* @param[In] ball_position: A tensor of the position of the ball, with the shape[2].
+* @param[In] reward: The reward given when the robot is close to the ball.
+*/
+torch::Tensor ComputeDistanceToBallReward(torch::Tensor & positions, torch::Tensor & ball_position, float reward);
+
+/*!
   @returns a tensor representing the reward given by when the robot either has the ball or not, with the shape [num_agents].
   @param[In] reward: The reward given when the robot has the ball.
 */

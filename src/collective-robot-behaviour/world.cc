@@ -25,9 +25,28 @@ torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_
 	return torch::clamp(rewards, 0, 1) * max_reward;
 }
 
+torch::Tensor ComputeDistanceToBallReward(torch::Tensor & positions, torch::Tensor & ball_position, float reward)
+{
+	torch::Tensor distances = (positions - ball_position).pow(2).sum(0); /* [num_agents]. */
+	return -torch::sqrt(distances) * reward;
+}
+
 torch::Tensor ComputeHaveBallReward(torch::Tensor & have_ball_flags, float reward)
 {
-	return torch::clone(have_ball_flags) * reward;
+	torch::Tensor rewards = torch::empty(have_ball_flags.size(0));
+	for (int32_t i = 0; i < have_ball_flags.size(0); i++)
+	{
+		int32_t flag = have_ball_flags[i].item<int>();
+		if(flag > 0)
+		{
+			rewards[i] = reward;
+		}
+		else
+		{
+			rewards[i] = -reward;
+		}
+	}
+	return rewards;
 }
 
 }

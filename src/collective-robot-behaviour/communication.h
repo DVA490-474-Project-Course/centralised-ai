@@ -51,6 +51,9 @@ typedef struct RewardConfiguration
 
     /* The reward that will be given to the robot when it has the ball. */
     float have_ball_reward;
+
+    /* The reward that will be multiplied with the distance.*/
+    float distance_to_ball_reward;
 } RewardConfiguration;
 
 /*!
@@ -58,19 +61,6 @@ typedef struct RewardConfiguration
 * @returns The opponent team.
 */
 Team ComputeOpponentTeam(Team own_team);
-
-/*!
- *@brief Get the current state from grSim
- *
- *@pre The following preconditions must be met before using this class:
- * - A connection to grSim.
- *
- *@param[In] referee: The automated referee, which is the source of the current state of the world.
- *@param[In] vision_client: The vision client, which is the source of the current state of the world.
- *@param[In] Team: The team that the agents are on.
- *@param[Out] Tensor array of the current state that includes ....
- */
-Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interface::VisionClient vision_client, struct RewardConfiguration reward_configuration, Team team);
 
 /*!
 *@brief Get the current state from grSim
@@ -131,16 +121,6 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 *@param[In] opponent_team: The team that the robots are playing against.
 */
 torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
-
-/*!
-*@brief Computes the rewards for each agent.
-*
-*@returns A tensor representing the rewards for each agent, with the shape [num_agents].
-*@param[In] states: The states of the world, with the shape [num_states].
-*@param[In] reward_configuration: The configuration of the rewards.
-*@param[In] own_team: The team that the agents are on.
-*/
-torch::Tensor ComputeRewards(torch::Tensor & states, struct RewardConfiguration reward_configuration, Team own_team);
 
 /*!
 *@brief Send actions to the robots.

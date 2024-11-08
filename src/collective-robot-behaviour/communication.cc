@@ -105,33 +105,6 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     return states.view({1, 1, num_states});
   }
 
-  torch::Tensor ComputeRewards(torch::Tensor & states, RewardConfiguration reward_configuration, Team own_team)
-  {
-    torch::Tensor positions = torch::zeros({2, 6});
-    positions[0][0] = states[3];
-    positions[1][0] = states[4];
-    positions[0][1] = states[5];
-    positions[1][1] = states[6];
-    positions[0][2] = states[7];
-    positions[1][2] = states[8];
-    positions[0][3] = states[9];
-    positions[1][3] = states[10];
-    positions[0][4] = states[11];
-    positions[1][4] = states[12];
-    positions[0][5] = states[13];
-    positions[1][5] = states[14];
-
-    torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
-    std::cout << average_distance_reward << std::endl;
-
-    torch::Tensor have_ball = states.slice(0, 28, 34);
-    torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
-    
-    torch::Tensor total_reward = average_distance_reward + have_ball_reward;
-
-    return total_reward;
-  }
-
   Team ComputeOpponentTeam(Team own_team)
   {
     switch (own_team)
@@ -147,39 +120,6 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     }
   }
 
-  Observation GetObservations(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, RewardConfiguration reward_configuration, Team team)
-  {
-    /* Correct the dessignated teams.*/
-    Team teammate;
-    Team opponent;
-    switch (team)
-    {
-    case Team::kBlue:
-      teammate = Team::kBlue;
-      opponent = Team::kYellow;
-      break;
-    case Team::kYellow:
-      teammate = Team::kYellow;
-      opponent = Team::kBlue;
-      break;
-    case Team::kUnknown:
-      teammate = Team::kUnknown;
-      opponent = Team::kUnknown;
-    default:
-      teammate = Team::kUnknown;
-      opponent = Team::kUnknown;
-      break;
-    }
-
-    /* Get the states of the world. */
-    torch::Tensor states = GetStates(referee, vision_client, teammate, opponent);
-
-    /* Compute the rewards for each agent. */
-    torch::Tensor rewards = ComputeRewards(states, reward_configuration, teammate);
-
-    return Observation{rewards : rewards, state : states};
-  }
-
   void SendActions(std::vector<robot_controller_interface::simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids)
   {
     for (int32_t i = 0; i < action_ids.size(0); i++)
@@ -191,10 +131,10 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
         break;
       case 1:
-        robot_interfaces[i].SetVelocity(5.0F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(1.0F, 0.0F, 0.0F);
         break;
       case 2:
-        robot_interfaces[i].SetVelocity(-5.0F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(-1.0F, 0.0F, 0.0F);
         break;
       default:
         break;

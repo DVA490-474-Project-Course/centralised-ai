@@ -119,7 +119,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.actions = actions_agents;
       //exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 1, 0.001}).expand({1, amount_of_players_in_team});
+      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001}).expand({1, amount_of_players_in_team});
       state = GetStates(referee,vision_client,own_team,opponent_team);
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
