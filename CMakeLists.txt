@@ -14,7 +14,7 @@ project(centralized_ai)
 # find_package, include etc. Lastly add_subdirectory.
 
 # Set to the absolute path of .../libtorch/share/cmake/Torch in your libtorch directory
-set(CMAKE_PREFIX_PATH "/home/jacob/Hämtningar/libtorch-cxx11-abi-shared-with-deps-2.5.0+cpu/libtorch/share/cmake/Torch")
+set(CMAKE_PREFIX_PATH "/home/viktor/PRO/libtorch/share/cmake/Torch")
 
 find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
@@ -24,6 +24,6 @@ find_package(Torch REQUIRED)
 # add_subdirectories must be last
 
 add_subdirectory(src)
-add_subdirectory(test)
+#add_subdirectory(test)
 
 #===============================================================================

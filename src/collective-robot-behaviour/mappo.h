@@ -21,6 +21,7 @@
 /* Projects .h files. */
 #include "communication.h"
 #include "network.h"
+#include "../simulation-interface/simulation_interface.h"
 
 /*Configuration values, change in MAPPO.cc if needed*/
 extern  int max_timesteps;
@@ -39,9 +40,15 @@ namespace collective_robot_behaviour {
   *@param[in] models is the created/loaded models for each agent, the amount of models is the amount_of_player_in_team which can be changed in MAPPO.cc.
   *@param[in] critic is the created/loaded ctritic network that the MAPPO will be validating from.
   */
-void Mappo_Update(std::vector<Agents> models,CriticNetwork critic, std::vector<DataBuffer> data_buffer);
+void Mappo_Update(std::vector<Agents> models,CriticNetwork critic,
+ std::vector<DataBuffer> data_buffer,
+ std::vector<Agents> &old_net, CriticNetwork &old_net_critic);
 
-std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team);
+std::vector<DataBuffer> MappoRun(std::vector<Agents> Models,
+ CriticNetwork critic,ssl_interface::AutomatedReferee & referee,
+ ssl_interface::VisionClient & vision_client,
+ Team own_team,
+ std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

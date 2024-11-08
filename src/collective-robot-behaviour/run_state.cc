@@ -22,7 +22,7 @@ namespace collective_robot_behaviour
 
     torch::Tensor RunState::ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration)
     {
-        torch::Tensor positions = torch::zeros({2, 6});
+        torch::Tensor positions = torch::empty({2, 6});
         positions[0][0] = states[3];
         positions[1][0] = states[4];
         positions[0][1] = states[5];
@@ -40,7 +40,6 @@ namespace collective_robot_behaviour
     
         torch::Tensor have_ball = states.slice(0, 28, 34);
         torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
-    
         torch::Tensor total_reward = average_distance_reward + have_ball_reward;
 
         return total_reward;

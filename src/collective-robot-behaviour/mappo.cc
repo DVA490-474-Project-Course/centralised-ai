@@ -21,6 +21,7 @@
 #include "network.h"
 #include "utils.h"
 #include "run_state.h"
+#include "../simulation-interface/simulation_interface.h"
 
 /*Configuration values*/
 extern int max_timesteps;
@@ -54,13 +55,15 @@ static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHi
   return std::make_tuple(trajectories, act_prob, action);
 };
 
-std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team) {
+std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee,
+  ssl_interface::VisionClient & vision_client, Team own_team,
+  std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces) {
+
   std::vector<DataBuffer> data_buffer; /*Initialise data buffer D. Reset each step*/
   Team opponent_team = ComputeOpponentTeam(own_team);
   std::vector<Trajectory> trajectories;
   torch::Tensor act_prob;
   torch::Tensor action;
-
   RunState run_state;
 
   /* Gain enough batch for training */
@@ -98,10 +101,11 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 
       } /*end for agent*/
 
-      //std::cout << prob_actions_stored << std::endl;
-      /*Act*/
+      /*Get the actions with higest probabilities for each agent*/
+      exp.actions = std::get<1>(prob_actions_stored.max(1));
 
-      exp.actions = (torch::zeros({amount_of_players_in_team}));
+      //std::cout << exp.actions << std::endl;
+      SendActions(simulation_interfaces,exp.actions);
       /*
       *NEEDS TO ME IMPLEMENTED:
       *execute actions_prob
@@ -113,9 +117,10 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 
       exp.actions_prob = prob_actions_stored;
       exp.actions = actions_agents;
-      exp.state = state;
+      //exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.00001, 0.5, 0.001}).expand({1, amount_of_players_in_team});
+      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 1, 0.001}).expand({1, amount_of_players_in_team});
+      std::cerr << exp.rewards << std::endl;
       state = GetStates(referee,vision_client,own_team,opponent_team);
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
@@ -169,9 +174,8 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
   * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
   * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
   */
-void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<DataBuffer> data_buffer) {
-  auto old_net = Models; /*Initalise old network*/
-  auto old_net_critic = critic;
+void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<DataBuffer> data_buffer,std::vector<Agents> &old_net, CriticNetwork &old_net_critic) {
+
   int len = data_buffer.size();
   std::vector<DataBuffer> min_batch; /*b (minbatch)*/
   /* Random mini-batch from D with all agent data*/
@@ -257,18 +261,20 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
     auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
 
 
-
     auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
     auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
 
+    /*Update the network and save the old networks*/
+    //old_net = Models;
+    //old_net_critic = critic;
 
     UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
     SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
     std::cout << "Training of buffer done! " << std::endl;
     std::cout << "==============================================" << std::endl;
 
-    std::cout << "Policy loss: " << policyloss << std::endl;
-    std::cout << "Critic loss: " << critic_loss << std::endl;
+    //std::cout << "Policy loss: " << policyloss << std::endl;
+    //std::cout << "Critic loss: " << critic_loss << std::endl;
 
 }
 

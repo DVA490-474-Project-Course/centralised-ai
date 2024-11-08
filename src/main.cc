@@ -64,14 +64,16 @@ int main() {
   }
   
 
-
+  auto old_net = models;
+  auto old_net_critic = critic;
   while (true) {
     std::cout << "Running" << std::endl;
     /*run actions and save  to buffer*/
-    auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue);
+    auto databuffer = MappoRun(models,critic,referee,vision_client,
+      centralised_ai::Team::kBlue,simulation_interfaces);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
+    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer,old_net, old_net_critic);
   }
 
 
