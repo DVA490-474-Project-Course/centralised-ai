@@ -20,10 +20,10 @@
 #include "simulation-interface/simulation_interface.h"
 
 /*Configuration values*/
-int max_timesteps = 100;
+int max_timesteps = 300;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
-int batch_size = 30;
+int batch_size = 5;
 int amount_of_players_in_team = 6;
 int input_size = 43; // Number of input features
 int num_actions = 3;
@@ -35,7 +35,7 @@ int main() {
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
-  //Models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -60,7 +60,7 @@ int main() {
   for (int32_t id = 0; id < 6; id++)
   {
     simulation_interfaces.push_back(robot_controller_interface::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, robot_controller_interface::Team::kBlue));
-    simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
+    //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
   
 
@@ -74,6 +74,8 @@ int main() {
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer,old_net, old_net_critic);
+
+    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
 
 

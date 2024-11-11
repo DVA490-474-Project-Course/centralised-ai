@@ -90,16 +90,13 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       /* For each agent in one timestep, get probabilities and hidden states*/
       for (auto& agent : Models) {
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-
-        state.index({0, 0, 0}) = agent.robotId;
+        auto agent_state = state.clone();
+        agent_state.index({0, 0, 0}) = agent.robotId;
         auto [act_prob, hx_new, ct_new] = agent.policy_network.Forward(
-          state, trajectories[timestep - 1].hidden_p[agent.robotId].ht_p,
+          agent_state, trajectories[timestep - 1].hidden_p[agent.robotId].ht_p,
           trajectories[timestep - 1].hidden_p[agent.robotId].ct_p);
 
         prob_actions_stored.index_put_({agent.robotId}, act_prob);
-        //std::cout << act_prob << std::endl;
-        //std::cout << prob_actions_stored << std::endl;
-
         /*Save hidden states*/
         new_states.ht_p = hx_new;
         new_states.ct_p = ct_new;
@@ -156,8 +153,8 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor rew_sum = rewards_tensor.sum(1);
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
-    /*Split trajectories into chunks of lenght L*/
-    int L = 4;
+    /*Split amount of timesteps in trajectories to L*/
+    int L = max_timesteps-1;
     for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;
@@ -185,41 +182,38 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<DataBuffer> data_buffer,std::vector<Agents> &old_net, CriticNetwork &old_net_critic) {
 
   int len = data_buffer.size();
-  std::vector<DataBuffer> min_batch; /*b (minbatch)*/
-
-  /* Random mini-batch from D with all agent data*/
-  for (int k = 1; k <= 1; k++) { /*should be k = 1*/
+  std::vector<DataBuffer> min_batch; /* Mini-batch */
+  for (int k = 1; k <= 2; k++) {
+    /* Should be k = 1 */
     int rand_index = torch::randint(0, len, {1}).item<int>();
-    auto rand_batch = data_buffer[rand_index];/*Take random saved chunks*/
-    /*Send in the minibatch and update the hidden states by the saved states and hidden values.*/
-    /*for each timestep in batch*/
-    for (int i = 0; i <= rand_batch.t.size()-1; i++) {
-      auto state_read = rand_batch.t[i].state; /*get state for the timestep in minibatch*/
-      /*
-      *For each agents actions_prob in one timestep
-      *UPDATE SO ALL TIMESTEPS GET SENT AS ONE VECTOR AS STATE
-      */
-      /*Update the hidden stated for policy and critic networks
-     *for each data chunk in the mini-batch b*/
-      for (int agent = 0; agent < amount_of_players_in_team; agent++)
-      {
-        auto hx_read = rand_batch.t[i].hidden_p[agent].ht_p;
-        auto ct_read = rand_batch.t[i].hidden_p[agent].ct_p;
+    auto rand_batch = data_buffer[rand_index]; /* Take random saved chunks */
 
-        /*update LSTM hidden states for policy from first hidden state in data chunk.*/
-        Models[agent].policy_network.Forward(state_read,hx_read,ct_read);
-        /*
-         * FIX SO WE UPDATE A STATE VECTOR OF MULTIPLE TIMESTEPS INSTEAD OF USING LOOP
-         */
+    int t_len = rand_batch.t.size();
+
+    // Create state tensor for the batch of all sequences
+    torch::Tensor state_read = torch::zeros({1, t_len, input_size}); // [batch_size, sequence_len, input_size]
+    // Create hidden state and cell state tensors for all agents
+    torch::Tensor ht_read = torch::zeros({amount_of_players_in_team, t_len, hidden_size}); // [batch_size, sequence_len, hidden_size]
+    torch::Tensor ct_read = torch::zeros({amount_of_players_in_team, t_len, hidden_size}); // [batch_size, sequence_len, hidden_size]
+
+    // Populate the state, hidden state, and cell state for each timestep
+    for (int t = 0; t < t_len; t++) {
+      state_read[0][t] = rand_batch.t[t].state.squeeze();
+      // Now you can send the entire batch (ht_read, ct_read, and state_read) to the model for each agent
+      for (int agent = 0; agent < amount_of_players_in_team; agent++) {
+        ht_read[agent][t] = rand_batch.t[t].hidden_p[agent].ht_p.squeeze();
+        ct_read[agent][t] = rand_batch.t[t].hidden_p[agent].ct_p.squeeze();
       }
-      auto hv_read = rand_batch.t[i].hidden_v.ht_p;
-      auto cv_read = rand_batch.t[i].hidden_v.ct_p;
-      /*update LSTM hidden states for critic network from first hidden state in data chunk.*/
-      critic.Forward(state_read,hv_read,cv_read);
     }
-    min_batch.push_back(rand_batch); //push rand_batch to minbatch
-  } /*end for*/
-
+    for (auto agent : Models) {
+      auto agent_state_read = state_read;
+      for (int t = 0; t < 299; ++t) {
+        agent_state_read[0][t][0] = agent.robotId;  // Change the first feature value at each timestep
+      }
+      agent.policy_network.Forward(agent_state_read, ht_read[agent.robotId].unsqueeze(0), ct_read[agent.robotId].unsqueeze(0));
+    }
+    min_batch.push_back(rand_batch);
+  }
 
   /*Make the arrays fit update functions*/
   int64_t length = static_cast<int64_t>(min_batch[0].t.size()); /*Timesteps in batch*/

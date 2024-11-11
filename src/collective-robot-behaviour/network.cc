@@ -44,7 +44,7 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork()
   : num_layers(1),
   output_size(num_actions),
-  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
+  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
   output_layer(torch::nn::Linear(hidden_size, output_size)) {
 
   register_module("lstm", lstm);
@@ -183,16 +183,15 @@ void UpdateNets(std::vector<Agents>& agents,
   torch::Tensor policy_loss,
   torch::Tensor critic_loss) {
 
-  torch::Tensor pol_loss = torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
+  torch::Tensor pol_loss = - torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
   torch::Tensor cri_loss = torch::tensor(critic_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
 
   /*Update each policy network*/
   for (auto& agent : agents)
   {
     agent.policy_network.train();
-    torch::optim::Adam policynet(agent.policy_network.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
-
-    policynet.zero_grad();
+    agent.policy_network.zero_grad();
+    torch::optim::Adam policynet(agent.policy_network.parameters(),torch::optim::AdamOptions(0.99).eps(1e-5));
     pol_loss.backward();
     policynet.step();
 
@@ -200,6 +199,7 @@ void UpdateNets(std::vector<Agents>& agents,
 
   /*Update critic network*/
   critic.train();
+  critic.zero_grad();
   torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
   critnet.zero_grad();
   cri_loss.backward();
