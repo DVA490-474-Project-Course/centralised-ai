@@ -15,10 +15,25 @@ namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-    static torch::Tensor ComputeAngleToBall(const torch::Tensor & positions, const torch::Tensor & ball_position)
+    static torch::Tensor ComputeAngleToBall(const torch::Tensor & orientations, const torch::Tensor & ball_position)
     {
-        torch::Tensor angle_to_ball = torch::atan2(ball_position[1] - positions[1], ball_position[0] - positions[0]);
-        return angle_to_ball.abs();
+        torch::Tensor angles_to_ball = torch::empty(6);
+
+        for (int32_t i = 0; i < orientations.size(0); i++)
+        {
+            torch::Tensor world_forward = torch::zeros(2);
+            world_forward[0] = orientations[i].cos();
+            world_forward[1] = orientations[i].sin();
+
+            torch::Tensor ball_position_normalized = ball_position.div(ball_position.norm());
+
+            torch::Tensor ball_product = ball_position_normalized.dot(world_forward);
+            torch::Tensor ball_product_abs = ball_product.abs();
+
+            angles_to_ball[i] = ball_product_abs;
+        }
+        
+        return angles_to_ball;
     }
 
     torch::Tensor RunState::ComputeActionMasks(const torch::Tensor & states)
@@ -42,6 +57,15 @@ namespace collective_robot_behaviour
         positions[0][5] = states[13];
         positions[1][5] = states[14];
 
+        torch::Tensor orientations = torch::zeros(6);
+        orientations[0] = states[41];
+        orientations[1] = states[42];
+        orientations[2] = states[43];
+        orientations[3] = states[44];
+        orientations[4] = states[45];
+        orientations[5] = states[46];
+
+
         torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
         torch::Tensor have_ball = states.slice(0, 28, 34);
         torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
@@ -52,11 +76,12 @@ namespace collective_robot_behaviour
         ball_position[0] = states[1];
         ball_position[1] = states[2];
         torch::Tensor distance_to_ball_reward = ComputeDistanceToBallReward(positions, ball_position, reward_configuration.distance_to_ball_reward);
-        torch::Tensor angle_to_ball_reward = -ComputeAngleToBall(positions, ball_position);
+        torch::Tensor angle_to_ball_reward = -ComputeAngleToBall(orientations, ball_position);
+        //std::cout << "Angle: " << angle_to_ball_reward << std::endl;
 
         torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
-        std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
+        //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
         return angle_to_ball_reward + distance_to_ball_reward;
     }
 }

@@ -44,7 +44,7 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     vision_client.ReceivePacket();
     referee.AnalyzeGameState();
 
-    int32_t num_states = 41;
+    int32_t num_states = 47;
     torch::Tensor states = torch::empty(num_states);
     states[0] = 0; /* Reserved for the robot id. */
 
@@ -102,6 +102,14 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     /* Remaining time */
     states[40] = referee.GetStageTimeLeft();
 
+    /* Rotation of each robot in the own team */
+    states[41] = vision_client.GetRobotOrientation(0, own_team);
+    states[42] = vision_client.GetRobotOrientation(1, own_team);
+    states[43] = vision_client.GetRobotOrientation(2, own_team);
+    states[44] = vision_client.GetRobotOrientation(3, own_team);
+    states[45] = vision_client.GetRobotOrientation(4, own_team);
+    states[46] = vision_client.GetRobotOrientation(5, own_team);
+
     /* Reshape the states to [1, 1, num_states], but keeping the data in the third dimension. */
     return states.view({1, 1, num_states});
   }
@@ -132,18 +140,18 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
         break;
       case 1:
-        robot_interfaces[i].SetVelocity(0.5F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(5.0F, 0.0F, 0.0F);
         break;
       case 2:
-        robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(-5.0F, 0.0F, 0.0F);
         break;
       case 3:
         /* Rotate left. */
-        robot_interfaces[i].SetVelocity(-1.0F, -1.0F, 1.0F, 1.0F);
+        robot_interfaces[i].SetVelocity(-5.0F, -5.0F, 5.0F, 5.0F);
         break;
       case 4:
         /* Rotate right. */
-        robot_interfaces[i].SetVelocity(1.0F, 1.0F, -1.0F, -1.0F);
+        robot_interfaces[i].SetVelocity(5.0F, 5.0F, -5.0F, -5.0F);
         break;
       default:
         break;
