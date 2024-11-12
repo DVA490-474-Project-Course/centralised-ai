@@ -15,6 +15,12 @@ namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
+    static torch::Tensor ComputeAngleToBall(const torch::Tensor & positions, const torch::Tensor & ball_position)
+    {
+        torch::Tensor angle_to_ball = torch::atan2(ball_position[1] - positions[1], ball_position[0] - positions[0]);
+        return angle_to_ball.abs();
+    }
+
     torch::Tensor RunState::ComputeActionMasks(const torch::Tensor & states)
     {
         return torch::ones({6, 10});
@@ -46,11 +52,12 @@ namespace collective_robot_behaviour
         ball_position[0] = states[1];
         ball_position[1] = states[2];
         torch::Tensor distance_to_ball_reward = ComputeDistanceToBallReward(positions, ball_position, reward_configuration.distance_to_ball_reward);
+        torch::Tensor angle_to_ball_reward = -ComputeAngleToBall(positions, ball_position);
 
         torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
-        //std::cout << "Total reward: " << distance_to_ball_reward << std::endl;
-        return distance_to_ball_reward;
+        std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
+        return angle_to_ball_reward + distance_to_ball_reward;
     }
 }
 }
