@@ -50,6 +50,11 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models,
  Team own_team,
  std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces);
 
+ bool CheckModelParametersMatch(const std::vector<centralised_ai::collective_robot_behaviour::Agents>& saved_models,
+                                  const std::vector<centralised_ai::collective_robot_behaviour::Agents>& loaded_models,
+                                  const centralised_ai::collective_robot_behaviour::CriticNetwork& saved_critic,
+                                  const centralised_ai::collective_robot_behaviour::CriticNetwork& loaded_critic);
+
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //MAPPO_H_

@@ -37,6 +37,50 @@ namespace collective_robot_behaviour {
 /*
 *
 */
+
+bool CheckModelParametersMatch(const std::vector<centralised_ai::collective_robot_behaviour::Agents>& saved_models,
+                                 const std::vector<centralised_ai::collective_robot_behaviour::Agents>& loaded_models,
+                                 const centralised_ai::collective_robot_behaviour::CriticNetwork& saved_critic,
+                                 const centralised_ai::collective_robot_behaviour::CriticNetwork& loaded_critic) {
+    // Check each agent model
+    for (size_t i = 0; i < saved_models.size(); ++i) {
+      auto saved_params = saved_models[i].policy_network.lstm->parameters();
+      auto loaded_params = loaded_models[i].policy_network.lstm->parameters();
+
+      if (saved_params.size() != loaded_params.size()) {
+        std::cerr << "Parameter count mismatch for agent " << i << std::endl;
+        return false;
+      }
+
+      for (size_t j = 0; j < saved_params.size(); ++j) {
+        if (!saved_params[j].equal(loaded_params[j])) {
+          std::cerr << "Parameter mismatch in agent " << i << " at parameter " << j << std::endl;
+          return false;
+        }
+      }
+    }
+
+    // Check critic model parameters
+    auto saved_critic_params = saved_critic.lstm->parameters();
+    auto loaded_critic_params = loaded_critic.lstm->parameters();
+
+    if (saved_critic_params.size() != loaded_critic_params.size()) {
+      std::cerr << "Parameter count mismatch in critic network." << std::endl;
+      return false;
+    }
+
+    for (size_t j = 0; j < saved_critic_params.size(); ++j) {
+      if (!saved_critic_params[j].equal(loaded_critic_params[j])) {
+        std::cerr << "Parameter mismatch in critic network at parameter " << j << std::endl;
+        return false;
+      }
+    }
+
+    // If no mismatches are found
+    std::cout << "All parameters match successfully!" << std::endl;
+    return true;
+  }
+
 static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden(){
   std::vector<Trajectory> trajectories;
   HiddenStates reset_states;
@@ -123,14 +167,13 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
-      state = GetStates(referee,vision_client,own_team,opponent_team);
 
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      state = GetStates(referee,vision_client,own_team,opponent_team);
 
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(4));
     } /*end for timestep*/
 
     /*Erase initial trajectory*/
@@ -207,7 +250,7 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
     }
     for (auto agent : Models) {
       auto agent_state_read = state_read;
-      for (int t = 0; t < 299; ++t) {
+      for (int t = 0; t < t_len; ++t) {
         agent_state_read[0][t][0] = agent.robotId;  // Change the first feature value at each timestep
       }
       agent.policy_network.Forward(agent_state_read, ht_read[agent.robotId].unsqueeze(0), ct_read[agent.robotId].unsqueeze(0));
@@ -262,18 +305,22 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
   auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
 
   auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
+  //why minbtach[0]------------------------------------------------------------
   auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
   auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
 
-  /*Update the network and save the old networks*/
-  //old_net = Models;
-  //old_net_critic.parameters()= critic.parameters();
+  //old_net[0].policy_network.lstm->parameters()[0].data() = Models[0].policy_network.lstm->parameters()[0].data();
+
+  CheckModelParametersMatch(old_net,Models,old_net_critic,critic);
 
   UpdateNets(Models,critic,policyloss,critic_loss); /*update networks*/
   SaveModels(Models,critic); /*save models of all networks(policy and critic)*/
+
+  std::cout << "Old net validation: " << std::endl;
+  CheckModelParametersMatch(old_net,Models,old_net_critic,critic);
+
   std::cout << "Training of buffer done! " << std::endl;
   std::cout << "==============================================" << std::endl;
-
   std::cout << "Policy loss: " << policyloss << std::endl;
   std::cout << "Critic loss: " << critic_loss << std::endl;
 

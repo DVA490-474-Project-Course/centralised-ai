@@ -49,7 +49,7 @@ namespace collective_robot_behaviour
 
         torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
-        std::cout << "Total reward: " << distance_to_ball_reward << std::endl;
+        //std::cout << "Total reward: " << distance_to_ball_reward << std::endl;
         return distance_to_ball_reward;
     }
 }

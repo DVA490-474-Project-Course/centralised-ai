@@ -136,47 +136,47 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
   }
 }
 
-std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
+  std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   std::vector<Agents> agents;
-  PolicyNetwork model;;
 
-  /*Load all policy networks and assign to each agent*/
-  for (player_count--; player_count >= 0; player_count--) {
+  /* Load all policy networks and assign to each agent */
+  for (int i = 0; i < player_count; ++i) {
     try {
-      std::string model_path = "../models/agent_network" + std::to_string(player_count) + ".pt";
+      std::string model_path = "../models/agent_network" + std::to_string(i) + ".pt";
       torch::serialize::InputArchive input_archive;
 
       input_archive.load_from(model_path);
 
-
+      // Create a new PolicyNetwork for each agent and load its parameters
+      PolicyNetwork model;
       model.load(input_archive);
-      std::cout << "Loading agent " << player_count << " from " << model_path << std::endl;
-      agents.emplace_back(player_count, model);
 
+      std::cout << "Loading agent " << i << " from " << model_path << std::endl;
+      agents.emplace_back(i, model);
     }
     catch (const std::exception& e) {
-      std::cerr << "Error loading model for agent " << player_count << ": " << e.what() << std::endl;
+      std::cerr << "Error loading model for agent " << i << ": " << e.what() << std::endl;
       exit(EXIT_FAILURE);
     }
   }
 
-  /*Load in crtitic network*/
+  /* Load the critic network */
   try {
-    std::string model_path = "../models/critic_network.pt";
-    torch::serialize::InputArchive input_archive;
-    input_archive.load_from(model_path);
+    std::string critic_path = "../models/critic_network.pt";
+    torch::serialize::InputArchive critic_archive;
+    critic_archive.load_from(critic_path);
 
-    critic.load(input_archive);
-    std::cout << "Loading critic network from " << model_path << std::endl;
+    critic.load(critic_archive);
+    std::cout << "Loading critic network from " << critic_path << std::endl;
   }
-
   catch (const std::exception& e) {
-    std::cerr << "Error loading model for critic network" << std::endl;
+    std::cerr << "Error loading model for critic network: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
 
   return agents;
 }
+
 
 void UpdateNets(std::vector<Agents>& agents,
   CriticNetwork& critic,
