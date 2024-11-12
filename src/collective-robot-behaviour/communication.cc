@@ -44,7 +44,7 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     vision_client.ReceivePacket();
     referee.AnalyzeGameState();
 
-    int32_t num_states = 43;
+    int32_t num_states = 41;
     torch::Tensor states = torch::empty(num_states);
     states[0] = 0; /* Reserved for the robot id. */
 
@@ -125,8 +125,9 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
   {
     for (int32_t i = 0; i < action_ids.size(0); i++)
     {
+      std::cout << "Robot: " << i  << " Did action " << action_ids[i] << std::endl;
+
       // 0: Stop, 1: Forward, 2: Backward
-      //std::cout << "Robot: " << i  << "Did action" << action_ids[i] << std::endl;
       switch (action_ids[i].item<int>())
       {
       case 0:
@@ -137,6 +138,14 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
         break;
       case 2:
         robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
+        break;
+      case 3:
+        /* Rotate left. */
+        robot_interfaces[i].SetVelocity(-1.0F, -1.0F, 1.0F, 1.0F);
+        break;
+      case 4:
+        /* Rotate right. */
+        robot_interfaces[i].SetVelocity(1.0F, 1.0F, -1.0F, -1.0F);
         break;
       default:
         break;
