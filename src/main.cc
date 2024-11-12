@@ -38,40 +38,27 @@ std::vector<double> critic_loss;
 
 void PlotLoss()
 {
-try {
-        // Initialize the Python interpreter in this thread
-        pybind11::scoped_interpreter guard{};
+  /* Set plot labels and title. */
+  matplotlibcpp::figure();
 
-        // Import matplotlib in Python
-        pybind11::module plt = pybind11::module::import("matplotlib.pyplot");
+  /* Plot the data in real-time. */
+  while (true) {
+  
+      /* Plot the data. */
+      matplotlibcpp::plot(critic_loss, "-k");
 
-        // Create a plot figure
-        pybind11::object figure = plt.attr("figure")();
-        pybind11::object ax = figure.attr("add_subplot")(111);  // Add a subplot
+      matplotlibcpp::grid(true);
 
-        // Set plot labels and title
-        ax.attr("set_title")("Real-Time Critic Loss Plot");
-        ax.attr("set_xlabel")("Time");
-        ax.attr("set_ylabel")("Critic Loss");
+      matplotlibcpp::title("Critic Loss");
+      matplotlibcpp::xlabel("Time Step");
+      matplotlibcpp::ylabel("Critic Loss");
+    
+      //matplotlibcpp::xlim(0, static_cast<int32_t>(time_steps.size()));
 
-
-        plt.attr("show")();  // Show the plot
-
-        // Plot the data in real-time
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Adjust the interval to your need
-
-            // Read the latest data in the vector (non-blocking)
-            pybind11::list py_data = pybind11::cast(critic_loss);  // Convert the data vector to a Python list
-
-            // Redraw the plot
-            plt.attr("plot")();  // Update the plot with new data
-            plt.attr("pause")(0.01);  // Allow matplotlib to process the plot update
-        }
-    }
-    catch (const pybind11::error_already_set& e) {
-        std::cerr << "Python exception occurred: " << e.what() << std::endl;
-    }
+      /* Pause for more efficient plotting. */
+      matplotlibcpp::pause(0.1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }  
 }
 
 int main() {
@@ -113,16 +100,17 @@ int main() {
 
   auto old_net = models;
   auto old_net_critic = critic;
-  int32_t counter = 0;
   while (true) {
     std::cout << "Running" << std::endl;
     /*run actions and save  to buffer*/
     auto databuffer = MappoRun(models,critic,referee,vision_client,
       centralised_ai::Team::kBlue,simulation_interfaces);
 
-      //critic_loss.push_back(databuffer[0].t[0].rewards[0].item<float>());
-      critic_loss.push_back(counter);
-      counter++;
+      /* Push the mean reward for each time step in the returned epoch. */
+      for (int32_t t = 0; t < databuffer[0].t.size(); t++)
+      {
+        /* Todo: Push critic loss to the list. */
+      }
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer,old_net, old_net_critic);
