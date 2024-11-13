@@ -119,6 +119,7 @@ Team ComputeOpponentTeam(Team own_team);
 *@param[In] vision_client: The vision client, which is the source of the current state of the world.
 *@param[In] own_team: The team that the robots are on.
 *@param[In] opponent_team: The team that the robots are playing against.
+*@param[In] num_robots: The number of robots on each team.
 */
 torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
 
