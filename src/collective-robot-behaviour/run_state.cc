@@ -17,7 +17,7 @@ namespace collective_robot_behaviour
 {
     static torch::Tensor ComputeAngleToBall(const torch::Tensor & orientations, const torch::Tensor & positions, const torch::Tensor & ball_position)
     {
-        torch::Tensor angles_to_ball = torch::empty(6);
+        torch::Tensor angles_to_ball = torch::empty(orientations.size(0));
 
         torch::Tensor robots_to_ball = ball_position - positions;
 
@@ -48,28 +48,20 @@ namespace collective_robot_behaviour
 
     torch::Tensor RunState::ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration)
     {
-        torch::Tensor positions = torch::empty({2, 6});
-        positions[0][0] = states[3];
-        positions[1][0] = states[4];
-        positions[0][1] = states[5];
-        positions[1][1] = states[6];
-        positions[0][2] = states[7];
-        positions[1][2] = states[8];
-        positions[0][3] = states[9];
-        positions[1][3] = states[10];
-        positions[0][4] = states[11];
-        positions[1][4] = states[12];
-        positions[0][5] = states[13];
-        positions[1][5] = states[14];
-
-        torch::Tensor orientations = torch::zeros(6);
-        orientations[0] = states[41];
-        orientations[1] = states[42];
-        orientations[2] = states[43];
-        orientations[3] = states[44];
-        orientations[4] = states[45];
-        orientations[5] = states[46];
-
+        torch::Tensor positions = torch::zeros({2, amount_of_players_in_team});
+        int32_t position_start_index = 3;
+        for (int32_t i = 0; i < amount_of_players_in_team; i++)
+        {
+            positions[0][i] = states[position_start_index + amount_of_players_in_team * 2 + 0];
+            positions[1][i] = states[position_start_index + amount_of_players_in_team * 2 + 1];
+        }
+        
+        int32_t orientation_start_index = 3 + amount_of_players_in_team * 2 * 2 + 1 + amount_of_players_in_team * 2;
+        torch::Tensor orientations = torch::zeros(amount_of_players_in_team);
+        for (int32_t i = 0; i < amount_of_players_in_team; i++)
+        {
+            orientations[i] = states[orientation_start_index + i];
+        }
 
         torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
         torch::Tensor have_ball = states.slice(0, 28, 34);
@@ -82,11 +74,9 @@ namespace collective_robot_behaviour
         ball_position[1] = states[2];
         torch::Tensor distance_to_ball_reward = ComputeDistanceToBallReward(positions, ball_position, reward_configuration.distance_to_ball_reward);
         torch::Tensor angle_to_ball_reward = ComputeAngleToBall(orientations, positions, ball_position);
-        //std::cout << "Angle: " << angle_to_ball_reward << std::endl;
+        //torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
-        torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
-
-        //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
+        std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
         return angle_to_ball_reward + distance_to_ball_reward;
     }
 }
