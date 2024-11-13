@@ -52,8 +52,8 @@ namespace collective_robot_behaviour
         int32_t position_start_index = 3;
         for (int32_t i = 0; i < amount_of_players_in_team; i++)
         {
-            positions[0][i] = states[position_start_index + amount_of_players_in_team * 2 + 0];
-            positions[1][i] = states[position_start_index + amount_of_players_in_team * 2 + 1];
+            positions[0][i] = states[position_start_index + 2 * i + 0];
+            positions[1][i] = states[position_start_index + 2 * i + 1];
         }
         
         int32_t orientation_start_index = 3 + amount_of_players_in_team * 2 * 2 + 1 + amount_of_players_in_team * 2;
@@ -62,6 +62,9 @@ namespace collective_robot_behaviour
         {
             orientations[i] = states[orientation_start_index + i];
         }
+
+        //std::cout << "Positions: " << positions << std::endl;
+        //std::cout << "Orientations: " << orientations << std::endl;
 
         torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
         torch::Tensor have_ball = states.slice(0, 28, 34);
@@ -77,6 +80,7 @@ namespace collective_robot_behaviour
         //torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
         std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
+        //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
         return angle_to_ball_reward + distance_to_ball_reward;
     }
 }

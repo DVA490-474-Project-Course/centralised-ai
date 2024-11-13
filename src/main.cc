@@ -96,7 +96,7 @@ int main() {
   }
 
   // Launch the plotting in a separate thread
-  std::thread plot_thread(PlotLoss);
+  //std::thread plot_thread(PlotLoss);
 
   auto old_net = models;
   auto old_net_critic = critic;
@@ -118,7 +118,7 @@ int main() {
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
 
-  plot_thread.join();
+  //plot_thread.join();
 
 
   return 0;
