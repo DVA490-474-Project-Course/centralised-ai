@@ -29,7 +29,7 @@ int max_timesteps = 300;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
 int batch_size = 5;
-int amount_of_players_in_team = 2;
+int amount_of_players_in_team = 6;
 int input_size = 5 + amount_of_players_in_team * 7;
 int num_actions = 5;
 int hidden_size = 64;
@@ -96,7 +96,7 @@ int main() {
   }
 
   // Launch the plotting in a separate thread
-  //std::thread plot_thread(PlotLoss);
+  std::thread plot_thread(PlotLoss);
 
   auto old_net = models;
   auto old_net_critic = critic;
@@ -106,11 +106,24 @@ int main() {
     auto databuffer = MappoRun(models,critic,referee,vision_client,
       centralised_ai::Team::kBlue,simulation_interfaces);
 
-      /* Push the mean reward for each time step in the returned epoch. */
-      for (int32_t t = 0; t < databuffer[0].t.size(); t++)
+      /* Calcuate the mean episode reward */
+      float mean_reward = 0.0;
+      for (int32_t i = 0; i < databuffer.size(); i++)
       {
-        /* Todo: Push critic loss to the list. */
+        for (int32_t j = 0; j < databuffer[i].t.size(); j++)
+        {
+          mean_reward += databuffer[i].t[j].rewards.sum().div(amount_of_players_in_team).item<float>();
+        }
       }
+
+      mean_reward /= static_cast<float>(max_timesteps);
+
+      critic_loss.push_back(mean_reward);
+      /* Push the mean reward for each time step in the returned epoch. */
+      //for (int32_t t = 0; t < databuffer[0].t.size(); t++)
+      //{
+      //  /* Todo: Push critic loss to the list. */
+      //}
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer,old_net, old_net_critic);
@@ -118,7 +131,7 @@ int main() {
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
 
-  //plot_thread.join();
+  plot_thread.join();
 
 
   return 0;
