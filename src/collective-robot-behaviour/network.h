@@ -130,7 +130,6 @@ struct PolicyNetwork : torch::nn::Module {
  */
 struct CriticNetwork : torch::nn::Module {
   const int num_layers;
-  const int output_size;
 
   torch::nn::LSTM lstm{nullptr};
   torch::nn::Linear value_layer{nullptr};
@@ -202,6 +201,12 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic);
  * @param[out] Returns Agent vector of all policy networks for each robot.
  */
 std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
+
+
+std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic);
+
+void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic);
+
 
 /*!
  * @brief Update all network weights

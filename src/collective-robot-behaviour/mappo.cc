@@ -167,12 +167,12 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.state = state;
       exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
-
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       state = GetStates(referee,vision_client,own_team,opponent_team);
+
 
     } /*end for timestep*/
 
@@ -191,13 +191,14 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor critic_values_array = torch::cat(criticvalues, /*dim=*/0);
     /*compute GAE and reward-go-to*/
     auto TemporalDifference = ComputeTemporalDifference(critic_values_array,rewards_tensor,0.9);
+    std::cout << TemporalDifference << std::endl;
     torch::Tensor A =  ComputeGeneralAdvantageEstimation(TemporalDifference,0.99, 0.95);
 
     torch::Tensor rew_sum = rewards_tensor.sum(1);
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
     /*Split amount of timesteps in trajectories to L*/
-    int L = max_timesteps-1;
+    int L = 5;
     for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;
@@ -222,7 +223,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
   * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
   * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
   */
-void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<DataBuffer> data_buffer,std::vector<Agents> &old_net, CriticNetwork &old_net_critic) {
+void Mappo_Update(std::vector<Agents> &Models,CriticNetwork &critic, std::vector<DataBuffer> data_buffer) {
 
   int len = data_buffer.size();
   std::vector<DataBuffer> min_batch; /* Mini-batch */
@@ -270,6 +271,10 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
   torch::Tensor critic_values = torch::zeros({length,amount_of_players_in_team});
   torch::Tensor reward_arr_minbatch = torch::zeros({length,1});
 
+  std::vector<Agents> old_net; /*Create Models class for each robot.*/
+  CriticNetwork old_net_critic;
+  old_net = LoadOldAgents(amount_of_players_in_team,old_net_critic);
+
   for (int samp_i = 0; samp_i < min_batch.size(); samp_i++) {
     /*Each sample in mini batch*/
     for (int t = 0; t < min_batch[samp_i].t.size(); ++t) { /*each timestep in batch*/
@@ -309,7 +314,7 @@ void Mappo_Update(std::vector<Agents> Models,CriticNetwork critic, std::vector<D
   auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
   auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
 
-  //old_net[0].policy_network.lstm->parameters()[0].data() = Models[0].policy_network.lstm->parameters()[0].data();
+  SaveOldModels(Models,critic); /*Save to old network*/
 
   CheckModelParametersMatch(old_net,Models,old_net_critic,critic);
 

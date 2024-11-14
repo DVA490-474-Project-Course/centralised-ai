@@ -73,9 +73,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
 
 CriticNetwork::CriticNetwork():
   num_layers(1),
-  output_size(1),
   lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
-  value_layer(torch::nn::Linear(hidden_size, output_size)) {
+  value_layer(torch::nn::Linear(hidden_size, 1)) {
 
   register_module("lstm", lstm);
   register_module("value_layer", value_layer);
@@ -177,34 +176,110 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
   return agents;
 }
 
+void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic) {
+  for (const auto& agent : models) {
+    std::string model_path = "../models/old_agents/agent_network" + std::to_string(agent.robotId) + ".pt";
+
+    try {
+      torch::serialize::OutputArchive output_archive;
+      agent.policy_network.save(output_archive);
+      output_archive.save_to(model_path);
+    }
+    catch (const std::exception& e) {
+      std::cerr << "Error saving model for agent " << agent.robotId << ": " << e.what() << std::endl;
+    }
+  }
+
+  /*Save Crtitc network in models folder*/
+  try {
+    std::string model_path = "../models/old_agents/critic_network.pt";
+
+    torch::serialize::OutputArchive output_archive;
+    critic.save(output_archive);
+
+    output_archive.save_to(model_path);
+ }
+  catch (const std::exception& e) {
+    std::cerr << "Error saving model for critic network!" << std::endl;
+  }
+}
+
+std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
+  std::vector<Agents> agents;
+
+  /* Load all policy networks and assign to each agent */
+
+  for (int i = 0; i < player_count; ++i) {
+    try {
+      std::string model_path = "../models/old_agents/agent_network" + std::to_string(i) + ".pt";
+      torch::serialize::InputArchive input_archive;
+
+      input_archive.load_from(model_path);
+
+      // Create a new PolicyNetwork for each agent and load its parameters
+      PolicyNetwork model;
+      model.load(input_archive);
+
+      std::cout << "Loading agent " << i << " from " << model_path << std::endl;
+      agents.emplace_back(i, model);
+    }
+    catch (const std::exception& e) {
+      std::cerr << "Error loading model for agent " << i << ": " << e.what() << std::endl;
+    }
+  }
+
+  /* Load the critic network */
+  try {
+    std::string critic_path = "../models/old_agents/critic_network.pt";
+    torch::serialize::InputArchive critic_archive;
+    critic_archive.load_from(critic_path);
+
+    critic.load(critic_archive);
+    std::cout << "Loading critic network from " << critic_path << std::endl;
+  }
+  catch (const std::exception& e) {
+    std::cerr << "Error loading model for critic network: " << e.what() << std::endl;
+  }
+
+  return agents;
+}
 
 void UpdateNets(std::vector<Agents>& agents,
   CriticNetwork& critic,
-  torch::Tensor policy_loss,
-  torch::Tensor critic_loss) {
+  torch::Tensor pol_loss,
+  torch::Tensor cri_loss) {
 
-  torch::Tensor pol_loss = - torch::tensor(policy_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
-  torch::Tensor cri_loss = torch::tensor(critic_loss.item<float>(), torch::requires_grad(true));  // This creates a tensor with gradient tracking enabled
-
-  /*Update each policy network*/
-  for (auto& agent : agents)
-  {
-    agent.policy_network.train();
-    agent.policy_network.zero_grad();
-    torch::optim::Adam policynet(agent.policy_network.parameters(),torch::optim::AdamOptions(0.99).eps(1e-5));
-    pol_loss.backward();
-    policynet.step();
-
+  std::vector<torch::optim::Adam> opts;
+  for (int agent = 0; agent < amount_of_players_in_team; agent++) {
+    agents[agent].policy_network.train();
+    // Define the optimizer for the current agent's policy network
+    opts.push_back(torch::optim::Adam(agents[agent].policy_network.parameters(),
+                                    torch::optim::AdamOptions(0.99).eps(1e-5)));
   }
+
+  for (int agent = 0; agent < amount_of_players_in_team; agent++) {
+    // Step the optimizer to update the parameters
+    opts[agent].zero_grad();
+    opts[agent].step();
+  }
+
+  pol_loss.requires_grad_();
+  pol_loss.backward({},true);
 
   /*Update critic network*/
   critic.train();
-  critic.zero_grad();
   torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+  // Ensure that the critic loss requires gradients
+  cri_loss.requires_grad_();
+
+  // Perform backward pass for the critic loss
+  cri_loss.backward();  // This works after the first backward() call
+
+  // Step the optimizer to update the critic network
   critnet.zero_grad();
-  cri_loss.backward();
   critnet.step();
 
 }
+
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

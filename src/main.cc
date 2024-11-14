@@ -126,7 +126,7 @@ int main() {
       //}
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer,old_net, old_net_critic);
+    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
 
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
