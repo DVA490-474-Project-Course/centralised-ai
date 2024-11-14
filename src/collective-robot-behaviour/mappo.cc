@@ -170,8 +170,10 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
       state = GetStates(referee,vision_client,own_team,opponent_team);
+
+      //std::cout << "Rewards: " << exp.rewards << std::endl;
 
 
     } /*end for timestep*/
@@ -191,8 +193,10 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor critic_values_array = torch::cat(criticvalues, /*dim=*/0);
     /*compute GAE and reward-go-to*/
     auto TemporalDifference = ComputeTemporalDifference(critic_values_array,rewards_tensor,0.9);
-    std::cout << TemporalDifference << std::endl;
+    //std::cout << "Rewards: " << rewards_tensor << std::endl;
     torch::Tensor A =  ComputeGeneralAdvantageEstimation(TemporalDifference,0.99, 0.95);
+
+    //std::cout << critic_values_array << std::endl;
 
     torch::Tensor rew_sum = rewards_tensor.sum(1);
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
@@ -313,6 +317,8 @@ void Mappo_Update(std::vector<Agents> &Models,CriticNetwork &critic, std::vector
   //why minbtach[0]------------------------------------------------------------
   auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
   auto critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
+
+  //std::cout << "Critic loss: " << critic_loss << std::endl;
 
   SaveOldModels(Models,critic); /*Save to old network*/
 

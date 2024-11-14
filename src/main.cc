@@ -19,17 +19,19 @@
 #include "ssl-interface/ssl_vision_client.h"
 #include "simulation-interface/simulation_interface.h"
 
+#include "collective-robot-behaviour/communication.h"
+
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
 #include <matplotlibcpp.h>
 #include <iostream>
 
 /*Configuration values*/
-int max_timesteps = 300;
+int max_timesteps = 199;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
-int batch_size = 5;
-int amount_of_players_in_team = 6;
+int batch_size = 5 * 50;
+int amount_of_players_in_team = 2;
 int input_size = 5 + amount_of_players_in_team * 7;
 int num_actions = 5;
 int hidden_size = 64;
@@ -95,11 +97,13 @@ int main() {
     //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
 
+  torch::Tensor states = centralised_ai::collective_robot_behaviour::GetStates(referee,vision_client,centralised_ai::Team::kBlue,centralised_ai::Team::kYellow);
+  std::cout << "States: " << states << std::endl;
+
   // Launch the plotting in a separate thread
   std::thread plot_thread(PlotLoss);
 
-  auto old_net = models;
-  auto old_net_critic = critic;
+  SaveOldModels(models,critic);
   while (true) {
     std::cout << "Running" << std::endl;
     /*run actions and save  to buffer*/

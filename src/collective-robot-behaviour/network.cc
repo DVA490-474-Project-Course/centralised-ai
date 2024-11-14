@@ -68,9 +68,6 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   return std::make_tuple(value, hx_new, cx_new);
 }
 
-
-
-
 CriticNetwork::CriticNetwork():
   num_layers(1),
   lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
