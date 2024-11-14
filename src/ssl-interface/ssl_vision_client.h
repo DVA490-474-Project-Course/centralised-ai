@@ -121,6 +121,16 @@ public:
     * @brief Returns the y coordinate of the ball in mm.
     */
   float GetBallPositionY();
+
+  /*!
+    * @brief Reads a UDP packet from ssl Vision.
+    * 
+    * Reads a UDP packets from ssl Vision, and updates all
+    * game state values that are available in the client
+    * until positions of ball and each robot have been read
+    * at least once.
+    */
+  void ReceivePacketsUntilAllDataRead();
  
 protected:
   /*********************/
@@ -185,6 +195,10 @@ protected:
    * @brief Y coordinate of the ball.
    */
   float ball_position_y;
+
+  float blue_robot_positions_read[team_size];
+  float yellow_robot_positions_read[team_size];
+  bool ball_data_read;
 
   /**************************/
   /* Private methods */
