@@ -66,10 +66,11 @@ void PlotLoss()
 int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
+  critic.lstm->reset_parameters();
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
-  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  //models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
+  models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -101,7 +102,7 @@ int main() {
   std::cout << "States: " << states << std::endl;
 
   // Launch the plotting in a separate thread
-  std::thread plot_thread(PlotLoss);
+  //std::thread plot_thread(PlotLoss);
 
   SaveOldModels(models,critic);
   while (true) {
@@ -135,7 +136,7 @@ int main() {
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
 
-  plot_thread.join();
+  //plot_thread.join();
 
 
   return 0;

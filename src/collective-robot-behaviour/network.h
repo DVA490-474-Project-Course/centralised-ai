@@ -163,10 +163,10 @@ struct Agents {
   torch::Tensor random_floats; // Declaration only
   float x_pos;
   float y_pos;
-  PolicyNetwork policy_network;
+  std::shared_ptr<PolicyNetwork> policy_network;
 
   // Constructor
-  Agents(int id, PolicyNetwork network);
+  Agents(int id, std::shared_ptr<PolicyNetwork> model);
 };
 
 /*!

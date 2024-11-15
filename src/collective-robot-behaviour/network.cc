@@ -28,7 +28,7 @@ DataBuffer::DataBuffer()
       R(torch::zeros({1, amount_of_players_in_team})) {
 }
 
-Agents::Agents(int id, PolicyNetwork network)
+Agents::Agents(int id, std::shared_ptr<PolicyNetwork> network)
     : robotId(id), policy_network(std::move(network)),
       random_floats(torch::rand({2})), // Initialize random_floats here
       x_pos(random_floats[0].item<float>()), // Initialize x_pos
@@ -98,7 +98,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> CriticNetwork::Forward(
 std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
   std::vector<Agents> robots;
   for (int i = 0; i < amount_of_players_in_team; i++) {
-    PolicyNetwork model;;
+    auto model = std::make_shared<PolicyNetwork>();
+    model->lstm->reset_parameters();
     robots.emplace_back(i, model);
   }
   return robots;
@@ -110,7 +111,7 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
 
     try {
       torch::serialize::OutputArchive output_archive;
-      agent.policy_network.save(output_archive);
+      agent.policy_network->save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
@@ -144,8 +145,8 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
       input_archive.load_from(model_path);
 
       // Create a new PolicyNetwork for each agent and load its parameters
-      PolicyNetwork model;
-      model.load(input_archive);
+      std::shared_ptr<PolicyNetwork> model = std::make_shared<PolicyNetwork>();;
+      model->load(input_archive);
 
       std::cout << "Loading agent " << i << " from " << model_path << std::endl;
       agents.emplace_back(i, model);
@@ -179,7 +180,7 @@ void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic) {
 
     try {
       torch::serialize::OutputArchive output_archive;
-      agent.policy_network.save(output_archive);
+      agent.policy_network->save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
@@ -214,8 +215,8 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
       input_archive.load_from(model_path);
 
       // Create a new PolicyNetwork for each agent and load its parameters
-      PolicyNetwork model;
-      model.load(input_archive);
+      std::shared_ptr<PolicyNetwork> model = std::make_shared<PolicyNetwork>();
+      model->load(input_archive);
 
       std::cout << "Loading agent " << i << " from " << model_path << std::endl;
       agents.emplace_back(i, model);
@@ -246,35 +247,28 @@ void UpdateNets(std::vector<Agents>& agents,
   torch::Tensor pol_loss,
   torch::Tensor cri_loss) {
 
-  std::vector<torch::optim::Adam> opts;
-  for (int agent = 0; agent < amount_of_players_in_team; agent++) {
-    agents[agent].policy_network.train();
-    // Define the optimizer for the current agent's policy network
-    opts.push_back(torch::optim::Adam(agents[agent].policy_network.parameters(),
-                                    torch::optim::AdamOptions(0.99).eps(1e-5)));
-  }
+  // Backpropagate for each agent
+  torch::optim::Adam opts({agents[0].policy_network->parameters(),agents[1].policy_network->parameters()},
+                            torch::optim::AdamOptions(0.9).eps(1e-5));
 
-  for (int agent = 0; agent < amount_of_players_in_team; agent++) {
-    // Step the optimizer to update the parameters
-    opts[agent].zero_grad();
-    opts[agent].step();
-  }
+  // Zero the gradients before the backward pass
+  opts.zero_grad();
 
+  // Ensure we retain the graph for subsequent backward calls
   pol_loss.requires_grad_();
   pol_loss.backward({},true);
 
+  // Update the policy network for the current agent
+  opts.step();
   /*Update critic network*/
   critic.train();
-  torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.99).eps(1e-5));
+  torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.9).eps(1e-5));
   // Ensure that the critic loss requires gradients
-  cri_loss.requires_grad_();
-
-  // Perform backward pass for the critic loss
-  cri_loss.backward();  // This works after the first backward() call
-
-  // Step the optimizer to update the critic network
   critnet.zero_grad();
+  cri_loss.requires_grad_();
+  cri_loss.backward();
   critnet.step();
+
 
 }
 
