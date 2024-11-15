@@ -67,6 +67,84 @@ TEST(ComputeRewardToGoTest, Test_3)
   EXPECT_EQ(output[5].item<float>(), 160);
 }
 
+TEST(ComputeTemporalDifferenceTest, Test_1)
+{
+  torch::Tensor critic_values = torch::zeros({4, 1});
+  torch::Tensor rewards = torch::zeros({4, 6});
+  double discount = 0;
+
+  torch::Tensor output = ComputeTemporalDifference(critic_values, rewards, discount);
+
+  EXPECT_EQ(output.size(0), 4);
+  EXPECT_EQ(output.size(1), 6);
+  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[0][4].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[0][5].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][3].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][4].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[1][5].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][3].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][4].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[2][5].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][3].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][4].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[3][5].item<float>(), 0);
+}
+
+TEST(ComputeTemporalDifferenceTest, Test_2)
+{
+  torch::Tensor critic_values = torch::zeros({4, 1});
+  torch::Tensor rewards = torch::ones({4, 6});
+  double discount = 2;
+
+  critic_values[0][0] = 0.1;
+  critic_values[1][0] = 0.2;
+  critic_values[2][0] = 0.3;
+  critic_values[3][0] = 0.4;
+
+  torch::Tensor output = ComputeTemporalDifference(critic_values, rewards, discount);
+
+  EXPECT_EQ(output.size(0), 4);
+  EXPECT_EQ(output.size(1), 6);
+  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[0][4].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[0][5].item<float>(), 1.3);
+  EXPECT_FLOAT_EQ(output[1][0].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[1][1].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[1][2].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[1][4].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[1][5].item<float>(), 1.4);
+  EXPECT_FLOAT_EQ(output[2][0].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[2][1].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[2][2].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[2][3].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[2][4].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[2][5].item<float>(), 1.5);
+  EXPECT_FLOAT_EQ(output[3][0].item<float>(), 0.6);
+  EXPECT_FLOAT_EQ(output[3][1].item<float>(), 0.6);
+  EXPECT_FLOAT_EQ(output[3][2].item<float>(), 0.6);
+  EXPECT_FLOAT_EQ(output[3][3].item<float>(), 0.6);
+  EXPECT_FLOAT_EQ(output[3][4].item<float>(), 0.6);
+  EXPECT_FLOAT_EQ(output[3][5].item<float>(), 0.6);
+  
+  }
+
 TEST(ComputeGAETest, Test_1)
 {
   torch::Tensor temporaldiffs = torch::zeros({1, 4});
@@ -212,10 +290,10 @@ TEST(ComputePolicyEntropy, Test_1)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
-  EXPECT_EQ(output.item<float>(), 0);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_NEAR(output.item<float>(), 0, 0.0001);
 }
 
 TEST(ComputePolicyEntropy, Test_2)
@@ -225,11 +303,11 @@ TEST(ComputePolicyEntropy, Test_2)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
   EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.5);
-  EXPECT_FLOAT_EQ(output.item<float>(), -4*log(0.5));
+  EXPECT_NEAR(output.item<float>(), -4*log(0.5), 0.0001);
 }
 
 TEST(ComputePolicyEntropy, Test_3)
@@ -239,11 +317,11 @@ TEST(ComputePolicyEntropy, Test_3)
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_EQ(actions_probabilities.size(0), 4);
-  EXPECT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_EQ(actions_probabilities.size(2), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
+  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
   EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.25);
-  EXPECT_FLOAT_EQ(output.item<float>(), -8*log(0.25));
+  EXPECT_NEAR(output.item<float>(), -8*log(0.25), 0.0001);
 }
 
 TEST(ComputePolicyLoss, Test_1)

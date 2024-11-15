@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-10-29 by Jacob Johansson
+// Last modified: 2024-11-01 by Jacob Johansson
 // Description: Stores all tests for the world.cc and world.h file.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -127,12 +127,46 @@ TEST(ComputeAverageDistanceReward, Test_3)
 	torch::Tensor output = ComputeAverageDistanceReward(positions, max_distance, max_reward);
 
 	EXPECT_EQ(output.size(0), 6);
-	EXPECT_FLOAT_EQ(output[0].item<float>(), -0.001);
-	EXPECT_FLOAT_EQ(output[1].item<float>(), -0.001);
-	EXPECT_FLOAT_EQ(output[2].item<float>(), -0.001);
-	EXPECT_FLOAT_EQ(output[3].item<float>(), -0.001);
-	EXPECT_FLOAT_EQ(output[4].item<float>(), -0.001);
-	EXPECT_FLOAT_EQ(output[5].item<float>(), -0.001 * ((20 / 72) + 1));
+	EXPECT_FLOAT_EQ(output[0].item<float>(), -0.001 * 0);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), -0.001 * 0.8611111111);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), -0.001 * 0.4444444444);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), -0.001 * 0);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), -0.001 * 0.2777777778);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), -0.001 * 0.2777777778);
+}
+
+TEST(ComputeHaveBallReward, Test_1)
+{
+	torch::Tensor have_ball_flags = torch::zeros(6);
+	float reward = 1;
+
+	torch::Tensor output = ComputeHaveBallReward(have_ball_flags, reward);
+
+	EXPECT_EQ(output.size(0), 6);
+	EXPECT_EQ(have_ball_flags.size(0), 6);
+	EXPECT_FLOAT_EQ(output[0].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), 0);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), 0);
+}
+
+TEST(ComputeHaveBallReward, Test_2)
+{
+	torch::Tensor have_ball_flags = torch::ones(6);
+	float reward = 1;
+
+	torch::Tensor output = ComputeHaveBallReward(have_ball_flags, reward);
+
+	EXPECT_EQ(output.size(0), 6);
+	EXPECT_EQ(have_ball_flags.size(0), 6);
+	EXPECT_FLOAT_EQ(output[0].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[1].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[2].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[3].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[4].item<float>(), 1);
+	EXPECT_FLOAT_EQ(output[5].item<float>(), 1);
 }
 
 }

@@ -51,19 +51,23 @@ namespace collective_robot_behaviour
     // State, action probabilities, rewards, new state
     /*int robotID;*/
     torch::Tensor state;
+    torch::Tensor actions_prob;
     torch::Tensor actions;
-    float rewards;
+    torch::Tensor rewards;
     torch::Tensor new_state;
     std::vector<HiddenStates> hidden_p;
     HiddenStates hidden_v;
+    torch::Tensor criticvalues;
 
 
     Trajectory()
-      : /*robotID(-1),*/
-        state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
-        actions(torch::zeros({amount_of_players_in_team,num_actions})),
-        rewards(float{1}), // Initialize rewards as an empty vector
-        new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
+    : /*robotID(-1),*/
+      state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
+      actions_prob(torch::zeros({num_actions})),
+      rewards(torch::zeros({1,amount_of_players_in_team})),
+      actions(torch::zeros({amount_of_players_in_team})),
+      new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
+
     {}
   };
 
@@ -206,7 +210,7 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
  * @param[in] critic A reference to the CriticNetwork
  * @param[in] exper_buff experience buffer vector.
  */
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic, std::vector<DataBuffer> exper_buff);
+void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //NETWORK_H
