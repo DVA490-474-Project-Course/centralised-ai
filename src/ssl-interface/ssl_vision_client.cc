@@ -65,6 +65,38 @@ void VisionClient::ReceivePacket()
   }
 }
 
+/* Receive packets until all positions have been read at least once */
+void VisionClient::ReceivePacketsUntilAllDataRead()
+{
+  bool all_data_has_been_read;
+
+  /* Set flags indicating that ball and robot positions have not been read yet */
+  ball_data_read = false;
+  for (int id = 0; id < team_size; id++)
+  {
+    blue_robot_positions_read[id] = false;
+    yellow_robot_positions_read[id] = false;
+  }
+
+  do
+  {
+    ReceivePacket();
+    all_data_has_been_read = true;
+
+    for (int id = 0; id < team_size; id++)
+    {
+      if (blue_robot_positions_read[id] == false ||
+          yellow_robot_positions_read[id] == false ||
+          ball_data_read == false)
+      {
+        all_data_has_been_read = false;
+        break;
+      }
+    }
+  }
+  while (all_data_has_been_read == false);
+}
+
 void VisionClient::ReadVisionData(SSL_WrapperPacket packet)
 {
   SSL_DetectionFrame detection;
@@ -89,6 +121,7 @@ void VisionClient::ReadVisionData(SSL_WrapperPacket packet)
         if (robot.has_orientation())
         {
           blue_robot_orientations[id] = robot.orientation();
+          blue_robot_positions_read[id] = true;
         }
       }
     }
@@ -106,6 +139,7 @@ void VisionClient::ReadVisionData(SSL_WrapperPacket packet)
         if (robot.has_orientation())
         {
           yellow_robot_orientations[id] = robot.orientation();
+          yellow_robot_positions_read[id] = true;
         }
       }
     }
@@ -116,6 +150,7 @@ void VisionClient::ReadVisionData(SSL_WrapperPacket packet)
       ball = detection.balls(0);    // Assume only one ball is in play
       ball_position_x = ball.x();
       ball_position_y = ball.y();
+      ball_data_read = true;
     }
   }
 
@@ -138,9 +173,10 @@ void VisionClient::Print()
       yellow_robot_orientations[id]);
   }
   
-  printf("BALL POS=<%9.2f,%9.2f> \n\n",
+  printf("BALL POS=<%9.2f,%9.2f> TIME=<%f> \n\n",
     ball_position_x,
-    ball_position_y);
+    ball_position_y,
+    timestamp);
 }
 
 double VisionClient::GetTimestamp()
