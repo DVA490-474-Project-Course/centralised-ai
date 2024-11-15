@@ -81,7 +81,7 @@ int main() {
 
   /* Create the VisionClient instance with IP and port */
   centralised_ai::ssl_interface::VisionClient vision_client(vision_ip, vision_port);
-  vision_client.ReceivePacket();
+  vision_client.ReceivePacketsUntilAllDataRead();
 
   /* Create the AutomatedReferee instance with the VisionClient */
   centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip,
