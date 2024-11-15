@@ -202,7 +202,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99);
 
     /*Split amount of timesteps in trajectories to L*/
-    int L = 5;
+    int L = 50;
     for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;

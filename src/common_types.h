@@ -35,7 +35,7 @@ const float ball_radius = 21.5;
 /*! 
  * @brief The number of robots in each team.
  */
-const int team_size = 6;
+const int team_size = 2;
 
 /*! 
  * @brief Enum representing player team selection.
