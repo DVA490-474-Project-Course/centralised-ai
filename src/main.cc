@@ -27,10 +27,10 @@
 #include <iostream>
 
 /*Configuration values*/
-int max_timesteps = 200;
+int max_timesteps = 199;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
-int batch_size = 25;
+int batch_size = 5;
 int amount_of_players_in_team = 2;
 int input_size = 5 + amount_of_players_in_team * 7;
 int num_actions = 5;

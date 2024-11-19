@@ -49,6 +49,20 @@ PolicyNetwork::PolicyNetwork()
 
   register_module("lstm", lstm);
   register_module("output_layer", output_layer);
+
+  for (const auto& param : lstm->named_parameters()) {
+    std::cout << param.key() << std::endl;  // Print the parameter names
+
+    if (param.key() == "weight_ih_l0") {
+      torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
+    } else if (param.key() == "weight_hh_l0") {
+      torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
+    } else if (param.key() == "bias_ih_l0") {
+      torch::nn::init::zeros_(param.value());  // Initialize bias to zero
+    } else if (param.key() == "bias_hh_l0") {
+      torch::nn::init::zeros_(param.value());  // Initialize bias to zero
+    }
+  }
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
@@ -62,19 +76,31 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   auto hx_new = std::get<0>(std::get<1>(lstm_output));
   auto cx_new = std::get<1>(std::get<1>(lstm_output));
 
-  auto output = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
-  auto value = torch::nn::functional::softmax(output_layer(output), /*dim=*/1); // Apply softmax on the last dimension
-
+  auto value = output_layer(val); // Apply softmax on the last dimension
   return std::make_tuple(value, hx_new, cx_new);
 }
 
 CriticNetwork::CriticNetwork():
   num_layers(1),
-  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(true)),
+  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
   value_layer(torch::nn::Linear(hidden_size, 1)) {
 
   register_module("lstm", lstm);
   register_module("value_layer", value_layer);
+
+  for (const auto& param : lstm->named_parameters()) {
+    std::cout << param.key() << std::endl;  // Print the parameter names
+
+    if (param.key() == "weight_ih_l0") {
+      torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
+    } else if (param.key() == "weight_hh_l0") {
+      torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
+    } else if (param.key() == "bias_ih_l0") {
+      torch::nn::init::zeros_(param.value());  // Initialize bias to zero
+    } else if (param.key() == "bias_hh_l0") {
+      torch::nn::init::zeros_(param.value());  // Initialize bias to zero
+    }
+  }
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> CriticNetwork::Forward(
@@ -248,9 +274,16 @@ void UpdateNets(std::vector<Agents>& agents,
   torch::Tensor cri_loss) {
 
   // Backpropagate for each agent
-  torch::optim::Adam opts({agents[0].policy_network->parameters(),agents[1].policy_network->parameters()},
-                            torch::optim::AdamOptions(0.9).eps(1e-5));
 
+  // Set up Adam options
+  torch::optim::AdamOptions adam_options;
+  adam_options.lr(1e-4);  // Learning rate
+  adam_options.betas(std::make_tuple(0.9, 0.999));  // Betas
+  adam_options.eps(1e-5);  // Epsilon
+  adam_options.weight_decay(0);  // Weight decay
+
+  torch::optim::Adam opts({agents[0].policy_network->parameters(),agents[1].policy_network->parameters()},
+                            adam_options);
   // Zero the gradients before the backward pass
   opts.zero_grad();
 
@@ -262,7 +295,7 @@ void UpdateNets(std::vector<Agents>& agents,
   opts.step();
   /*Update critic network*/
   critic.train();
-  torch::optim::Adam critnet(critic.parameters(), torch::optim::AdamOptions(0.9).eps(1e-5));
+  torch::optim::Adam critnet(critic.parameters(), adam_options);
   // Ensure that the critic loss requires gradients
   critnet.zero_grad();
   cri_loss.requires_grad_();

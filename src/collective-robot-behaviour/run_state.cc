@@ -67,7 +67,7 @@ namespace collective_robot_behaviour
         //std::cout << "Orientations: " << orientations << std::endl;
 
         torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
-        torch::Tensor have_ball = states.slice(0, 28, 34);
+        torch::Tensor have_ball = states.slice(0, 12, 14);
         torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
         
 
@@ -81,7 +81,7 @@ namespace collective_robot_behaviour
 
         //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
         //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
-        return distance_to_ball_reward;
+        return distance_to_ball_reward + have_ball_reward;
     }
 }
 }
