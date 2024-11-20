@@ -81,7 +81,7 @@ namespace collective_robot_behaviour
 
         //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
         //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
-        return distance_to_ball_reward + have_ball_reward;
+        return distance_to_ball_reward;
     }
 }
 }

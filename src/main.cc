@@ -69,8 +69,8 @@ int main() {
   critic.lstm->reset_parameters();
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  //models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
-  models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
+  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";

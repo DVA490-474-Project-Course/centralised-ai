@@ -52,8 +52,8 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     state_index++;
 
     /* Ball position */
-    states[state_index + 1] = vision_client.GetBallPositionX();
-    states[state_index + 2] = vision_client.GetBallPositionY();
+    states[state_index + 0] = vision_client.GetBallPositionX();
+    states[state_index + 1] = vision_client.GetBallPositionY();
 
     state_index += 2;
 

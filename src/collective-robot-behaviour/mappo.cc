@@ -154,7 +154,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
           agent_state, trajectories[timestep - 1].hidden_p[agent.robotId].ht_p,
           trajectories[timestep - 1].hidden_p[agent.robotId].ct_p);
 
-        prob_actions_stored.index_put_({agent.robotId}, act_prob); /*Store probabilities*/
+        prob_actions_stored.index_put_({agent.robotId}, act_prob[0][0].softmax(0)); /*Store probabilities*/
 
         /*Save hidden states*/
         new_states.ht_p = hx_new;
@@ -162,7 +162,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
         exp.hidden_p.push_back(new_states); /*Store hidden states*/
 
       } /*end for agent*/
-      prob_actions_stored = torch::softmax(prob_actions_stored,1);
+
       /*Get the actions with the highest probabilities for each agent*/
       exp.actions = std::get<1>(prob_actions_stored.max(1));
       //std::cout << prob_actions_stored << std::endl;
@@ -171,17 +171,16 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
        *such as shooting/passing only if player have ball
       */
 
-      /*Let agents run for 20 ms until next timestep*/
-      for(int a = 0; a < 20; a++){
       SendActions(simulation_interfaces,exp.actions);
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      }
+      /*Let agents run for 20 ms until next timestep*/
+      //for(int a = 0; a < 20; a++){
+      //SendActions(simulation_interfaces,exp.actions);
+      //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      //}
 
       /*Update all values*/
       exp.actions_prob = prob_actions_stored;
-      exp.state = state.clone();
-      exp.criticvalues = valNetOutput.squeeze().expand({amount_of_players_in_team});
-      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
+      exp.state = state.clone(); trajectories.erase(trajectories.begin());e.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
       trajectories.push_back(exp); /*Store into trajectories*/
@@ -359,7 +358,6 @@ void Mappo_Update(std::vector<Agents> &Models,CriticNetwork &critic, std::vector
   UpdateNets(Models,critic,policyloss,critic_loss);
   /*save updated models of all networks(Policy and Critic)*/
   SaveModels(Models,critic);
-
 
   std::cout << "Old net validation: " << std::endl;
   /*This should be false after updateNets() if networks were updated correctly*/

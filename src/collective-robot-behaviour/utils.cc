@@ -134,10 +134,12 @@ torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torc
 	torch::Tensor  clipping_max = previous_values + clip_value;
 	torch::Tensor  current_values_clipped = torch::clamp(current_values, clipping_min, clipping_max);
 
-	/* Calculate Mean Squared Error. */
+	/* Calculate Huber loss. */
 	torch::Tensor  reward_to_go_expanded = reward_to_go.expand({num_time_steps, num_agents});
+	torch::Tensor loss_current_values = torch::huber_loss(current_values, reward_to_go_expanded, 'Mean', 10);
 	torch::Tensor  current_values_mse = torch::pow(current_values - reward_to_go_expanded, 2);
 
+	torch::Tensor loss_current_values_clipped = torch::huber_loss(current_values_clipped, reward_to_go_expanded, 'Mean', 10);
 	torch::Tensor  current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go_expanded, 2);
 
 	/* Calculate the loss. */
