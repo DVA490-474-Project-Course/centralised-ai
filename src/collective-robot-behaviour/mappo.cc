@@ -172,22 +172,28 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       */
 
       SendActions(simulation_interfaces,exp.actions);
-      /*Let agents run for 20 ms until next timestep*/
-      //for(int a = 0; a < 20; a++){
-      //SendActions(simulation_interfaces,exp.actions);
-      //std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      //}
 
+      /*Let agents run for 20 ms until next timestep*/
+      for(int a = 0; a < 20; a++){
+      SendActions(simulation_interfaces,exp.actions);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      // TOOD: Fix to use the new state
       /*Update all values*/
       exp.actions_prob = prob_actions_stored;
-      exp.state = state.clone(); trajectories.erase(trajectories.begin());e.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
+      exp.state = state.clone();
+      exp.criticvalues = valNetOutput.squeeze(0).expand({amount_of_players_in_team});
       exp.hidden_v.ht_p = V_hx;
       exp.hidden_v.ct_p = V_cx;
-      trajectories.push_back(exp); /*Store into trajectories*/
 
       /*Update state and use it for next itteration*/
       state = GetStates(referee,vision_client,own_team,opponent_team);
 
+      /* Get rewards from the actions. */
+      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001}).expand({1, amount_of_players_in_team});
+      trajectories.push_back(exp); /*Store into trajectories*/
+    
     } /*end for timestep*/
 
     /* Erase initial trajectory (First index in trajectories) */
@@ -213,7 +219,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
     torch::Tensor R = ComputeRewardToGo(rew_sum,0.99); /*Reward To Go*/
 
     /* Split amount of timesteps in trajectories to length L */
-    int L = 25;
+    int L = 10;
     for (int l = 0; l < max_timesteps/L; l++) /* T/L */ {
       /*Add each Trajectory into dat.t value for all timesteps in chunk*/
       DataBuffer dat;
@@ -242,96 +248,161 @@ void Mappo_Update(std::vector<Agents> &Models,CriticNetwork &critic, std::vector
 
 
   int len = data_buffer.size();
-  std::vector<DataBuffer> min_batch; /* Mini-batch */
+
+  /* Mini-batch */
+  std::vector<DataBuffer> min_batch;
 
   /*Create random min batches that the agents network will update on
    * from papaer, should be set to 1
    */
-  for (int k = 1; k <= 1; k++) {
-    int rand_index = torch::randint(0, len, {1}).item<int>();
-    auto rand_batch = data_buffer[rand_index]; /* Take random saved chunks */
-    int t_len = rand_batch.t.size();
+  int num_mini_batch = 1;
+  int mini_batch_size = batch_size / num_mini_batch;
+  for (int k = 1; k <= num_mini_batch; k++)
+  {
+    std::vector<DataBuffer> mini_batch_data;
+
+    // Take a random number of chunks from the data buffer.
+    for (int i = 0; i < mini_batch_size; i++) {
+      int rand_index = torch::randint(0, len, {1}).item<int>();
+      mini_batch_data.push_back(data_buffer[rand_index]);
+    }
+
     /*Create state tensor for the batch of all sequences*/
-    torch::Tensor state_read = torch::zeros({1, t_len, input_size}); // [batch_size, sequence_len, input_size]
-
+    int num_chunks = mini_batch_data.size();
+    int num_layers = 1;
+    torch::Tensor input = torch::zeros({max_timesteps, num_chunks, input_size}); /* [sequence_len, batch_size, input_size] */
     /* Create hidden state and cell state tensors for all agents*/
-    torch::Tensor ht_read = torch::zeros({amount_of_players_in_team, t_len, hidden_size}); // [batch_size, sequence_len, hidden_size]
-    torch::Tensor ct_read = torch::zeros({amount_of_players_in_team, t_len, hidden_size}); // [batch_size, sequence_len, hidden_size]
-    torch::Tensor cx_crit = torch::zeros({1,t_len, hidden_size});
-    torch::Tensor ht_crit = torch::zeros({1,t_len, hidden_size});
+    torch::Tensor c0_policy = torch::zeros({amount_of_players_in_team, num_layers, num_chunks, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
+    torch::Tensor c0_critic = torch::zeros({num_layers, num_chunks, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
+    torch::Tensor h0_critic = torch::zeros({num_layers, num_chunks, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
+    torch::Tensor h0_policy = torch::zeros({amount_of_players_in_team, num_layers, num_chunks, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
 
-    /*For each timestep in random mini batch
-     * Create full arrays with states, hidden states and memorycell for each agent */
-    for (int t = 0; t < t_len; t++) {
-      state_read[0][t] = rand_batch.t[t].state.squeeze();
+    /* For each chunk in the mini batch, update hidden states from first hidden state.*/
+    for (int c = 0; c < mini_batch_data.size(); c++)
+    {
+        auto chunk = mini_batch_data[c];
 
-      cx_crit[0][t] = rand_batch.t[t].hidden_v.ct_p[0].squeeze(0);
-      ht_crit[0][t] = rand_batch.t[t].hidden_v.ht_p[0].squeeze(0);
+        int num_time_steps = chunk.t.size();
 
-      for (int agent = 0; agent < amount_of_players_in_team; agent++) {
-        ht_read[agent][t] = rand_batch.t[t].hidden_p[agent].ht_p.squeeze();
-        ct_read[agent][t] = rand_batch.t[t].hidden_p[agent].ct_p.squeeze();
-      }
+        c0_critic[0][c] = chunk.t[0].hidden_v.ct_p.squeeze();
+        h0_critic[0][c] = chunk.t[0].hidden_v.ht_p.squeeze();
 
+        for (int t = 0; t < num_time_steps; t++)
+        {
+          input[t][c] = chunk.t[t].state.squeeze();
+        }
+
+        for(int agent = 0; agent < amount_of_players_in_team; agent++)
+        {
+          c0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ct_p.squeeze();
+          h0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ht_p.squeeze(); 
+        }
     }
-    for (auto agent : Models) {
-      auto agent_state_read = state_read;
-      for (int t = 0; t < t_len; ++t) {
-        agent_state_read[0][t][0] = agent.robotId;  /* Change the first state value (Robot ID) in each timestep */
+
+    for(int agent = 0; agent < amount_of_players_in_team; agent++)
+    {
+      auto model = Models[agent];
+      
+      for (int c = 0; c < num_chunks; c++)
+      {
+        input[0][c][0] = model.robotId;
       }
+
       /*Update the policy networks hidden states */
-      agent.policy_network->Forward(agent_state_read, ht_read[agent.robotId].unsqueeze(0), ct_read[agent.robotId].unsqueeze(0));
+      model.policy_network->Forward(input, h0_policy[agent], c0_policy[agent]);
     }
-    /*Update the critic networks hidden states */
-    critic.Forward(state_read,cx_crit,ht_crit);
 
-    min_batch.push_back(rand_batch);
-  }
+    /*Update the critic networks hidden states */
+    for (int c = 0; c < num_chunks; c++)
+    {
+      for (int t = 0; t < max_timesteps; t++)
+      {
+        input[t][c][0] = -1;
+      }
+    }
+
+    critic.Forward(input, c0_critic, h0_critic);
+
+    /* Push chunk to min batch. */
+    for (int c = 0; c < num_chunks; c++)
+    {
+      min_batch.push_back(mini_batch_data[c]);
+    }
+  }  
 
   /*Create the arrays fit update functions*/
+  int num_chunks = min_batch.size();
   int64_t length = static_cast<int64_t>(min_batch[0].t.size()); /*Timesteps in batch*/
-  torch::Tensor old_predicts_p=torch::zeros({length,amount_of_players_in_team}); /*old network predicts of action of policy network*/
-  torch::Tensor new_predicts_p=torch::zeros({length,amount_of_players_in_team}); /*new network predicts of action of policy network*/
-  torch::Tensor all_actions_probs = torch::zeros({length,amount_of_players_in_team,num_actions}); /*predictions of all actions per agent*/
+  torch::Tensor old_predicts_p=torch::zeros({num_chunks, length, amount_of_players_in_team}); /*old network predicts of action of policy network*/
+  torch::Tensor new_predicts_p=torch::zeros({num_chunks, length, amount_of_players_in_team}); /*new network predicts of action of policy network*/
+  torch::Tensor all_actions_probs = torch::zeros({num_chunks, length, amount_of_players_in_team, num_actions}); /*predictions of all actions per agent*/
 
-  torch::Tensor old_predicts_c=torch::zeros({length,amount_of_players_in_team});  /*old network predicts of action of critic network*/
-  torch::Tensor new_predicts_c=torch::zeros({length,amount_of_players_in_team});  /*old network predicts of action of critic network*/
-  torch::Tensor critic_values = torch::zeros({length,amount_of_players_in_team});
-  torch::Tensor reward_arr_minbatch = torch::zeros({length,1});
+  torch::Tensor old_predicts_c=torch::zeros({num_chunks, length, amount_of_players_in_team});  /*old network predicts of action of critic network*/
+  torch::Tensor new_predicts_c=torch::zeros({num_chunks, length, amount_of_players_in_team});  /*old network predicts of action of critic network*/
+  torch::Tensor critic_values = torch::zeros({num_chunks, length, amount_of_players_in_team});
+  torch::Tensor reward_arr_minbatch = torch::zeros({num_chunks, length, 1});
 
   std::vector<Agents> old_net; /*Create Models class for each robot.*/
   CriticNetwork old_net_critic;
   old_net = LoadOldAgents(amount_of_players_in_team,old_net_critic);
 
   /*Configure arrays from min_batch to fit into later functions*/
-  for (int samp_i = 0; samp_i < min_batch.size(); samp_i++) {
-    /*Each sample in mini batch*/
-    for (int t = 0; t < min_batch[samp_i].t.size(); ++t) { /*each timestep in batch*/
+  for (int c = 0; c < num_chunks; c++) /* For each chunk in mini batch. */
+  {
+    auto batch = min_batch[c];
 
-      auto state = min_batch[samp_i].t[t].state; /*Get saved state for critic*/
-      auto hs_c = min_batch[samp_i].t[t].hidden_v.ht_p; /*Get hidden state for critic*/
-      auto mc_c = min_batch[samp_i].t[t].hidden_v.ct_p; /*Get memory cell for critic*/
+    // For each timestep in the chunk.
+    for (int t = 0; t < batch.t.size(); t++)
+    {
+      assert(old_predicts_p.size(0) == num_chunks);
+      assert(old_predicts_p.size(1) == length);
+      assert(old_predicts_p.size(2) == amount_of_players_in_team);
+      assert(old_predicts_c.size(0) == num_chunks);
+      assert(old_predicts_c.size(1) == length);
+      assert(old_predicts_c.size(2) == amount_of_players_in_team);
+      assert(new_predicts_p.size(0) == num_chunks);
+      assert(new_predicts_p.size(1) == length);
+      assert(new_predicts_p.size(2) == amount_of_players_in_team);
+      assert(new_predicts_c.size(0) == num_chunks);
+      assert(new_predicts_c.size(1) == length);
+      assert(new_predicts_c.size(2) == amount_of_players_in_team);
+      assert(critic_values.size(0) == num_chunks);
+      assert(critic_values.size(1) == length);
+      assert(critic_values.size(2) == amount_of_players_in_team);
+      assert(all_actions_probs.size(0) == num_chunks);
+      assert(all_actions_probs.size(1) == length);
+      assert(all_actions_probs.size(2) == amount_of_players_in_team);
+      assert(all_actions_probs.size(3) == num_actions);
+      assert(reward_arr_minbatch.size(0) == num_chunks);
+      assert(reward_arr_minbatch.size(1) == length);
+      assert(reward_arr_minbatch.size(2) == 1);
+
+      auto state = batch.t[t].state; /*Get saved state for critic*/
+      auto hs_c = batch.t[t].hidden_v.ht_p; /*Get hidden state for critic*/
+      auto mc_c = batch.t[t].hidden_v.ct_p; /*Get memory cell for critic*/
       auto old_ci = old_net_critic.Forward(state,hs_c,mc_c); /*Get predictions from old critic network*/
+
       torch::Tensor output_old_c = std::get<0>(old_ci).squeeze();
-      old_predicts_c[t] = output_old_c.expand({amount_of_players_in_team}); /*Array needs to be same value for all agents*/
-      new_predicts_c[t] = min_batch[samp_i].t[t].criticvalues;
-      reward_arr_minbatch[t] = min_batch[samp_i].R[t]; /*Store Reward To Go*/
+      old_predicts_c[c][t] = output_old_c.expand({amount_of_players_in_team}); /*Array needs to be same value for all agents*/
+      new_predicts_c[c][t] = batch.t[t].criticvalues;
+      reward_arr_minbatch[c][t] = batch.R[t]; /*Store Reward To Go*/
+
       /*each agent in timestep*/
-      for (int agent = 0; agent < amount_of_players_in_team; ++agent) {
+      for (int agent = 0; agent < amount_of_players_in_team; agent++) {
         /* Pass each agent's state at the current timestep through the policy network*/
-        auto hs_p = min_batch[samp_i].t[t].hidden_p[agent].ht_p; /*Get saved hidden state for agent*/
-        auto mc_p = min_batch[samp_i].t[t].hidden_p[agent].ct_p; /*Get saved memory cell for agent*/
+        auto hs_p = batch.t[t].hidden_p[agent].ht_p; /*Get saved hidden state for agent*/
+        auto mc_p = batch.t[t].hidden_p[agent].ct_p; /*Get saved memory cell for agent*/
 
         auto agent_state = state.clone();
         agent_state.index({0, 0, 0}) = agent; /*Update the first index value to robot ID*/
-        auto old_pi = old_net[agent].policy_network->Forward(agent_state,hs_p,mc_p); /*Make prediction from the agents old network*/
+        auto old_pi = old_net[agent].policy_network->Forward(agent_state, hs_p, mc_p); /*Make prediction from the agents old network*/
 
         /*Save new and old predicts for each agent*/
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze(); /*Output from old_net*/
-        auto act = min_batch[samp_i].t[t].actions[agent].item<int>(); /*action did in the recorded timestep*/
-        old_predicts_p[t][agent] = output_old_p[act]; /*Save prediction of the old networks probability of agents done action in the timestep*/
-        new_predicts_p[t][agent] = min_batch[samp_i].t[t].actions_prob[agent][act]; /*Save stored prediction of the action*/
-        all_actions_probs[t][agent] = min_batch[samp_i].t[t].actions_prob[agent]; /*Store all predictions the agent did at the timestep*/
+        auto act = batch.t[t].actions[agent].item<int>(); /*action did in the recorded timestep*/
+        old_predicts_p[c][t][agent] = output_old_p[act]; /*Save prediction of the old networks probability of agents done action in the timestep*/
+        new_predicts_p[c][t][agent] = batch.t[t].actions_prob[agent][act]; /*Save stored prediction of the action*/
+        all_actions_probs[c][t][agent] = batch.t[t].actions_prob[agent]; /*Store all predictions the agent did at the timestep*/
       } /*end agent loop*/
 
     }
@@ -339,33 +410,41 @@ void Mappo_Update(std::vector<Agents> &Models,CriticNetwork &critic, std::vector
 
   /*Calculate from configured arrays*/
 
-  /*Policy Loss calculations*/
-  auto probratio = ComputeProbabilityRatio(new_predicts_p,old_predicts_p);
-  auto policy_entropy = ComputePolicyEntropy(all_actions_probs,0.9);
-  auto policyloss = ComputePolicyLoss(min_batch[0].A,probratio,0.9,policy_entropy);
-
-  /*Critic Loss calculations*/
-  auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch);
-  auto critic_loss = -ComputeCriticLoss(new_predicts_c, old_predicts_c,norm_rew,0.9);
-
   /*Save to old network*/
   SaveOldModels(Models,critic);
 
   /*Verify the old saved networks is the same as the current networks*/
   CheckModelParametersMatch(old_net,Models,old_net_critic,critic);
 
-  /*Update the networks by the loss values*/
-  UpdateNets(Models,critic,policyloss,critic_loss);
+  auto policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.9);
+  auto probability_ratios = ComputeProbabilityRatio(new_predicts_p, old_predicts_p);
+
+  torch::Tensor probratio
+
+  /*Policy Loss calculations*/
+  for(int c = 0; c < num_mini_batch; c++)
+  {
+    
+    auto policyloss = ComputePolicyLoss(min_batch[c].A, probratio, 0.2, policy_entropy);
+
+    /*Critic Loss calculations*/
+    auto norm_rew = NormalizeRewardToGo(reward_arr_minbatch[c]);
+    auto critic_loss = -ComputeCriticLoss(new_predicts_c[c], old_predicts_c[c], norm_rew,0.2);
+
+    /*Update the networks by the loss values*/
+    UpdateNets(Models, critic, policyloss, critic_loss);
+  }
+
   /*save updated models of all networks(Policy and Critic)*/
   SaveModels(Models,critic);
 
   std::cout << "Old net validation: " << std::endl;
   /*This should be false after updateNets() if networks were updated correctly*/
-  CheckModelParametersMatch(old_net,Models,old_net_critic,critic);
+  CheckModelParametersMatch(old_net, Models, old_net_critic, critic);
 
   std::cout << "Training of buffer done! " << std::endl;
-  std::cout << "Policy loss: " << policyloss << std::endl;
-  std::cout << "Critic loss: " << critic_loss << std::endl;
+  //std::cout << "Policy loss: " << policyloss << std::endl;
+  //std::cout << "Critic loss: " << critic_loss << std::endl;
   std::cout << "==============================================" << std::endl;
 }
 

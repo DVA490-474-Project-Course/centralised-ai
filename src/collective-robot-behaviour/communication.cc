@@ -67,34 +67,34 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     state_index += 2 * num_robots;
 
     /* Opponent team positions */
-    for (int32_t i = 0; i < num_robots; i++)
-    {
-      states[state_index + i * 2 + 0] = vision_client.GetRobotPositionX(i, opponent_team);
-      states[state_index + i * 2 + 1] = vision_client.GetRobotPositionY(i, opponent_team);
-    }
+    //for (int32_t i = 0; i < num_robots; i++)
+    //{
+    //  states[state_index + i * 2 + 0] = vision_client.GetRobotPositionX(i, opponent_team);
+    //  states[state_index + i * 2 + 1] = vision_client.GetRobotPositionY(i, opponent_team);
+    //}
+    //
+    //state_index += 2 * num_robots;
 
-    state_index += 2 * num_robots;
-
-    /* Goal difference */
-    states[state_index] = ComputeGoalDifference(referee, own_team);
-
-    state_index++;
+    ///* Goal difference */
+    //states[state_index] = ComputeGoalDifference(referee, own_team);
+    //
+    //state_index++;
 
     /* Own team ball owner */
-    for (int32_t i = 0; i < num_robots; i++)
-    {
-      states[state_index + i] = referee.IsTouchingBall(i, own_team);
-    }
-    
-    state_index += num_robots;
+    //for (int32_t i = 0; i < num_robots; i++)
+    //{
+    //  states[state_index + i] = referee.IsTouchingBall(i, own_team);
+    //}
+    //
+    //state_index += num_robots;
 
     /* Opponent team ball owner */
-    for (int32_t i = 0; i < num_robots; i++)
-    {
-      states[state_index + i] = referee.IsTouchingBall(i, opponent_team);
-    }
+    //for (int32_t i = 0; i < num_robots; i++)
+    //{
+    //  states[state_index + i] = referee.IsTouchingBall(i, opponent_team);
+    //}
 
-    state_index += num_robots;
+    //state_index += num_robots;
 
     /* Rotation of each robot in the own team */
     for (int32_t i = 0; i < num_robots; i++)
@@ -105,9 +105,9 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     state_index += num_robots;
 
     /* Remaining time */
-    states[state_index] = referee.GetStageTimeLeft();
+    //states[state_index] = referee.GetStageTimeLeft();
 
-    state_index++;
+    //state_index++;
 
     /* Reshape the states to [1, 1, num_states], but keeping the data in the third dimension. */
     return states.view({1, 1, num_states});
@@ -139,10 +139,12 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
         break;
       case 1:
-        robot_interfaces[i].SetVelocity(1.0F, 0.0F, 0.0F);
+        /* Rotate left. */
+        robot_interfaces[i].SetVelocity(-3.0F, -3.0F, 3.0F, 3.0F);
         break;
       case 2:
-        robot_interfaces[i].SetVelocity(-1.0F, 0.0F, 0.0F);
+        /* Rotate right. */
+        robot_interfaces[i].SetVelocity(3.0F, 3.0F, -3.0F, -3.0F);
         break;
       case 3:
         /* Rotate left. */

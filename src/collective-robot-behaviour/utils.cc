@@ -124,7 +124,6 @@ torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimati
 
 torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value)
 {
-        
 	/* Get the shape of the tensors. */
 	int32_t num_time_steps = current_values.size(0);
 	int32_t num_agents = current_values.size(1);
@@ -153,24 +152,29 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 	/* Ensure that the action probabilities are in the range (0, 1.0] in order to avoid log(0). */
 	torch::Tensor  clipped_probabilities = torch::clamp(actions_probabilities, 1e-10, 1.0);
 
-	int32_t num_time_steps = actions_probabilities.size(0);
-	int32_t num_agents = actions_probabilities.size(1);
-	int32_t num_actions = actions_probabilities.size(2);
+	int32_t num_mini_batch = actions_probabilities.size(0);
+	int32_t num_time_steps = actions_probabilities.size(1);
+	int32_t num_agents = actions_probabilities.size(2);
+	int32_t num_actions = actions_probabilities.size(3);
 
-	torch::Tensor entropy = torch::empty({num_time_steps, num_agents});
+	torch::Tensor entropy = torch::zeros(1);
 
-	for(int32_t t = 0; t < num_time_steps; t++)
+	for (int32_t i = 0; i < num_mini_batch; i++)
 	{
-		for(int32_t k = 0; k < num_agents; k++)
+		/* Compute the entropy over all the time steps for each agent. */
+		for (int32_t k = 0; k < num_agents; k++)
 		{
-			torch::Tensor probabitilies = actions_probabilities[t][k] + 0.000001;
+			for (int32_t t = 0; t < num_time_steps; t++)
+			{
+				torch::Tensor probabitilies = actions_probabilities[i][t][k];
 
-			entropy[t][k] = -torch::sum(probabitilies.log());
+				entropy += -torch::sum(probabitilies.log());
+			}
 		}
 	}
 
-	/* Calculate the average entropy over the time steps and agents. */
-	return entropy_coefficient * entropy.sum().div(num_time_steps * num_agents);
+	/* Calculate the average entropy over the chunks. */
+	return entropy_coefficient * entropy.sum().div(num_mini_batch * num_agents);
 }
 
 }

@@ -37,6 +37,8 @@ namespace collective_robot_behaviour
 
             angles_to_ball[i] = ball_product;
         }
+
+        std::cout << angles_to_ball << std::endl;
         
         return angles_to_ball;
     }
@@ -49,27 +51,19 @@ namespace collective_robot_behaviour
     torch::Tensor RunState::ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration)
     {
         torch::Tensor positions = torch::zeros({2, amount_of_players_in_team});
-        int32_t position_start_index = 3;
-        for (int32_t i = 0; i < amount_of_players_in_team; i++)
-        {
-            positions[0][i] = states[position_start_index + 2 * i + 0];
-            positions[1][i] = states[position_start_index + 2 * i + 1];
-        }
+        positions[0][0] = states[3];
+        positions[1][0] = states[4];
+        positions[0][1] = states[5];
+        positions[1][1] = states[6];
         
         int32_t orientation_start_index = 3 + amount_of_players_in_team * 2 * 2 + 1 + amount_of_players_in_team * 2;
         torch::Tensor orientations = torch::zeros(amount_of_players_in_team);
-        for (int32_t i = 0; i < amount_of_players_in_team; i++)
-        {
-            orientations[i] = states[orientation_start_index + i];
-        }
+        orientations[0] = states[7];
+        orientations[1] = states[8];
 
-        //std::cout << "Positions: " << positions << std::endl;
-        //std::cout << "Orientations: " << orientations << std::endl;
-
-        torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
-        torch::Tensor have_ball = states.slice(0, 12, 14);
-        torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
-        
+        //torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
+        //torch::Tensor have_ball = states.slice(0, 12, 14);
+        //torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
 
         /* Distance to ball */
         torch::Tensor ball_position = torch::empty({2, 1});
@@ -81,7 +75,9 @@ namespace collective_robot_behaviour
 
         //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
         //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
-        return distance_to_ball_reward;
+        //std::cout << "Angle to ball reward: " << angle_to_ball_reward << std::endl;
+        //std::cout << "states: " << states << std::endl;
+        return angle_to_ball_reward;
     }
 }
 }

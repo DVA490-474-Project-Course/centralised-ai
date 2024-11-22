@@ -30,10 +30,11 @@
 int max_timesteps = 199;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
-int batch_size = 5;
+int buffer_length = 2;
+int batch_size = buffer_length * amount_of_players_in_team;
 int amount_of_players_in_team = 2;
-int input_size = 5 + amount_of_players_in_team * 7;
-int num_actions = 5;
+int input_size = 9;
+int num_actions = 3;
 int hidden_size = 64;
 
 std::vector<double> critic_loss;
@@ -51,7 +52,7 @@ void PlotLoss()
 
       matplotlibcpp::grid(true);
 
-      matplotlibcpp::title("Critic Loss");
+      matplotlibcpp::title("Mean reward");
       matplotlibcpp::xlabel("Time Step");
       matplotlibcpp::ylabel("Critic Loss");
     
@@ -102,7 +103,7 @@ int main() {
   std::cout << "States: " << states << std::endl;
 
   // Launch the plotting in a separate thread
-  //std::thread plot_thread(PlotLoss);
+  std::thread plot_thread(PlotLoss);
 
   SaveOldModels(models,critic);
   while (true) {
@@ -136,7 +137,7 @@ int main() {
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
   }
 
-  //plot_thread.join();
+  plot_thread.join();
 
 
   return 0;
