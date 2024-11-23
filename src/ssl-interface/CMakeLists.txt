@@ -13,13 +13,5 @@ add_library(ssl_interface_lib
   automated_referee.cc
   simulation_reset.cc)
 
-# add executables for demos
-add_executable(ssl_vision_client_demo ssl_vision_client_demo.cc)
-add_executable(ssl_game_controller_client_demo ssl_game_controller_client_demo.cc)
-add_executable(automated_referee_demo automated_referee_demo.cc)
-
-# link libraries
+# link Protobuf libraries
 target_link_libraries(ssl_interface_lib ${Protobuf_LIBRARIES})
-target_link_libraries(ssl_vision_client_demo ssl_interface_lib)
-target_link_libraries(ssl_game_controller_client_demo ssl_interface_lib)
-target_link_libraries(automated_referee_demo ssl_interface_lib)
