@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+message GrSimRobotReplacement
+{
+  required double x=1;
+  required double y=2;
+  required double dir=3;
+  required uint32 id=4;
+  required bool yellow_team=5;
+  optional bool turnon=6;
+}
+
+message GrSimBallReplacement
+{
+  optional double x=1;
+  optional double y=2;
+  optional double vx=3;
+  optional double vy=4;
+}
+
+message GrSimReplacement
+{
+  optional GrSimBallReplacement ball=1;
+  repeated GrSimRobotReplacement robots=2;
+}

@@ -18,8 +18,8 @@
 #include <string> 
 
 /* Project .h files */
-#include "generated/messages_robocup_ssl_detection.pb.h"
-#include "generated/messages_robocup_ssl_wrapper.pb.h"
+#include "generated/ssl_vision_detection.pb.h"
+#include "generated/ssl_vision_wrapper.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai

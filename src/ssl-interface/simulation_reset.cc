@@ -21,8 +21,8 @@
 #include <string>
 
 /* Project .h files */
-#include "generated/grSim_Commands.pb.h"
-#include "generated/grSim_Packet.pb.h"
+#include "generated/grsim_commands.pb.h"
+#include "generated/grsim_packet.pb.h"
 
 namespace centralised_ai
 {
@@ -34,7 +34,7 @@ double initial_position_x[6] = {1.50, 1.50, 1.50, 0.55, 2.50, 3.60};
 double initial_position_y[6] = {1.12, 0.0, -1.12, 0.00, 0.00, 0.00};
 
 /* Send a grSim packet with UDP */
-void SendPacket(grSim_Packet packet, std::string ip, uint16_t port)
+void SendPacket(GrSimPacket packet, std::string ip, uint16_t port)
 {
   size_t size;
   void *buffer;
@@ -64,12 +64,12 @@ void SendPacket(grSim_Packet packet, std::string ip, uint16_t port)
 /* Reset ball and all robots position and other attributes */
 void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positive_half)
 {
-  grSim_Packet packet;
-  grSim_Robot_Command *command;
-  grSim_RobotReplacement *replacement;
-  grSim_BallReplacement *ball_replacement;
+  GrSimPacket packet;
+  GrSimRobotCommand *command;
+  GrSimRobotReplacement *replacement;
+  GrSimBallReplacement *ball_replacement;
 
-  packet.mutable_commands()->set_isteamyellow(false); /* Set to false for blue team */
+  packet.mutable_commands()->set_is_team_yellow(false); /* Set to false for blue team */
   packet.mutable_commands()->set_timestamp(0.0L);
 
   /* Loop through each robot index to reset the positions and other attributes
@@ -79,12 +79,12 @@ void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positiv
     /* Reset blue team robots (yellowteam = false) */
     command = packet.mutable_commands()->add_robot_commands();
     command->set_id(k);
-    command->set_wheelsspeed(false);
-    command->set_veltangent(0.0F); /* Stop all movement */
-    command->set_velnormal(0.0F);  /* Stop all movement */
-    command->set_velangular(0.0F); /* Stop angular movement */
-    command->set_kickspeedx(0.0F); /* No kick speed */
-    command->set_kickspeedz(0.0F); /* No kick in Z direction */
+    command->set_wheels_speed(false);
+    command->set_vel_tangent(0.0F); /* Stop all movement */
+    command->set_vel_normal(0.0F);  /* Stop all movement */
+    command->set_vel_angular(0.0F); /* Stop angular movement */
+    command->set_kick_speed_x(0.0F); /* No kick speed */
+    command->set_kick_speed_z(0.0F); /* No kick in Z direction */
     command->set_spinner(false);   /* Turn off the spinner */
 
     /* Set up the replacement packet for blue team */
@@ -101,17 +101,17 @@ void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positiv
       replacement->set_dir(180.0F);
     }
     replacement->set_y(initial_position_y[k]);           /* Set new y position */
-    replacement->set_yellowteam(false); /* Set to blue team (yellowteam = false) */
+    replacement->set_yellow_team(false); /* Set to blue team (yellowteam = false) */
 
     /* Reset yellow team robots (yellowteam = true) */
     command = packet.mutable_commands()->add_robot_commands();
     command->set_id(k);
-    command->set_wheelsspeed(false);
-    command->set_veltangent(0.0F); /* Stop all movement */
-    command->set_velnormal(0.0F);  /* Stop all movement */
-    command->set_velangular(0.0F); /* Stop angular movement */
-    command->set_kickspeedx(0.0F); /* No kick speed */
-    command->set_kickspeedz(0.0F); /* No kick in Z direction */
+    command->set_wheels_speed(false);
+    command->set_vel_tangent(0.0F); /* Stop all movement */
+    command->set_vel_normal(0.0F);  /* Stop all movement */
+    command->set_vel_angular(0.0F); /* Stop angular movement */
+    command->set_kick_speed_x(0.0F); /* No kick speed */
+    command->set_kick_speed_z(0.0F); /* No kick in Z direction */
     command->set_spinner(false);   /* Turn off the spinner */
 
     /* Set up the replacement packet for yellow team */
@@ -128,7 +128,7 @@ void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positiv
       replacement->set_dir(0.0F);
     }
     replacement->set_y(initial_position_y[k]);
-    replacement->set_yellowteam(true);
+    replacement->set_yellow_team(true);
   }
 
   /* Replacement packet for ball */
