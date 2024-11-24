@@ -48,7 +48,7 @@ VisionClient::VisionClient(std::string ip, int port)
 /* Receive one UDP packet and write the data to the output parameter */
 void VisionClient::ReceivePacket()
 {
-  SSL_WrapperPacket packet;
+  SSLWrapperPacket packet;
   int message_length;
   char buffer[max_datagram_size];
 
@@ -97,11 +97,11 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
   while (all_data_has_been_read == false);
 }
 
-void VisionClient::ReadVisionData(SSL_WrapperPacket packet)
+void VisionClient::ReadVisionData(SSLWrapperPacket packet)
 {
-  SSL_DetectionFrame detection;
-  SSL_DetectionRobot robot;
-  SSL_DetectionBall ball;
+  SSLDetectionFrame detection;
+  SSLDetectionRobot robot;
+  SSLDetectionBall ball;
   int id;
 
   if (packet.has_detection())

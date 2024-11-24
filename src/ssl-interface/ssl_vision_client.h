@@ -208,7 +208,7 @@ protected:
    * @brief Read the data from the protobuf data in the argument and store it locally
    * in the class instance.
    */
-  void ReadVisionData(SSL_WrapperPacket packet);
+  void ReadVisionData(SSLWrapperPacket packet);
 };
 
 } /* namespace ssl_interface */

@@ -47,8 +47,8 @@ public:
 class VisionClientDerived : public ::testing::Test {
 protected:
   MockVisionClient mock_client;
-  SSL_WrapperPacket dummyPacket;
-  SSL_DetectionFrame *detection;
+  SSLWrapperPacket dummyPacket;
+  SSLDetectionFrame *detection;
 
   VisionClientDerived() : mock_client("127.0.0.1", 10001) {
   detection = dummyPacket.mutable_detection();
@@ -64,7 +64,7 @@ protected:
     detection->set_camera_id(0);      
 
     /* Add a blue robot to the detection frame*/
-    SSL_DetectionRobot *robot_blue = detection->add_robots_blue();
+    SSLDetectionRobot *robot_blue = detection->add_robots_blue();
     robot_blue->set_robot_id(1);
     robot_blue->set_x(50.0f);
     robot_blue->set_y(100.0f);
@@ -75,7 +75,7 @@ protected:
     robot_blue->set_pixel_x(500);     
     robot_blue->set_pixel_y(600);     
     /* Add a ball to the detection frame*/
-    SSL_DetectionBall *ball = detection->add_balls();
+    SSLDetectionBall *ball = detection->add_balls();
     ball->set_x(75.0);
     ball->set_y(150.0);
 
@@ -117,7 +117,7 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create an empty packet */
-  SSL_WrapperPacket empty_packet;
+  SSLWrapperPacket empty_packet;
 
   /* Serialize the empty packet */
   std::string serialized_data;
@@ -149,8 +149,8 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create a packet with a robot without orientation */
-  SSL_WrapperPacket packet;
-  SSL_DetectionFrame* detection = packet.mutable_detection();
+  SSLWrapperPacket packet;
+  SSLDetectionFrame* detection = packet.mutable_detection();
 
   /* Set required fields for the detection frame */
   detection->set_frame_number(1);
@@ -159,7 +159,7 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
   detection->set_camera_id(0);
 
   /* Add a blue robot without setting orientation */
-  SSL_DetectionRobot* robot_blue = detection->add_robots_blue();
+  SSLDetectionRobot* robot_blue = detection->add_robots_blue();
   robot_blue->set_robot_id(0);
   robot_blue->set_x(50.0f);
   robot_blue->set_y(100.0f);
@@ -196,8 +196,8 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create a packet with multiple robots and a ball */
-  SSL_WrapperPacket packet;
-  SSL_DetectionFrame* detection = packet.mutable_detection();
+  SSLWrapperPacket packet;
+  SSLDetectionFrame* detection = packet.mutable_detection();
 
   /* Set required fields for the detection frame*/
   detection->set_frame_number(1);         /* Required frame number*/
@@ -207,7 +207,7 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
 
   /* Add blue robots with different positions and orientations */
   for (int i = 0; i < 6; ++i) {
-    SSL_DetectionRobot* robot_blue = detection->add_robots_blue();
+    SSLDetectionRobot* robot_blue = detection->add_robots_blue();
     robot_blue->set_robot_id(i);
     robot_blue->set_x(50.0f + i * 10.0f);
     robot_blue->set_y(100.0f + i * 5.0f);
@@ -218,7 +218,7 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
   }
 
   /* Add a single ball that is being tracked */
-  SSL_DetectionBall* ball_1 = detection->add_balls();
+  SSLDetectionBall* ball_1 = detection->add_balls();
   ball_1->set_x(75.0f);
   ball_1->set_y(150.0f);
   ball_1->set_confidence(1.0f);
