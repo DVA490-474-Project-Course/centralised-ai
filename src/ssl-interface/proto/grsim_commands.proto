@@ -1,5 +1,6 @@
 syntax = "proto2";
 
+/* Message containing command for one robot */
 message GrSimRobotCommand
 {
   required uint32 id = 1;
@@ -16,6 +17,7 @@ message GrSimRobotCommand
   optional float wheel4 = 12;
 }
 
+/* Message containing commands for multiple robots */
 message GrSimCommands
 {
   required double timestamp = 1;
