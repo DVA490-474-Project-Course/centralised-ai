@@ -18,7 +18,7 @@
 #include "../../src/ssl-interface/ssl_vision_client.h"
 #include "../../src/common_types.h"
 
-/* Duration for the PREPARE_KICKOFF_BLUE/YELLOW commands in all test cases */
+/* Duration for the kPrepareKickoffBLue/YELLOW commands in all test cases */
 const double prepare_kickoff_duration = 3.0D;
 
 /* Define a vision client class where, for testing purposes, values are set
@@ -75,7 +75,7 @@ TEST(AutomatedReferee, BlueTeamGoal)
 
   /* Check for correct referee command before kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_BLUE);
+    centralised_ai::RefereeCommand::kPrepareKickoffBlue);
 
   /* Let time pass until kickoff passes */
   vision_client.SetTimestamp(vision_client.GetTimestamp() + prepare_kickoff_duration
@@ -86,7 +86,7 @@ TEST(AutomatedReferee, BlueTeamGoal)
 
   /* Check for correct referee command after kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::NORMAL_START);
+    centralised_ai::RefereeCommand::kNormalStart);
 
   /* Put ball in yellow's goal */
   vision_client.SetBallPositionX(4550.0F);
@@ -97,7 +97,7 @@ TEST(AutomatedReferee, BlueTeamGoal)
 
   /* Check for correct score and referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW);
+    centralised_ai::RefereeCommand::kPrepareKickoffYellow);
   EXPECT_EQ(automated_referee.GetBlueTeamScore(), 1);
   EXPECT_EQ(automated_referee.GetYellowTeamScore(), 0);
 }
@@ -122,7 +122,7 @@ TEST(AutomatedReferee, YellowTeamGoal)
 
   /* Check for correct referee command before kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW);
+    centralised_ai::RefereeCommand::kPrepareKickoffYellow);
 
   /* Let time pass until kickoff passes */
   vision_client.SetTimestamp(vision_client.GetTimestamp() + prepare_kickoff_duration
@@ -133,7 +133,7 @@ TEST(AutomatedReferee, YellowTeamGoal)
 
   /* Check for correct referee command after kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::NORMAL_START);
+    centralised_ai::RefereeCommand::kNormalStart);
 
   /* Put ball in blue's goal */
   vision_client.SetBallPositionX(-4550.0F);
@@ -144,7 +144,7 @@ TEST(AutomatedReferee, YellowTeamGoal)
 
   /* Check for correct score and referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_BLUE);
+    centralised_ai::RefereeCommand::kPrepareKickoffBlue);
   EXPECT_EQ(automated_referee.GetBlueTeamScore(), 0);
   EXPECT_EQ(automated_referee.GetYellowTeamScore(), 1);
 }
@@ -169,7 +169,7 @@ TEST(AutomatedReferee, BlueTeamFreekick)
 
   /* Check for correct referee command before kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW);
+    centralised_ai::RefereeCommand::kPrepareKickoffYellow);
 
   /* Let time pass until kickoff passes */
   vision_client.SetTimestamp(vision_client.GetTimestamp() + prepare_kickoff_duration
@@ -180,7 +180,7 @@ TEST(AutomatedReferee, BlueTeamFreekick)
 
   /* Check for correct referee command after kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::NORMAL_START);
+    centralised_ai::RefereeCommand::kNormalStart);
 
   /* Put ball next to a yellow robot */
   vision_client.SetYellowRobotPositionX(0, 0.0F);
@@ -199,7 +199,7 @@ TEST(AutomatedReferee, BlueTeamFreekick)
 
   /* Check for correct referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::BALL_PLACEMENT_BLUE);
+    centralised_ai::RefereeCommand::kBallPlacementBlue);
 
   /* Put ball at designated position */
   vision_client.SetBallPositionX(
@@ -212,7 +212,7 @@ TEST(AutomatedReferee, BlueTeamFreekick)
 
   /* Check for correct referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::DIRECT_FREE_BLUE);
+    centralised_ai::RefereeCommand::kDirectFreeBlue);
 }
 
 /* Yellow team gets a freekick */
@@ -235,7 +235,7 @@ TEST(AutomatedReferee, YellowTeamFreekick)
 
   /* Check for correct referee command before kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW);
+    centralised_ai::RefereeCommand::kPrepareKickoffYellow);
 
   /* Let time pass until kickoff passes */
   vision_client.SetTimestamp(vision_client.GetTimestamp() + prepare_kickoff_duration
@@ -246,7 +246,7 @@ TEST(AutomatedReferee, YellowTeamFreekick)
 
   /* Check for correct referee command after kickoff */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::NORMAL_START);
+    centralised_ai::RefereeCommand::kNormalStart);
 
   /* Put ball next to a bluerobot */
   vision_client.SetBlueRobotPositionX(0, 0.0F);
@@ -265,7 +265,7 @@ TEST(AutomatedReferee, YellowTeamFreekick)
 
   /* Check for correct referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::BALL_PLACEMENT_YELLOW);
+    centralised_ai::RefereeCommand::kBallPlacementYellow);
 
   /* Put ball at designated position */
   vision_client.SetBallPositionX(
@@ -278,5 +278,5 @@ TEST(AutomatedReferee, YellowTeamFreekick)
 
   /* Check for correct referee command */
   EXPECT_EQ(automated_referee.GetRefereeCommand(),
-    centralised_ai::RefereeCommand::DIRECT_FREE_YELLOW);
+    centralised_ai::RefereeCommand::kDirectFreeYellow);
 }

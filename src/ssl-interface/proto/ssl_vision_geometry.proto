@@ -26,8 +26,8 @@ message SSLFieldLineSegment
   optional SSLFieldShapeType type = 5;
 }
 
-/* Represents a field marking as a circular arc segment represented by center point, a
- * start angle, an end angle, and an arc thickness. */
+/* Represents a field marking as a circular arc segment represented by center
+ * point, a start angle, an end angle, and an arc thickness. */
 message SSLFieldCircularArc
 {
   /* Name of this field marking. */

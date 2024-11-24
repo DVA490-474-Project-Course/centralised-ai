@@ -30,36 +30,21 @@ public:
 
 centralised_ai::RefereeCommand ConvertProtoRefereeCommand(Referee_Command command) {
   switch (command) {
-    case Referee_Command_HALT:
-      return centralised_ai::RefereeCommand::HALT;
-    case Referee_Command_STOP:
-      return centralised_ai::RefereeCommand::STOP;
-    case Referee_Command_NORMAL_START:
-      return centralised_ai::RefereeCommand::NORMAL_START;
-    case Referee_Command_PREPARE_KICKOFF_YELLOW:
-      return centralised_ai::RefereeCommand::PREPARE_KICKOFF_YELLOW;
-    case Referee_Command_PREPARE_KICKOFF_BLUE:
-      return centralised_ai::RefereeCommand::PREPARE_KICKOFF_BLUE;
-    case Referee_Command_FORCE_START:
-      return centralised_ai::RefereeCommand::FORCE_START;
-    case Referee_Command_PREPARE_PENALTY_YELLOW:
-      return centralised_ai::RefereeCommand::PREPARE_PENALTY_YELLOW;
-    case Referee_Command_PREPARE_PENALTY_BLUE:
-      return centralised_ai::RefereeCommand::PREPARE_PENALTY_BLUE;
-    case Referee_Command_DIRECT_FREE_YELLOW:
-      return centralised_ai::RefereeCommand::DIRECT_FREE_YELLOW;
-    case Referee_Command_INDIRECT_FREE_BLUE:
-      return centralised_ai::RefereeCommand::DIRECT_FREE_BLUE;
-    case Referee_Command_TIMEOUT_YELLOW:
-      return centralised_ai::RefereeCommand::TIMEOUT_YELLOW;
-    case Referee_Command_DIRECT_FREE_BLUE:
-      return centralised_ai::RefereeCommand::DIRECT_FREE_BLUE;
-    case Referee_Command_BALL_PLACEMENT_YELLOW:
-      return centralised_ai::RefereeCommand::BALL_PLACEMENT_YELLOW;
-    case Referee_Command_BALL_PLACEMENT_BLUE:
-      return centralised_ai::RefereeCommand::BALL_PLACEMENT_BLUE;
-    default:
-      return centralised_ai::RefereeCommand::UNKNOWN_COMMAND;
+    case Referee::HALT: return centralised_ai::RefereeCommand::kHalt;
+    case Referee::STOP: return centralised_ai::RefereeCommand::kStop;
+    case Referee::NORMAL_START: return centralised_ai::RefereeCommand::kNormalStart;
+    case Referee::FORCE_START: return centralised_ai::RefereeCommand::kForceStart;
+    case Referee::PREPARE_KICKOFF_YELLOW: return centralised_ai::RefereeCommand::kPrepareKickoffYellow;
+    case Referee::PREPARE_KICKOFF_BLUE: return centralised_ai::RefereeCommand::kPrepareKickoffBlue;
+    case Referee::PREPARE_PENALTY_YELLOW: return centralised_ai::RefereeCommand::kPreparePenaltyYellow;
+    case Referee::PREPARE_PENALTY_BLUE: return centralised_ai::RefereeCommand::kPreparePenaltyBlue;
+    case Referee::DIRECT_FREE_YELLOW: return centralised_ai::RefereeCommand::kDirectFreeYellow;
+    case Referee::DIRECT_FREE_BLUE: return centralised_ai::RefereeCommand::kDirectFreeBlue;
+    case Referee::TIMEOUT_YELLOW: return centralised_ai::RefereeCommand::kTimeoutYellow;
+    case Referee::TIMEOUT_BLUE: return centralised_ai::RefereeCommand::kTimeoutBlue;
+    case Referee::BALL_PLACEMENT_YELLOW: return centralised_ai::RefereeCommand::kBallPlacementYellow;
+    case Referee::BALL_PLACEMENT_BLUE: return centralised_ai::RefereeCommand::kBallPlacementBlue;
+    default: return centralised_ai::RefereeCommand::kUnknownCommand;
   }
 }
 /* Test Fixture */
@@ -101,7 +86,7 @@ TEST_F(GameControllerClientTest, TestReadGameStateData) {
   mock_client.TestReadGameStateData(dummyPacket);
 
   /* Verify values after calling ReadGameStateData */
-  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::HALT);
+  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::kHalt);
   EXPECT_EQ(mock_client.GetBlueTeamScore(), 2);
   EXPECT_EQ(mock_client.GetYellowTeamScore(), 1);
   EXPECT_EQ(mock_client.GetStageTimeLeft(), 50);
@@ -112,7 +97,7 @@ TEST_F(GameControllerClientTest, TestReadGameStateData) {
 /* Test GetRefereeCommand */
 TEST_F(GameControllerClientTest, TestGetRefereeCommand) {
   mock_client.TestReadGameStateData(dummyPacket);
-  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::HALT);
+  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::kHalt);
 }
 
 /* Test GetBlueTeamScore */

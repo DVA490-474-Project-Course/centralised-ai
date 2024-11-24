@@ -41,8 +41,8 @@ GameControllerClient::GameControllerClient(std::string ip, int port)
   bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
 
   /* Set initial values for game state data */
-  referee_command = RefereeCommand::UNKNOWN_COMMAND;
-  next_referee_command = RefereeCommand::UNKNOWN_COMMAND;
+  referee_command = RefereeCommand::kUnknownCommand;
+  next_referee_command = RefereeCommand::kUnknownCommand;
   blue_team_score = 0;
   yellow_team_score = 0;
   stage_time_left = 0;
@@ -103,7 +103,7 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   }
   else
   {
-    next_referee_command = RefereeCommand::UNKNOWN_COMMAND;
+    next_referee_command = RefereeCommand::kUnknownCommand;
   }
 
   if (packet.has_stage_time_left())
@@ -112,26 +112,27 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   }
 }
 
-/* Convert from protobuf enum definition to project enum definition */
+/* Convert from protobuf enum definition to project enum definition.
+ * The Referee_Command enum is defined by protobuf generated code. */
 enum RefereeCommand GameControllerClient::ConvertRefereeCommand(enum Referee_Command command)
 {
   switch (command)
   {
-    case Referee::HALT: return RefereeCommand::HALT;
-    case Referee::STOP: return RefereeCommand::STOP;
-    case Referee::NORMAL_START: return RefereeCommand::NORMAL_START;
-    case Referee::FORCE_START: return RefereeCommand::FORCE_START;
-    case Referee::PREPARE_KICKOFF_YELLOW: return RefereeCommand::PREPARE_KICKOFF_YELLOW;
-    case Referee::PREPARE_KICKOFF_BLUE: return RefereeCommand::PREPARE_KICKOFF_BLUE;
-    case Referee::PREPARE_PENALTY_YELLOW: return RefereeCommand::PREPARE_PENALTY_YELLOW;
-    case Referee::PREPARE_PENALTY_BLUE: return RefereeCommand::PREPARE_PENALTY_BLUE;
-    case Referee::DIRECT_FREE_YELLOW: return RefereeCommand::DIRECT_FREE_YELLOW;
-    case Referee::DIRECT_FREE_BLUE: return RefereeCommand::DIRECT_FREE_BLUE;
-    case Referee::TIMEOUT_YELLOW: return RefereeCommand::TIMEOUT_YELLOW;
-    case Referee::TIMEOUT_BLUE: return RefereeCommand::TIMEOUT_BLUE;
-    case Referee::BALL_PLACEMENT_YELLOW: return RefereeCommand::BALL_PLACEMENT_YELLOW;
-    case Referee::BALL_PLACEMENT_BLUE: return RefereeCommand::BALL_PLACEMENT_BLUE;
-    default: return RefereeCommand::UNKNOWN_COMMAND;
+    case Referee::HALT: return RefereeCommand::kHalt;
+    case Referee::STOP: return RefereeCommand::kStop;
+    case Referee::NORMAL_START: return RefereeCommand::kNormalStart;
+    case Referee::FORCE_START: return RefereeCommand::kForceStart;
+    case Referee::PREPARE_KICKOFF_YELLOW: return RefereeCommand::kPrepareKickoffYellow;
+    case Referee::PREPARE_KICKOFF_BLUE: return RefereeCommand::kPrepareKickoffBlue;
+    case Referee::PREPARE_PENALTY_YELLOW: return RefereeCommand::kPreparePenaltyYellow;
+    case Referee::PREPARE_PENALTY_BLUE: return RefereeCommand::kPreparePenaltyBlue;
+    case Referee::DIRECT_FREE_YELLOW: return RefereeCommand::kDirectFreeYellow;
+    case Referee::DIRECT_FREE_BLUE: return RefereeCommand::kDirectFreeBlue;
+    case Referee::TIMEOUT_YELLOW: return RefereeCommand::kTimeoutYellow;
+    case Referee::TIMEOUT_BLUE: return RefereeCommand::kTimeoutBlue;
+    case Referee::BALL_PLACEMENT_YELLOW: return RefereeCommand::kBallPlacementYellow;
+    case Referee::BALL_PLACEMENT_BLUE: return RefereeCommand::kBallPlacementBlue;
+    default: return RefereeCommand::kUnknownCommand;
   }
 }
 
@@ -140,21 +141,21 @@ std::string GameControllerClient::RefereeCommandToString(RefereeCommand referee_
 {
   switch (referee_command)
   {
-    case RefereeCommand::HALT: return "HALT";
-    case RefereeCommand::STOP: return "STOP";
-    case RefereeCommand::NORMAL_START: return "NORMAL_START";
-    case RefereeCommand::FORCE_START: return "FORCE_START";
-    case RefereeCommand::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
-    case RefereeCommand::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
-    case RefereeCommand::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
-    case RefereeCommand::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
-    case RefereeCommand::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
-    case RefereeCommand::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
-    case RefereeCommand::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
-    case RefereeCommand::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
-    case RefereeCommand::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
-    case RefereeCommand::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
-    default: return "UNKNOWN_COMMAND";
+    case RefereeCommand::kHalt: return "kHalt";
+    case RefereeCommand::kStop: return "kStop";
+    case RefereeCommand::kNormalStart: return "kNormalStart";
+    case RefereeCommand::kForceStart: return "kForceStart";
+    case RefereeCommand::kPrepareKickoffYellow: return "kPrepareKickoffYellow";
+    case RefereeCommand::kPrepareKickoffBlue: return "kPrepareKickoffBlue";
+    case RefereeCommand::kPreparePenaltyYellow: return "kPreparePenaltyYellow";
+    case RefereeCommand::kPreparePenaltyBlue: return "kPreparePenaltyBlue";
+    case RefereeCommand::kDirectFreeYellow: return "kDirectFreeYellow";
+    case RefereeCommand::kDirectFreeBlue: return "kDirectFreeBlue";
+    case RefereeCommand::kTimeoutYellow: return "kTimeoutYellow";
+    case RefereeCommand::kTimeoutBlue: return "kTimeoutBlue";
+    case RefereeCommand::kBallPlacementYellow: return "kBallPlacementYellow";
+    case RefereeCommand::kBallPlacementBlue: return "kBallPlacementBlue";
+    default: return "kUnknownCommand";
   }
 }
 

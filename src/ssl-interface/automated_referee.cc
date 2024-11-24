@@ -30,7 +30,7 @@ namespace ssl_interface
 /* Constructor */
 AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
   std::string grsim_ip, uint16_t grsim_port)
-    : vision_client_(vision_client), referee_command(RefereeCommand::STOP),
+    : vision_client_(vision_client), referee_command(RefereeCommand::kStop),
       blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
       designated_position({0.0F, 0.0F}),
       game_running(false), grsim_ip(grsim_ip), grsim_port(grsim_port) {}
@@ -68,39 +68,39 @@ void AutomatedReferee::RefereeStateHandler()
 
   switch (referee_command)
   {
-    case RefereeCommand::PREPARE_KICKOFF_YELLOW:
-    case RefereeCommand::PREPARE_KICKOFF_BLUE:
+    case RefereeCommand::kPrepareKickoffYellow:
+    case RefereeCommand::kPrepareKickoffBlue:
       if (current_time - prepare_kickoff_start_time >= prepare_kickoff_duration)
       {
-        referee_command = RefereeCommand::NORMAL_START;
+        referee_command = RefereeCommand::kNormalStart;
       }
       break;
-    case RefereeCommand::BALL_PLACEMENT_BLUE:
+    case RefereeCommand::kBallPlacementBlue:
       if (BallSuccessfullyPlaced())
       {
-        referee_command = RefereeCommand::DIRECT_FREE_BLUE;
+        referee_command = RefereeCommand::kDirectFreeBlue;
       }
       break;
-    case RefereeCommand::BALL_PLACEMENT_YELLOW:
+    case RefereeCommand::kBallPlacementYellow:
       if (BallSuccessfullyPlaced())
       {
-        referee_command = RefereeCommand::DIRECT_FREE_YELLOW;
+        referee_command = RefereeCommand::kDirectFreeYellow;
       }
       break;
-    case RefereeCommand::DIRECT_FREE_BLUE:
-    case RefereeCommand::DIRECT_FREE_YELLOW:
-    case RefereeCommand::NORMAL_START:
+    case RefereeCommand::kDirectFreeBlue:
+    case RefereeCommand::kDirectFreeYellow:
+    case RefereeCommand::kNormalStart:
       if (IsBallInGoal(Team::kBlue))
       {
         yellow_team_score++;
-        referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
+        referee_command = RefereeCommand::kPrepareKickoffBlue;
         prepare_kickoff_start_time = current_time;
         ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
       }
       else if (IsBallInGoal(Team::kYellow))
       {
         blue_team_score++;
-        referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
+        referee_command = RefereeCommand::kPrepareKickoffYellow;
         prepare_kickoff_start_time = current_time;
         ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
       }
@@ -111,12 +111,12 @@ void AutomatedReferee::RefereeStateHandler()
         if (last_kicker_team == Team::kYellow)
         {
           /* Free kick for blue team */
-          referee_command = RefereeCommand::BALL_PLACEMENT_BLUE;
+          referee_command = RefereeCommand::kBallPlacementBlue;
         }
         else if (last_kicker_team == Team::kBlue)
         {
           /* Free kick for yellow team */
-          referee_command = RefereeCommand::BALL_PLACEMENT_YELLOW;
+          referee_command = RefereeCommand::kBallPlacementYellow;
         }
       }
       break;
@@ -147,11 +147,11 @@ void AutomatedReferee::StartGame(enum Team starting_team,
 
   if (starting_team == Team::kBlue)
   {
-    referee_command = RefereeCommand::PREPARE_KICKOFF_BLUE;
+    referee_command = RefereeCommand::kPrepareKickoffBlue;
   }
   else
   {
-    referee_command = RefereeCommand::PREPARE_KICKOFF_YELLOW;
+    referee_command = RefereeCommand::kPrepareKickoffYellow;
   }
 
   ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
@@ -168,8 +168,8 @@ void AutomatedReferee::Print()
 {
   printf("referee command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
     RefereeCommandToString(referee_command).c_str(),
-    blue_team_score, yellow_team_score, designated_position.x, designated_position.y,
-    stage_time_left);
+    blue_team_score, yellow_team_score, designated_position.x,
+    designated_position.y, stage_time_left);
 }
 
 /* Returns true if ball is in the goal of the specified team */
@@ -243,7 +243,8 @@ float AutomatedReferee::DistanceToBall(float x, float y)
     std::pow((vision_client_.GetBallPositionY() - y), 2));
 }
 
-/* Returns true if ball is considered sucessfully placed according to SSL rules */
+/* Returns true if ball is considered sucessfully placed according to SSL
+ * rules */
 bool AutomatedReferee::BallSuccessfullyPlaced()
 {
   /* there is no robot within 0.05 meters distance to the ball */
@@ -258,7 +259,8 @@ bool AutomatedReferee::BallSuccessfullyPlaced()
     }
   }
 
-  /* the ball is at a position within 0.15 meters radius from the requested position */
+  /* the ball is at a position within 0.15 meters radius from the requested
+   * position */
   if (DistanceToBall(designated_position.x, designated_position.y)
     > 150)
   {
@@ -314,21 +316,21 @@ AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command)
 {
   switch (referee_command)
   {
-  case RefereeCommand::HALT: return "HALT";
-  case RefereeCommand::STOP: return "STOP";
-  case RefereeCommand::NORMAL_START: return "NORMAL_START";
-  case RefereeCommand::FORCE_START: return "FORCE_START";
-  case RefereeCommand::PREPARE_KICKOFF_YELLOW: return "PREPARE_KICKOFF_YELLOW";
-  case RefereeCommand::PREPARE_KICKOFF_BLUE: return "PREPARE_KICKOFF_BLUE";
-  case RefereeCommand::PREPARE_PENALTY_YELLOW: return "PREPARE_PENALTY_YELLOW";
-  case RefereeCommand::PREPARE_PENALTY_BLUE: return "PREPARE_PENALTY_BLUE";
-  case RefereeCommand::DIRECT_FREE_YELLOW: return "DIRECT_FREE_YELLOW";
-  case RefereeCommand::DIRECT_FREE_BLUE: return "DIRECT_FREE_BLUE";
-  case RefereeCommand::TIMEOUT_YELLOW: return "TIMEOUT_YELLOW";
-  case RefereeCommand::TIMEOUT_BLUE: return "TIMEOUT_BLUE";
-  case RefereeCommand::BALL_PLACEMENT_YELLOW: return "BALL_PLACEMENT_YELLOW";
-  case RefereeCommand::BALL_PLACEMENT_BLUE: return "BALL_PLACEMENT_BLUE";
-  default: return "UNKNOWN_COMMAND";
+    case RefereeCommand::kHalt: return "kHalt";
+    case RefereeCommand::kStop: return "kStop";
+    case RefereeCommand::kNormalStart: return "kNormalStart";
+    case RefereeCommand::kForceStart: return "kForceStart";
+    case RefereeCommand::kPrepareKickoffYellow: return "kPrepareKickoffYellow";
+    case RefereeCommand::kPrepareKickoffBlue: return "kPrepareKickoffBlue";
+    case RefereeCommand::kPreparePenaltyYellow: return "kPreparePenaltyYellow";
+    case RefereeCommand::kPreparePenaltyBlue: return "kPreparePenaltyBlue";
+    case RefereeCommand::kDirectFreeYellow: return "kDirectFreeYellow";
+    case RefereeCommand::kDirectFreeBlue: return "kDirectFreeBlue";
+    case RefereeCommand::kTimeoutYellow: return "kTimeoutYellow";
+    case RefereeCommand::kTimeoutBlue: return "kTimeoutBlue";
+    case RefereeCommand::kBallPlacementYellow: return "kBallPlacementYellow";
+    case RefereeCommand::kBallPlacementBlue: return "kBallPlacementBlue";
+    default: return "kUnknownCommand";
   }
 }
 
