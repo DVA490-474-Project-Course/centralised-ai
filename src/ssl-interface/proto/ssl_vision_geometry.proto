@@ -1,6 +1,7 @@
 syntax = "proto2";
 // A 2D float vector.
-message Vector2f {
+message Vector2f
+{
   // X-coordinate in mm
   required float x = 1;
   // Y-coordinate in mm
@@ -11,7 +12,8 @@ message Vector2f {
 // and end point p2, and a line thickness. The start and end points are along
 // the center of the line, so the thickness of the line extends by thickness / 2
 // on either side of the line.
-message SSL_FieldLineSegment {
+message SSL_FieldLineSegment
+{
   // Name of this field marking.
   required string name = 1;
   // Start point of the line segment.
@@ -26,7 +28,8 @@ message SSL_FieldLineSegment {
 
 // Represents a field marking as a circular arc segment represented by center point, a
 // start angle, an end angle, and an arc thickness.
-message SSL_FieldCircularArc {
+message SSL_FieldCircularArc
+{
   // Name of this field marking.
   required string name = 1;
   // Center point of the circular arc.
@@ -43,7 +46,8 @@ message SSL_FieldCircularArc {
   optional SSL_FieldShapeType type = 7;
 }
 
-message SSL_GeometryFieldSize {
+message SSL_GeometryFieldSize
+{
   // Field length (distance between goal lines) in mm
   required int32 field_length = 1;
   // Field width (distance between touch lines) in mm
@@ -76,7 +80,7 @@ message SSL_GeometryFieldSize {
   optional float max_robot_radius = 15;
 }
 
-message SSL_GeometryCameraCalibration {
+message SSL_GeometryCameraCalibration{
   required uint32 camera_id     = 1;
   required float focal_length = 2;
   required float principal_point_x = 3;
@@ -102,7 +106,8 @@ message SSL_GeometryCameraCalibration {
 // 2. Rolling
 // The full model is described in the TDP of ER-Force from 2016, which can be found here:
 // https://ssl.robocup.org/wp-content/uploads/2019/01/2016_ETDP_ER-Force.pdf
-message SSL_BallModelStraightTwoPhase {
+message SSL_BallModelStraightTwoPhase
+{
   // Ball sliding acceleration [m/s^2] (should be negative)
   required double acc_slide = 1;
   // Ball rolling acceleration [m/s^2] (should be negative)
@@ -113,7 +118,8 @@ message SSL_BallModelStraightTwoPhase {
 
 // Fixed-Loss model for chipped balls.
 // Uses fixed damping factors for xy and z direction per hop.
-message SSL_BallModelChipFixedLoss {
+message SSL_BallModelChipFixedLoss
+{
   // Chip kick velocity damping factor in XY direction for the first hop
   required double damping_xy_first_hop = 1;
   // Chip kick velocity damping factor in XY direction for all following hops
@@ -122,18 +128,21 @@ message SSL_BallModelChipFixedLoss {
   required double damping_z = 3;
 }
 
-message SSL_GeometryModels {
+message SSL_GeometryModels
+{
   optional SSL_BallModelStraightTwoPhase straight_two_phase = 1;
   optional SSL_BallModelChipFixedLoss chip_fixed_loss = 2;
 }
 
-message SSL_GeometryData {
+message SSL_GeometryData
+{
   required SSL_GeometryFieldSize field = 1;
   repeated SSL_GeometryCameraCalibration calib = 2;
   optional SSL_GeometryModels models = 3;
 }
 
-enum SSL_FieldShapeType {
+enum SSL_FieldShapeType
+{
   Undefined = 0;
   CenterCircle = 1;
   TopTouchLine = 2;
