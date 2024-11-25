@@ -38,7 +38,7 @@ namespace collective_robot_behaviour
             angles_to_ball[i] = ball_product;
         }
 
-        std::cout << angles_to_ball << std::endl;
+        //std::cout << angles_to_ball << std::endl;
         
         return angles_to_ball;
     }

@@ -56,29 +56,28 @@ torch::Tensor NormalizeRewardToGo(const torch::Tensor & reward_to_go)
 
 torch::Tensor  ComputeTemporalDifference(const torch::Tensor & critic_values, const torch::Tensor & rewards, double discount)
 {
-	uint32_t num_time_steps = rewards.size(0);
-	uint32_t num_agents = rewards.size(1);
+	int32_t num_agents = rewards.size(0);
+	int32_t num_time_steps = rewards.size(1);
 
-	torch::Tensor  critic_values_expanded = critic_values.expand({-1, num_agents});
-
-	/* Calculate the temporal differences for all but the last time step. */
-	torch::Tensor  output = torch::empty({num_time_steps, num_agents});
-	for (uint32_t t = 0; t < num_time_steps - 1; t++)
+	torch::Tensor temporal_difference = torch::zeros({num_agents, num_time_steps});
+	for (int32_t j = 0; j < num_agents; j++)
 	{
-		output[t] = rewards[t] + discount * critic_values_expanded[t + 1] - critic_values_expanded[t];
+		for (int32_t t = 0; t < num_time_steps - 1; t++)
+		{
+			temporal_difference[j][t] = rewards[j][t] + discount * critic_values[t + 1] - critic_values[t];
+		}
+
+		/* Handle the last time step (without discounting future value). */
+		temporal_difference[j][num_time_steps - 1] = rewards[j][num_time_steps - 1] - critic_values[num_time_steps - 1];
 	}
 
-	/* Handle the last time step (without discounting future value). */
-	output[num_time_steps - 1] = rewards[num_time_steps - 1] - critic_values_expanded[num_time_steps - 1];
-
-	return output;
+	return temporal_difference;
 }
 
 torch::Tensor  ComputeGeneralAdvantageEstimation(const torch::Tensor & temporal_differences, double discount, double gae_parameter)
 {
-        
-	uint32_t num_time_steps = temporal_differences.size(0);
-	uint32_t num_agents = temporal_differences.size(1);
+	int32_t num_agents = temporal_differences.size(0);
+	int32_t num_time_steps = temporal_differences.size(1);
 
 	/* Calculate the factors for each time step. */
 	torch::Tensor  factors = torch::empty(num_time_steps);
@@ -87,17 +86,20 @@ torch::Tensor  ComputeGeneralAdvantageEstimation(const torch::Tensor & temporal_
 	{
 		factors[t] = pow(discount_times_gae_parameter, t);
 	}
-        
-	/* Calculate the GAE for each time step. */
-	torch::Tensor  output = torch::zeros({num_time_steps, num_agents});
-	for (int32_t t = 0; t < num_time_steps; t++)
+
+	/* Calculate the GAE. */
+	torch::Tensor gae = torch::zeros({num_agents, num_time_steps});
+	for (int32_t j = 0; j < num_agents; j++)
 	{
-		torch::Tensor  remaining_factors = factors.slice(0, 0, num_time_steps - t);
-		torch::Tensor  remaining_temporal_differences = temporal_differences.index({torch::indexing::Slice(t, num_time_steps)});
-		output[t] = remaining_factors.matmul(remaining_temporal_differences);
+		for (int32_t t = 0; t < num_time_steps; t++)
+		{
+			torch::Tensor remaining_factors = factors.slice(0, 0, num_time_steps - t);
+			torch::Tensor remaining_temporal_differences = temporal_differences[j].index({torch::indexing::Slice(t, num_time_steps)});
+			gae[j][t] = remaining_factors.matmul(remaining_temporal_differences);
+		}
 	}
 
-	return output;
+	return gae;
 }
 
 torch::Tensor  ComputeProbabilityRatio(const torch::Tensor & current_probabilities, const torch::Tensor & previous_probabilities)
@@ -112,39 +114,59 @@ torch::Tensor  ClipProbabilityRatio(const torch::Tensor & probability_ratio, flo
 
 torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimation, const torch::Tensor & probability_ratio, float clip_value, const torch::Tensor & policy_entropy)
 {
+	/* Clip the probability ratio. */
 	torch::Tensor  probability_ratio_clipped = ClipProbabilityRatio(probability_ratio, clip_value);
-	torch::Tensor  probability_ratio_gae_product = torch::min(probability_ratio * general_advantage_estimation, probability_ratio_clipped * general_advantage_estimation);
+	int32_t mini_batch_size = general_advantage_estimation.size(0);
+	int32_t num_agents = general_advantage_estimation.size(1);
+	int32_t num_time_steps = general_advantage_estimation.size(2);
+	
+	torch::Tensor loss = torch::zeros(1);
 
 	/* Calculate the loss. */
-	int32_t num_time_steps = general_advantage_estimation.size(0);
-	int32_t num_agents = general_advantage_estimation.size(1);
-        
-	return probability_ratio_gae_product.sum().div(num_time_steps * num_agents) + policy_entropy;
+	for (int32_t t = 0; t < num_time_steps; t++)
+	{
+		for(int32_t j = 0; j < num_agents; j++)
+		{
+			for(int32_t i = 0; i < mini_batch_size; i++)
+			{
+				loss += torch::min(probability_ratio[i][j][t] * general_advantage_estimation[i][j][t], probability_ratio_clipped[i][j][t] * general_advantage_estimation[i][j][t]);
+			}
+		}
+	}
+
+	return loss.div(mini_batch_size * num_agents * num_time_steps) + policy_entropy;
 }
 
 torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value)
 {
+	
 	/* Get the shape of the tensors. */
-	int32_t num_time_steps = current_values.size(0);
-	int32_t num_agents = current_values.size(1);
+	int32_t num_mini_batches = current_values.size(0);
+	int32_t num_time_steps = current_values.size(1);
+	int32_t num_agents = reward_to_go.size(1);
 
 	/* Clip the current values. */
 	torch::Tensor  clipping_min = previous_values - clip_value;
 	torch::Tensor  clipping_max = previous_values + clip_value;
 	torch::Tensor  current_values_clipped = torch::clamp(current_values, clipping_min, clipping_max);
 
-	/* Calculate Huber loss. */
-	torch::Tensor  reward_to_go_expanded = reward_to_go.expand({num_time_steps, num_agents});
-	torch::Tensor loss_current_values = torch::huber_loss(current_values, reward_to_go_expanded, 'Mean', 10);
-	torch::Tensor  current_values_mse = torch::pow(current_values - reward_to_go_expanded, 2);
-
-	torch::Tensor loss_current_values_clipped = torch::huber_loss(current_values_clipped, reward_to_go_expanded, 'Mean', 10);
-	torch::Tensor  current_values_clipped_mse = torch::pow(current_values_clipped - reward_to_go_expanded, 2);
+	torch::Tensor loss = torch::zeros(1);
 
 	/* Calculate the loss. */
-	torch::Tensor  max_values = torch::max(current_values_mse, current_values_clipped_mse);
+	for (int32_t i = 0; i < num_mini_batches; i++)
+	{
+		for (int32_t j = 0; j < num_agents; j++)
+		{
+			for (int32_t t = 0; t < num_time_steps; t++)
+			{
+				torch::Tensor current_values_loss = torch::huber_loss(current_values[i][t], reward_to_go[i][j][t], 'Mean', 10);
+				torch::Tensor current_values_clipped_loss = torch::huber_loss(current_values_clipped[i][t], reward_to_go[i][j][t], 'Mean', 10);
+				loss += torch::max(current_values_loss, current_values_clipped_loss);
+			}
+		}
+	}
 
-	return max_values.sum().div(num_time_steps * num_agents).unsqueeze(0);
+	return loss.div(num_mini_batches * num_agents * num_time_steps);
 }
 
 torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, float entropy_coefficient)
@@ -153,8 +175,8 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 	torch::Tensor  clipped_probabilities = torch::clamp(actions_probabilities, 1e-10, 1.0);
 
 	int32_t num_mini_batch = actions_probabilities.size(0);
-	int32_t num_time_steps = actions_probabilities.size(1);
-	int32_t num_agents = actions_probabilities.size(2);
+	int32_t num_agents = actions_probabilities.size(1);
+	int32_t num_time_steps = actions_probabilities.size(2);
 	int32_t num_actions = actions_probabilities.size(3);
 
 	torch::Tensor entropy = torch::zeros(1);
@@ -166,7 +188,7 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 		{
 			for (int32_t t = 0; t < num_time_steps; t++)
 			{
-				torch::Tensor probabitilies = actions_probabilities[i][t][k];
+				torch::Tensor probabitilies = actions_probabilities[i][k][t];
 
 				entropy += -torch::sum(probabitilies.log());
 			}
@@ -174,7 +196,7 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 	}
 
 	/* Calculate the average entropy over the chunks. */
-	return entropy_coefficient * entropy.sum().div(num_mini_batch * num_agents);
+	return entropy_coefficient * entropy.div(num_mini_batch * num_agents);
 }
 
 }

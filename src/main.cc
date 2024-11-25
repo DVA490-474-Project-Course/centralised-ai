@@ -27,7 +27,7 @@
 #include <iostream>
 
 /*Configuration values*/
-int max_timesteps = 199;
+int max_timesteps = 201;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
 int buffer_length = 2;

@@ -57,14 +57,14 @@ namespace collective_robot_behaviour
     torch::Tensor new_state;
     std::vector<HiddenStates> hidden_p;
     HiddenStates hidden_v;
-    torch::Tensor criticvalues;
+    torch::Tensor critic_value;
 
 
     Trajectory()
     : /*robotID(-1),*/
       state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
       actions_prob(torch::zeros({num_actions})),
-      rewards(torch::zeros({1,amount_of_players_in_team})),
+      rewards(torch::zeros(amount_of_players_in_team)),
       actions(torch::zeros({amount_of_players_in_team})),
       new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
 
