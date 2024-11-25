@@ -35,7 +35,10 @@ public:
   }
 };
 
-centralised_ai::RefereeCommand ConvertProtoRefereeCommand(Referee_Command command) {
+/* Helper function to convert protobuf command to
+ * centralised_ai::RefereeCommand */
+centralised_ai::RefereeCommand
+    ConvertProtoRefereeCommand(Referee_Command command) {
   switch (command) {
     case Referee_Command_HALT:
       return centralised_ai::RefereeCommand::kHalt;

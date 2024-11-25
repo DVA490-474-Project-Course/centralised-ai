@@ -53,40 +53,88 @@ enum class Team
  */
 enum class RefereeCommand
 {
-  /* All robots should completely stop moving. */
+ /**!
+  * @brief All robots should completely stop moving.
+  */
   kHalt = 0,
-  /* Robots must keep 50 cm from the ball. */
+
+ /**!
+  * @brief Robots must keep 50 cm from the ball.
+  */
   kStop = 1,
-  /* A prepared kickoff or penalty may now be taken. */
+
+ /**!
+  * @brief A prepared kickoff or penalty may now be taken.
+  */
   kNormalStart = 2,
-  /* The ball is dropped and free for either team. */
+
+ /**!
+  * @brief The ball is dropped and free for either team.
+  */
   kForceStart = 3,
-  /* The yellow team may move into kickoff position. Followed by Normal Start. */
+
+ /**!
+  * @brief The yellow team may move into kickoff position.
+  * Followed by Normal Start.
+  */
   kPrepareKickoffYellow = 4,
-  /* The blue team may move into kickoff position. Followed by Normal Start. */
+
+ /**!
+  * @brief The blue team may move into kickoff position.
+  * Followed by Normal Start.
+  */
   kPrepareKickoffBlue = 5,
-  /* The yellow team may move into penalty position. Followed by Normal Start. */
+
+ /**!
+  * @brief The yellow team may move into penalty position.
+  * Followed by Normal Start.
+  */
   kPreparePenaltyYellow = 6,
-  /* The blue team may move into penalty position. Followed by Normal Start. */
+
+ /**!
+  * @brief The blue team may move into penalty position.
+  * Followed by Normal Start.
+  */
   kPreparePenaltyBlue = 7,
-  /* The yellow team may take a direct free kick. */
+
+ /**!
+  * @brief The yellow team may take a direct free kick.
+  */
   kDirectFreeYellow = 8,
-  /* The blue team may take a direct free kick. */
+
+ /**!
+  * @brief The blue team may take a direct free kick.
+  */
   kDirectFreeBlue = 9,
-  /* The yellow team is currently in a timeout. */
+
+ /**!
+  * @brief The yellow team is currently in a timeout.
+  */
   kTimeoutYellow = 12,
-  /* The blue team is currently in a timeout. */
+
+ /**!
+  * @brief The blue team is currently in a timeout.
+  */
   kTimeoutBlue = 13,
-  /* Equivalent to STOP, but the yellow team must pick up the ball and
-     drop it in the Designated Position. */
+
+ /**!
+  * @brief Equivalent to STOP, but the yellow team must pick up the
+  * ball and drop it in the Designated Position.
+  */
   kBallPlacementYellow = 16,
-  /* Equivalent to STOP, but the blue team must pick up the ball and drop
-     it in the Designated Position. */
+
+ /**!
+  * @brief Equivalent to STOP, but the blue team must pick up the
+  * ball and drop it in the Designated Position.
+  */
   kBallPlacementBlue = 17,
-  /* Unknown Command */
+
+ /**!
+  * @brief Unknown Command, used when an unrecognized or undefined
+  * command is encountered.
+  */
   kUnknownCommand = -1
 };
-
 } /* namespace centralised_ai */
 
 #endif /* CENTRALISEDAI_COMMONTYPES_H_ */
