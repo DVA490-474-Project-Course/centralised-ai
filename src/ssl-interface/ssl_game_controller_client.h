@@ -38,7 +38,7 @@ const int max_datagram_size = 65536;
  * provides methods to read game state variables including score
  * referee command, remaining stage time and ball designated position
  * 
- * @note Not copyable, moveable.
+ * @note Copyable, moveable.
  */
 class GameControllerClient
 {
