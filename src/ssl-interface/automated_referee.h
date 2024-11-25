@@ -29,6 +29,8 @@ namespace ssl_interface
  * Class representing an automated referee, which @return referee commands for
  * kickoff, freekicks/cornerkicks and keeps track of the score. Mainly intended
  * to be used during AI training so that it can be done without human supervision.
+ * 
+ * @note Not copyable, moveable.
  */
 class AutomatedReferee
 {
