@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef automated_referee_H
-#define automated_referee_H
+#ifndef AUTOMATED_REFEREE_H
+#define AUTOMATED_REFEREE_H
 
 /* C++ standard library headers */
 #include <string>
@@ -26,7 +26,7 @@ namespace ssl_interface
 /*!
  * @brief Class representing an automated referee.
  * 
- * Class representing an automated referee, which outputs referee commands for
+ * Class representing an automated referee, which @return referee commands for
  * kickoff, freekicks/cornerkicks and keeps track of the score. Mainly intended
  * to be used during AI training so that it can be done without human supervision.
  */
@@ -38,7 +38,7 @@ public:
     *
     * @param[in] vision_client A reference to the vision client.
     *
-    * @param[in] ip Ip address of the computer that is running grSim. When running
+    * @param[in] ip address of the computer that is running grSim. When running
     * grSim on the same computer that the simulation interface is running on this
     * value should be localhost i.e. "127.0.0.1".
     *
@@ -50,8 +50,6 @@ public:
 
   /*!
     * @brief Analyze the game state, needs to be called continously.
-    *
-    * @param[in] vision_client A reference to the vision client.
     */
   void AnalyzeGameState();
 
@@ -62,7 +60,7 @@ public:
     * @param[in] starting_team The team that has the first kickoff.
     * 
     * @param[in] team_on_positive_half The team that has its goal on the half
-    * of the field that is positive in ssl visision's coordinate system
+    * of the field that is positive in ssl vision's coordinate system
     * 
     * @param[in] stage_time The stage time duration.
     */
@@ -80,12 +78,12 @@ public:
     * Prints the game controller data that has been read by this client including
     * referee command, next referee command, score, ball designated position,
     * remaining stage time and which team has been assigned to the positive half
-    * of the field. Used for debugging purpuses.
+    * of the field. Used for debugging purposes.
     */
   void Print();
 
   /*!
-    * @brief Returns the referee command.
+    * @brief @return the referee command.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
@@ -93,7 +91,7 @@ public:
   enum RefereeCommand GetRefereeCommand();
 
   /*!
-    * @brief Returns the blue team score.
+    * @brief @return the blue team score.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
@@ -101,7 +99,7 @@ public:
   int GetBlueTeamScore();
 
   /*!
-    * @brief Returns the yellow team score.
+    * @brief @return the yellow team score.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * beforehand.
@@ -109,9 +107,9 @@ public:
   int GetYellowTeamScore();
 
   /*!
-    * @brief Returns the X coordinate of the ball designated position.
+    * @brief @return the X coordinate of the ball designated position.
     * 
-    * Returns the X coordinate in mm of the ball designated position. This value is
+    * @return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -122,9 +120,9 @@ public:
   float GetBallDesignatedPositionX();
 
   /*!
-    * @brief Returns the Y coordinate of the ball designated position.
+    * @brief @return the Y coordinate of the ball designated position.
     * 
-    * Returns the Y coordinate in mm of the ball designated position. This value is
+    * @return the Y coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -135,7 +133,7 @@ public:
   float GetBallDesignatedPositionY();
 
   /*!
-    * @brief Returns the team that has been assigned to the positive half of the field.
+    * @brief @return the team that has been assigned to the positive half of the field.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
@@ -143,10 +141,10 @@ public:
   enum Team TeamOnPositiveHalf();
 
   /*!
-    * @brief Returns the remaining stage time left.
+    * @brief @return the remaining stage time left.
     * 
-    * Returns the remaining stage time left in seconds. If the stage time is passed
-    * this value becomed negative.
+    * @return the remaining stage time left in seconds. If the stage time is passed
+    * this value become negative.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
@@ -154,9 +152,9 @@ public:
   int64_t GetStageTimeLeft();
 
   /*!
-    * @brief Returns true if the specified robot is currently touching the ball.
+    * @brief @return true if the specified robot is currently touching the ball.
     * 
-    * Returns true if the srobot with the given id and team is currently touching
+    * @return true if the robot with the given id and team is currently touching
     * the ball.
     * 
     * @param[in] ID of the robot.
@@ -220,7 +218,7 @@ protected:
   double time_at_game_start;
 
   /*!
-    * @brief Flag indicating wheter Automatic Referee is running.
+    * @brief Flag indicating whether Automatic Referee is running.
     */
   bool game_running;
 
@@ -255,7 +253,7 @@ protected:
   int yellow_team_score;
 
   /*!
-    * @brief When the BALL_PLACMENT_YELLOW/BLUE commands are issued, indicates
+    * @brief When the BALL_PLACEMENT_YELLOW/BLUE commands are issued, indicates
     * where the ball should be brought for a free kick.
     */
   struct Point designated_position;
@@ -275,44 +273,44 @@ protected:
   std::string RefereeCommandToString(RefereeCommand command);
 
   /*!
-    * @brief Returns true if ball is out of field.
+    * @brief @return true if ball is out of field.
     */
   bool IsBallOutOfField(float ball_x, float ball_y);
 
   /*!
-    * @brief Returns which team is currently touching the ball, returns kUnknow
+    * @brief @return which team is currently touching the ball, @return kUnknown
     * if no team is currently in contact with the ball.
     */
   enum Team CheckForCollision();
 
   /*!
-    * @brief Returns the distance between the specified robot and ball.
+    * @brief @return the distance between the specified robot and ball.
     */
   float DistanceToBall(int id, enum Team team);
 
   /*!
-    * @brief Returns the distance to ball and specified point.
+    * @brief @return the distance to ball and specified point.
     */
   float DistanceToBall(float x, float y);
 
   /*!
-    * @brief Returns true when ball is in the goal of the specified team.
+    * @brief @return true when ball is in the goal of the specified team.
     */
   bool IsBallInGoal(enum Team team);
 
   /*!
-    * @brief Returns true when ball is in yellow teams goal.
+    * @brief @return true when ball is in yellow teams goal.
     */
   bool IsBallInYellowGoal(float ball_x, float ball_y);
 
   /*!
-    * @brief Assuming ball is out of field, returns the point of where ball should
+    * @brief Assuming ball is out of field, @return the point of where ball should
     * be placed for freekick/cornerkick.
     */
   struct Point CalcBallDesignatedPosition();
 
   /*!
-    * @brief Returns true when ball is considered 'successfully placed' according
+    * @brief @return true when ball is considered 'successfully placed' according
     * to ssl rules
     */
   bool BallSuccessfullyPlaced();

@@ -27,13 +27,20 @@ namespace centralised_ai
 namespace ssl_interface
 {
 
-/* Constructor */
+ /* Constructor: Initializes the AutomatedReferee class.  */
 AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
-  std::string grsim_ip, uint16_t grsim_port)
-    : vision_client_(vision_client), referee_command(RefereeCommand::kStop),
-      blue_team_score(0), yellow_team_score(0), last_kicker_team(Team::kUnknown),
+    std::string grsim_ip, uint16_t grsim_port)
+    : vision_client_(vision_client),
+      referee_command(RefereeCommand::kStop),
+      blue_team_score(0),
+      yellow_team_score(0),
+      last_kicker_team(Team::kUnknown),
       designated_position({0.0F, 0.0F}),
-      game_running(false), grsim_ip(grsim_ip), grsim_port(grsim_port) {}
+      game_running(false),
+      grsim_ip(grsim_ip),
+      grsim_port(grsim_port) {
+
+}
 
 /* Analyze the game state by using VisionClient to access robot and ball
    positions */
@@ -54,8 +61,8 @@ void AutomatedReferee::AnalyzeGameState()
     RefereeStateHandler();
 
     /* Update stage time left */
-    stage_time_left = stage_time + (int)std::round(time_at_game_start -
-      vision_client_.GetTimestamp());
+    stage_time_left = stage_time +
+        std::lround(time_at_game_start - vision_client_.GetTimestamp());
   }
 }
 
@@ -70,18 +77,21 @@ void AutomatedReferee::RefereeStateHandler()
   {
     case RefereeCommand::kPrepareKickoffYellow:
     case RefereeCommand::kPrepareKickoffBlue:
+    /* Transition to normal start after kickoff preparation time. */
       if (current_time - prepare_kickoff_start_time >= prepare_kickoff_duration)
       {
         referee_command = RefereeCommand::kNormalStart;
       }
       break;
     case RefereeCommand::kBallPlacementBlue:
+      /* Transition to direct free kick if the ball is successfully placed. */
       if (BallSuccessfullyPlaced())
       {
         referee_command = RefereeCommand::kDirectFreeBlue;
       }
       break;
     case RefereeCommand::kBallPlacementYellow:
+      /* Transition to direct free kick if the ball is successfully placed. */
       if (BallSuccessfullyPlaced())
       {
         referee_command = RefereeCommand::kDirectFreeYellow;
@@ -90,6 +100,7 @@ void AutomatedReferee::RefereeStateHandler()
     case RefereeCommand::kDirectFreeBlue:
     case RefereeCommand::kDirectFreeYellow:
     case RefereeCommand::kNormalStart:
+    /* Handle goals and ball out-of-field events. */
       if (IsBallInGoal(Team::kBlue))
       {
         yellow_team_score++;
@@ -108,6 +119,7 @@ void AutomatedReferee::RefereeStateHandler()
         vision_client_.GetBallPositionY()))
       {
         designated_position = CalcBallDesignatedPosition();
+        /* Assign free kicks to the appropriate team. */
         if (last_kicker_team == Team::kYellow)
         {
           /* Free kick for blue team */
@@ -121,8 +133,10 @@ void AutomatedReferee::RefereeStateHandler()
       }
       break;
     default:
-      /* unhandled state encountered */
-      break;
+      /* Handle unexpected states by throwing a runtime error. */
+        throw std::runtime_error("unhandled state encountered: " +
+            std::to_string(static_cast<int>(referee_command)) +
+            ". Runtime exception occurred.");
   }
 }
 
@@ -145,6 +159,7 @@ void AutomatedReferee::StartGame(enum Team starting_team,
   this->stage_time = stage_time;
   stage_time_left = stage_time;
 
+  /* Set the initial referee command based on the starting team. */
   if (starting_team == Team::kBlue)
   {
     referee_command = RefereeCommand::kPrepareKickoffBlue;
@@ -153,7 +168,7 @@ void AutomatedReferee::StartGame(enum Team starting_team,
   {
     referee_command = RefereeCommand::kPrepareKickoffYellow;
   }
-
+  /* Reset robots and ball to initial positions. */
   ResetRobotsAndBall(grsim_ip, grsim_port, team_on_positive_half);
 }
 
@@ -166,7 +181,8 @@ void AutomatedReferee::StopGame()
 /* Print the current command and score */
 void AutomatedReferee::Print()
 {
-  printf("referee command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
+  printf("referee command: <%s> score: <%i, %i> designated position <%f, "
+      "%f> stage time left: <%li>\n",
     RefereeCommandToString(referee_command).c_str(),
     blue_team_score, yellow_team_score, designated_position.x,
     designated_position.y, stage_time_left);
@@ -206,7 +222,7 @@ bool AutomatedReferee::IsTouchingBall(int id, enum Team team)
   return (DistanceToBall(id, team) <= ball_radius + collision_margin);
 }
 
-/* Returns which team is currently touching the ball, returns kUnknow if no
+/* Returns which team is currently touching the ball, returns KUnknown if no
  * team is currently in contact with the ball. */
 enum Team AutomatedReferee::CheckForCollision()
 {
@@ -335,13 +351,27 @@ AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command)
 }
 
 /* Public getters */
-enum RefereeCommand AutomatedReferee::GetRefereeCommand() {return referee_command;}
-int AutomatedReferee::GetBlueTeamScore() {return blue_team_score;}
-int AutomatedReferee::GetYellowTeamScore() {return yellow_team_score;}
-float AutomatedReferee::GetBallDesignatedPositionX() {return designated_position.x;}
-float AutomatedReferee::GetBallDesignatedPositionY() {return designated_position.y;}
-enum Team AutomatedReferee::TeamOnPositiveHalf() {return team_on_positive_half;}
-int64_t AutomatedReferee::GetStageTimeLeft() {return stage_time_left;};
+enum RefereeCommand AutomatedReferee::GetRefereeCommand() {
+  return referee_command;
+}
+int AutomatedReferee::GetBlueTeamScore() {
+  return blue_team_score;
+}
+int AutomatedReferee::GetYellowTeamScore() {
+  return yellow_team_score;
+}
+float AutomatedReferee::GetBallDesignatedPositionX() {
+  return designated_position.x;
+}
+float AutomatedReferee::GetBallDesignatedPositionY() {
+  return designated_position.y;
+}
+enum Team AutomatedReferee::TeamOnPositiveHalf() {
+  return team_on_positive_half;
+}
+int64_t AutomatedReferee::GetStageTimeLeft() {
+  return stage_time_left;
+};
 
 } /* namespace ssl_interface */
 } /* namespace centralised_ai */

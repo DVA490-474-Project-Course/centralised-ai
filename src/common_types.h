@@ -25,17 +25,17 @@ namespace centralised_ai
 /*! 
  * @brief The robot radius in mm.
  */
-const float robot_radius = 85;
+constexpr float robot_radius = 85;
 
 /*! 
  * @brief The ball radius in mm.
  */
-const float ball_radius = 21.5;
+constexpr float ball_radius = 21.5;
 
 /*! 
  * @brief The number of robots in each team.
  */
-const int team_size = 6;
+constexpr int team_size = 6;
 
 /*! 
  * @brief Enum representing player team selection.
@@ -48,8 +48,8 @@ enum class Team
 };
 
 /*! 
- * @brief Enum with the possible referee commands that can be received from the
- * game controller.
+ * @brief Enum with the possible referee commands that can be
+ * received from the game controller.
  */
 enum class RefereeCommand
 {

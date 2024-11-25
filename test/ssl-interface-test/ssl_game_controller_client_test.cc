@@ -10,83 +10,112 @@
 /* Related .h files */
 #include "../../src/ssl-interface/ssl_game_controller_client.h"
 
-/* C++ standard library headers */
-
 /* Other .h files */
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 /* Project .h files */
 #include "../../src/ssl-interface/generated/ssl_gc_referee_message.pb.h"
 #include "../../src/common_types.h"
 
 /* Mock class for simulating network socket behavior */
-class MockGameControllerClient : public centralised_ai::ssl_interface::GameControllerClient {
+class MockGameControllerClient : public centralised_ai::ssl_interface
+    ::GameControllerClient {
 public:
-  MockGameControllerClient(std::string ip, int port) : GameControllerClient(ip, port) {}
+  /* Constructor to initialize with IP and port */
+  MockGameControllerClient(std::string ip, int port)
+      : GameControllerClient(ip, port) {}
+
+  /* Mock method to simulate receiving a packet */
   MOCK_METHOD(void, ReceivePacket, (), (override));
-  void TestReadGameStateData(Referee& packet) { GameControllerClient::ReadGameStateData(packet); }
+
+  /* Method to test reading game state data */
+  void TestReadGameStateData(Referee& packet) {
+    GameControllerClient::ReadGameStateData(packet);
+  }
 };
 
 centralised_ai::RefereeCommand ConvertProtoRefereeCommand(Referee_Command command) {
   switch (command) {
-    case Referee::HALT: return centralised_ai::RefereeCommand::kHalt;
-    case Referee::STOP: return centralised_ai::RefereeCommand::kStop;
-    case Referee::NORMAL_START: return centralised_ai::RefereeCommand::kNormalStart;
-    case Referee::FORCE_START: return centralised_ai::RefereeCommand::kForceStart;
-    case Referee::PREPARE_KICKOFF_YELLOW: return centralised_ai::RefereeCommand::kPrepareKickoffYellow;
-    case Referee::PREPARE_KICKOFF_BLUE: return centralised_ai::RefereeCommand::kPrepareKickoffBlue;
-    case Referee::PREPARE_PENALTY_YELLOW: return centralised_ai::RefereeCommand::kPreparePenaltyYellow;
-    case Referee::PREPARE_PENALTY_BLUE: return centralised_ai::RefereeCommand::kPreparePenaltyBlue;
-    case Referee::DIRECT_FREE_YELLOW: return centralised_ai::RefereeCommand::kDirectFreeYellow;
-    case Referee::DIRECT_FREE_BLUE: return centralised_ai::RefereeCommand::kDirectFreeBlue;
-    case Referee::TIMEOUT_YELLOW: return centralised_ai::RefereeCommand::kTimeoutYellow;
-    case Referee::TIMEOUT_BLUE: return centralised_ai::RefereeCommand::kTimeoutBlue;
-    case Referee::BALL_PLACEMENT_YELLOW: return centralised_ai::RefereeCommand::kBallPlacementYellow;
-    case Referee::BALL_PLACEMENT_BLUE: return centralised_ai::RefereeCommand::kBallPlacementBlue;
-    default: return centralised_ai::RefereeCommand::kUnknownCommand;
+    case Referee_Command_HALT:
+      return centralised_ai::RefereeCommand::kHalt;
+    case Referee_Command_STOP:
+      return centralised_ai::RefereeCommand::kStop;
+    case Referee_Command_NORMAL_START:
+      return centralised_ai::RefereeCommand::kNormalStart;
+    case Referee_Command_PREPARE_KICKOFF_YELLOW:
+      return centralised_ai::RefereeCommand::kPrepareKickoffYellow;
+    case Referee_Command_PREPARE_KICKOFF_BLUE:
+      return centralised_ai::RefereeCommand::kPrepareKickoffBlue;
+    case Referee_Command_FORCE_START:
+      return centralised_ai::RefereeCommand::kForceStart;
+    case Referee_Command_PREPARE_PENALTY_YELLOW:
+      return centralised_ai::RefereeCommand::kPreparePenaltyYellow;
+    case Referee_Command_PREPARE_PENALTY_BLUE:
+      return centralised_ai::RefereeCommand::kPreparePenaltyBlue;
+    case Referee_Command_DIRECT_FREE_YELLOW:
+      return centralised_ai::RefereeCommand::kDirectFreeYellow;
+    case Referee_Command_INDIRECT_FREE_BLUE:
+      return centralised_ai::RefereeCommand::kDirectFreeBlue;
+    case Referee_Command_TIMEOUT_YELLOW:
+      return centralised_ai::RefereeCommand::kTimeoutYellow;
+    case Referee_Command_DIRECT_FREE_BLUE:
+      return centralised_ai::RefereeCommand::kDirectFreeBlue;
+    case Referee_Command_BALL_PLACEMENT_YELLOW:
+      return centralised_ai::RefereeCommand::kBallPlacementYellow;
+    case Referee_Command_BALL_PLACEMENT_BLUE:
+      return centralised_ai::RefereeCommand::kBallPlacementBlue;
+    default:
+      return centralised_ai::RefereeCommand::kUnknownCommand;
   }
 }
-/* Test Fixture */
+/* Test Fixture: Set up the test environment and mock client */
 class GameControllerClientTest : public ::testing::Test {
 protected:
+  /* Mocked GameControllerClient */
   MockGameControllerClient mock_client;
-  Referee dummyPacket;
+
+  /* Dummy Referee packet used for testing */
+  Referee dummy_packet;
+
+  /* Constructor: Initialize mock client with IP and port */
   GameControllerClientTest() : mock_client("127.0.0.1", 10001) {}
   void SetUp() override {
 
     /* Code to set up the environment */
-    dummyPacket.set_packet_timestamp(123456789);
-    dummyPacket.set_stage(Referee::NORMAL_FIRST_HALF);
-    dummyPacket.set_command(Referee::HALT);
-    dummyPacket.set_command_counter(10);
-    dummyPacket.set_command_timestamp(123456789);
-    dummyPacket.mutable_designated_position()->set_x(0.0f);
-    dummyPacket.mutable_designated_position()->set_y(0.0f);
-    dummyPacket.set_stage_time_left(50);
+    dummy_packet.set_packet_timestamp(123456789);
+    dummy_packet.set_stage(Referee::NORMAL_FIRST_HALF);
+    dummy_packet.set_command(Referee::HALT);
+    dummy_packet.set_command_counter(10);
+    dummy_packet.set_command_timestamp(123456789);
+    dummy_packet.mutable_designated_position()->set_x(0.0f);
+    dummy_packet.mutable_designated_position()->set_y(0.0f);
+    dummy_packet.set_stage_time_left(50);
 
     /* Set up yellow team info */
-    Referee::TeamInfo* yellow_team = dummyPacket.mutable_yellow();
+    Referee::TeamInfo* yellow_team = dummy_packet.mutable_yellow();
     yellow_team->set_name("Yellow Team");
     yellow_team->set_score(1);
 
     /* Set up blue team info */
-    Referee::TeamInfo* blue_team = dummyPacket.mutable_blue();
+    Referee::TeamInfo* blue_team = dummy_packet.mutable_blue();
     blue_team->set_name("Blue Team");
     blue_team->set_score(2);
   }
 
+  /* Clean up after each test if needed */
   void TearDown() override {
-  /* Code to clean up after each test, if needed */
   }
 };
 
+/* Test case for reading game state data */
 TEST_F(GameControllerClientTest, TestReadGameStateData) {
   /* Call the TestReadGameStateData method */
-  mock_client.TestReadGameStateData(dummyPacket);
+  mock_client.TestReadGameStateData(dummy_packet);
 
   /* Verify values after calling ReadGameStateData */
-  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::kHalt);
+  EXPECT_EQ(mock_client.GetRefereeCommand(),
+      centralised_ai::RefereeCommand::kHalt);
   EXPECT_EQ(mock_client.GetBlueTeamScore(), 2);
   EXPECT_EQ(mock_client.GetYellowTeamScore(), 1);
   EXPECT_EQ(mock_client.GetStageTimeLeft(), 50);
@@ -96,37 +125,38 @@ TEST_F(GameControllerClientTest, TestReadGameStateData) {
 
 /* Test GetRefereeCommand */
 TEST_F(GameControllerClientTest, TestGetRefereeCommand) {
-  mock_client.TestReadGameStateData(dummyPacket);
-  EXPECT_EQ(mock_client.GetRefereeCommand(), centralised_ai::RefereeCommand::kHalt);
+  mock_client.TestReadGameStateData(dummy_packet);
+  EXPECT_EQ(mock_client.GetRefereeCommand(),
+      centralised_ai::RefereeCommand::kHalt);
 }
 
 /* Test GetBlueTeamScore */
 TEST_F(GameControllerClientTest, TestGetBlueTeamScore) {
-    mock_client.TestReadGameStateData(dummyPacket);
-    EXPECT_EQ(mock_client.GetBlueTeamScore(), 2);
+  mock_client.TestReadGameStateData(dummy_packet);
+  EXPECT_EQ(mock_client.GetBlueTeamScore(), 2);
 }
 
 /* Test GetYellowTeamScore */
 TEST_F(GameControllerClientTest, TestGetYellowTeamScore) {
-  mock_client.TestReadGameStateData(dummyPacket);
+  mock_client.TestReadGameStateData(dummy_packet);
   EXPECT_EQ(mock_client.GetYellowTeamScore(), 1);
 }
 
 /* Test GetBallDesignatedPositionX */
 TEST_F(GameControllerClientTest, TestGetBallDesignatedPositionX) {
-  mock_client.TestReadGameStateData(dummyPacket);
+  mock_client.TestReadGameStateData(dummy_packet);
   EXPECT_FLOAT_EQ(mock_client.GetBallDesignatedPositionX(), 0.0f);
 }
 
 /* Test GetBallDesignatedPositionY */
 TEST_F(GameControllerClientTest, TestGetBallDesignatedPositionY) {
-  mock_client.TestReadGameStateData(dummyPacket);
+  mock_client.TestReadGameStateData(dummy_packet);
   EXPECT_FLOAT_EQ(mock_client.GetBallDesignatedPositionY(), 0.0f);
 }
 
 /* Test GetStageTimeLeft */
 TEST_F(GameControllerClientTest, TestGetStageTimeLeft) {
-  mock_client.TestReadGameStateData(dummyPacket);
+  mock_client.TestReadGameStateData(dummy_packet);
   /* Adjust as per the actual implementation */
   EXPECT_EQ(mock_client.GetStageTimeLeft(), 50);
 }
@@ -135,10 +165,12 @@ TEST_F(GameControllerClientTest, TestGetStageTimeLeft) {
 TEST_F(GameControllerClientTest, TestGetTeamOnPositiveHalf) {
   /* Assuming the positive half team is set somewhere in your actual implementation.
      In this dummy packet, we may not have it, so you'd adjust accordingly */
-  dummyPacket.set_blue_team_on_positive_half(true);
-  mock_client.TestReadGameStateData(dummyPacket);
-  EXPECT_EQ(mock_client.GetTeamOnPositiveHalf(), centralised_ai::Team::kBlue);
-  dummyPacket.set_blue_team_on_positive_half(false);
-  mock_client.TestReadGameStateData(dummyPacket);
-  EXPECT_EQ(mock_client.GetTeamOnPositiveHalf(), centralised_ai::Team::kYellow);
+  dummy_packet.set_blue_team_on_positive_half(true);
+  mock_client.TestReadGameStateData(dummy_packet);
+  EXPECT_EQ(mock_client.GetTeamOnPositiveHalf(),
+      centralised_ai::Team::kBlue);
+  dummy_packet.set_blue_team_on_positive_half(false);
+  mock_client.TestReadGameStateData(dummy_packet);
+  EXPECT_EQ(mock_client.GetTeamOnPositiveHalf(),
+      centralised_ai::Team::kYellow);
 }
