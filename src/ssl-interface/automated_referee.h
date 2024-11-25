@@ -30,7 +30,7 @@ namespace ssl_interface
  * kickoff, freekicks/cornerkicks and keeps track of the score. Mainly intended
  * to be used during AI training so that it can be done without human supervision.
  * 
- * @note Not copyable, moveable.
+ * @note Copyable, moveable.
  */
 class AutomatedReferee
 {

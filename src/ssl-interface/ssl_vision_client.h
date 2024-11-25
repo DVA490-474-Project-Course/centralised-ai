@@ -38,7 +38,7 @@ const int max_datagram_size = 65536;
  * Class for communicating with ssl vision and provides methods to read ball and
  * robot positions and orientation.
  * 
- * @note Not copyable, moveable.
+ * @note Copyable, moveable.
  */
 class VisionClient
 {
