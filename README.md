@@ -71,12 +71,12 @@ API:
 - [x] Develop SSL interface
 
 Collective Robot Behaviour:
-- [] Develop AI algorithm
-- [] Ability to send and receive data from simulation
+- [ ] Develop AI algorithm
+- [ ] Ability to send and receive data from simulation
 - [x] Ability to receive referee commands from SSL interface
 - [x] Ability to receive pose data from SSL interface
-- [] Ability to send commands to robot
-- [] Ability to receive information from robot
+- [ ] Ability to send commands to robot
+- [ ] Ability to receive information from robot
 
 
 Design diagrams
