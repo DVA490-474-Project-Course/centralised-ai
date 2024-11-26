@@ -3,7 +3,7 @@ Centralised AI
 
 About
 -----------------------
-This repository contains the executable code intended for running on the central computer, which is responsible for the overarching control of the robot team, as well as functionality for receiving data from the shared vision system ([SSL-Vision](https://github.com/RoboCup-SSL/ssl-vision)) and referee software ([SSL Game Controller](https://github.com/RoboCup-SSL/ssl-game-controller)) of RoboCup SSL.
+This repository contains the executable code intended for running on the central computer, which is responsible for the overarching control of the robot team, as well as functionality for receiving data from the shared vision system ([SSL-Vision](https://github.com/RoboCup-SSL/ssl-vision)) and referee software ([SSL Game Controller](https://github.com/RoboCup-SSL/ssl-game-controller)) of RoboCup SSL, as well as fuctionality for communicating with the simulation software grSim (https://github.com/RoboCup-SSL/grSim).
 
 ### Built with
 The Centralized AI software is built with the following:
