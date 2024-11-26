@@ -44,6 +44,7 @@ mkdir build & cd build
 5. Build the source code:<br/>
 ```
 cmake ..
+make
 ```
 6. Locate the binaries which should be stored in bin:<br/>
 ```

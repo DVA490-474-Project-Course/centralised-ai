@@ -53,6 +53,7 @@ mkdir build & cd build
 5. Build the source code:<br/>
 ```
 cmake ..
+make
 ```
 6. Locate the binaries which should be stored in bin:<br/>
 ```
@@ -65,11 +66,24 @@ Usage
 
 Roadmap
 -----------------------
+API:
+- [x] Develop Simulation interface
+- [x] Develop SSL interface
+
+Collective Robot Behaviour:
+- [] Develop AI algorithm
+- [] Ability to send and receive data from simulation
+- [x] Ability to receive referee commands from SSL interface
+- [x] Ability to receive pose data from SSL interface
+- [] Ability to send commands to robot
+- [] Ability to receive information from robot
+
 
 Design diagrams
 -----------------------
 Design diagrams/files can be found in the [docs](/docs) directory. Additionally they are available on:
-- [SSL Interface](https://www.mermaidchart.com/raw/6428d81b-020c-4506-a2c5-c319e514648f?theme=dark&version=v0.1&format=svg)
+- [Simulation interface](https://www.mermaidchart.com/raw/16fc3609-d826-440a-bef5-40a7a39f1140?theme=dark&version=v0.1&format=svg)
+- [SSL interface](https://www.mermaidchart.com/raw/6428d81b-020c-4506-a2c5-c319e514648f?theme=dark&version=v0.1&format=svg)
 - [Collective Robot Behaviour](https://www.mermaidchart.com/raw/80201d9e-191f-4971-82e5-fbe7ab0a4692?theme=light&version=v0.1&format=svg)
 
 
