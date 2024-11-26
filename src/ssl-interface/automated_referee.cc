@@ -18,6 +18,7 @@
 #include <string>
 
 /* Project .h files */
+#include "../ssl-interface/referee_command_functions.h"
 #include "../ssl-interface/ssl_vision_client.h"
 #include "../ssl-interface/simulation_reset.h"
 #include "../common_types.h"
@@ -324,30 +325,6 @@ struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition()
   }
 
   return local_designated_position;
-}
-
-/* Translate RefereeCommand enumerator to string */
-std::string
-AutomatedReferee::RefereeCommandToString(RefereeCommand referee_command)
-{
-  switch (referee_command)
-  {
-    case RefereeCommand::kHalt: return "kHalt";
-    case RefereeCommand::kStop: return "kStop";
-    case RefereeCommand::kNormalStart: return "kNormalStart";
-    case RefereeCommand::kForceStart: return "kForceStart";
-    case RefereeCommand::kPrepareKickoffYellow: return "kPrepareKickoffYellow";
-    case RefereeCommand::kPrepareKickoffBlue: return "kPrepareKickoffBlue";
-    case RefereeCommand::kPreparePenaltyYellow: return "kPreparePenaltyYellow";
-    case RefereeCommand::kPreparePenaltyBlue: return "kPreparePenaltyBlue";
-    case RefereeCommand::kDirectFreeYellow: return "kDirectFreeYellow";
-    case RefereeCommand::kDirectFreeBlue: return "kDirectFreeBlue";
-    case RefereeCommand::kTimeoutYellow: return "kTimeoutYellow";
-    case RefereeCommand::kTimeoutBlue: return "kTimeoutBlue";
-    case RefereeCommand::kBallPlacementYellow: return "kBallPlacementYellow";
-    case RefereeCommand::kBallPlacementBlue: return "kBallPlacementBlue";
-    default: return "kUnknownCommand";
-  }
 }
 
 /* Public getters */

@@ -270,11 +270,6 @@ protected:
   /*******************/
 
   /*!
-    * @brief Convert RefereeCommand enum to string.
-    */
-  std::string RefereeCommandToString(RefereeCommand command);
-
-  /*!
     * @brief @return true if ball is out of field.
     */
   bool IsBallOutOfField(float ball_x, float ball_y);

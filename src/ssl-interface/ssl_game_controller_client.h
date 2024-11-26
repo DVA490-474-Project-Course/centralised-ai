@@ -18,7 +18,7 @@
 #include <string> 
 
 /* Project .h files */
-#include "generated/ssl_gc_referee_message.pb.h"
+#include "../ssl-interface/generated/ssl_gc_referee_message.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
@@ -155,9 +155,7 @@ public:
 
 protected:
   /* Helper methods */
-  std::string RefereeCommandToString(enum RefereeCommand referee_command);
   void ReadGameStateData(Referee packet);
-  enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command);
 
   /* Network variables */
   sockaddr_in client_address;

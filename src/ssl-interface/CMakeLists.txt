@@ -11,7 +11,8 @@ add_library(ssl_interface_lib
   ssl_vision_client.cc
   ssl_game_controller_client.cc
   automated_referee.cc
-  simulation_reset.cc)
+  simulation_reset.cc
+  referee_command_functions.cc)
 
 # link Protobuf libraries
 target_link_libraries(ssl_interface_lib ${Protobuf_LIBRARIES})
