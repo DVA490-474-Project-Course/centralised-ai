@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+message GrSimRobotCommand
+{
+  required uint32 id = 1;
+  required float kick_speed_x = 2;
+  required float kick_speed_z = 3;
+  required float vel_tangent = 4;
+  required float vel_normal  = 5;
+  required float vel_angular = 6;
+  required bool spinner = 7;
+  required bool wheels_speed = 8;
+  optional float wheel_1 = 9;
+  optional float wheel_2 = 10;
+  optional float wheel_3 = 11;
+  optional float wheel_4 = 12;
+}
+
+message GrSimCommands
+{
+  required double timestamp = 1;
+  required bool is_team_yellow = 2;
+  repeated GrSimRobotCommand robot_commands = 3;
+}
+

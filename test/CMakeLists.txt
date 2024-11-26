@@ -23,6 +23,7 @@ target_link_libraries(
   GTest::gmock_main
   ssl_interface_lib
   mappo_lib
+  simulation_interface_lib
 )
 
 #===============================================================================
@@ -40,7 +41,7 @@ target_sources(main_test_exe PRIVATE
   ssl-interface-test/ssl_game_controller_client_test.cc
   ssl-interface-test/ssl_vision_client_test.cc
   ssl-interface-test/automated_referee_test.cc
-
+  simulation-interface-test/simulation_interface_test.cc
 )
 
 #===============================================================================
