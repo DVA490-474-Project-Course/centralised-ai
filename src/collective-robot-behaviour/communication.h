@@ -123,6 +123,8 @@ Team ComputeOpponentTeam(Team own_team);
 */
 torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
 
+std::vector<torch::Tensor> GetActionStates(torch::Tensor state);
+
 /*!
 *@brief Send actions to the robots.
 *

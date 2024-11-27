@@ -100,7 +100,7 @@ struct PolicyNetwork : torch::nn::Module {
   const int num_layers;
   const int output_size;
 
-  torch::nn::LSTM lstm{nullptr};
+  torch::nn::RNN rnn{nullptr};
   torch::nn::Linear output_layer{nullptr};
 
   PolicyNetwork();
@@ -113,10 +113,9 @@ struct PolicyNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
-  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> Forward(
+  std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
-    torch::Tensor hx,
-    torch::Tensor cx
+    torch::Tensor hx
   );
 };
 
@@ -131,7 +130,7 @@ struct PolicyNetwork : torch::nn::Module {
 struct CriticNetwork : torch::nn::Module {
   const int num_layers;
 
-  torch::nn::LSTM lstm{nullptr};
+  torch::nn::RNN rnn{nullptr};
   torch::nn::Linear value_layer{nullptr};
 
   CriticNetwork();
@@ -145,10 +144,9 @@ struct CriticNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
-  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> Forward(
+  std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
-    torch::Tensor hx,
-    torch::Tensor cx
+    torch::Tensor hx
   );
 };
 

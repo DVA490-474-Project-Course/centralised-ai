@@ -39,9 +39,8 @@ torch::Tensor ComputeHaveBallReward(torch::Tensor & have_ball_flags, float rewar
 		int32_t flag = have_ball_flags[i].item<int>();
 		if(flag > 0)
 		{
-			rewards[i] = reward;
+			rewards[i] += 1;
 			std::cerr << "TOUCHED BALL REWARD!" << reward << std::endl;
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		else
 		{

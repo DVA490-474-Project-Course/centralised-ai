@@ -34,7 +34,7 @@ int buffer_length = 2;
 int batch_size = buffer_length * amount_of_players_in_team;
 int amount_of_players_in_team = 2;
 int input_size = 9;
-int num_actions = 3;
+int num_actions = 5;
 int hidden_size = 64;
 
 std::vector<double> critic_loss;
@@ -52,7 +52,7 @@ void PlotLoss()
 
       matplotlibcpp::grid(true);
 
-      matplotlibcpp::title("Mean reward");
+      matplotlibcpp::title("Critic Loss");
       matplotlibcpp::xlabel("Time Step");
       matplotlibcpp::ylabel("Critic Loss");
     
@@ -67,7 +67,7 @@ void PlotLoss()
 int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
-  critic.lstm->reset_parameters();
+  critic.rnn->reset_parameters();
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
@@ -99,18 +99,23 @@ int main() {
     //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
 
-  torch::Tensor states = centralised_ai::collective_robot_behaviour::GetStates(referee,vision_client,centralised_ai::Team::kBlue,centralised_ai::Team::kYellow);
-  std::cout << "States: " << states << std::endl;
+  //torch::Tensor states = centralised_ai::collective_robot_behaviour::GetStates(referee,vision_client,centralised_ai::Team::kBlue,centralised_ai::Team::kYellow);
+  //std::cout << "States: " << states << std::endl;
 
   // Launch the plotting in a separate thread
-  std::thread plot_thread(PlotLoss);
+  //std::thread plot_thread(PlotLoss);
 
   SaveOldModels(models,critic);
+  critic.train();
+  for (auto &model : models) {
+    model.policy_network->train();
+  }
+  int epochs = 0;
+  std::cout << "Running" << std::endl;
   while (true) {
-    std::cout << "Running" << std::endl;
+    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
     /*run actions and save  to buffer*/
-    auto databuffer = MappoRun(models,critic,referee,vision_client,
-      centralised_ai::Team::kBlue,simulation_interfaces);
+    auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue,simulation_interfaces);
 
       /* Calcuate the mean episode reward */
       float mean_reward = 0.0;
@@ -134,10 +139,11 @@ int main() {
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
 
-    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
+    std::cout << "* Epochs: " << epochs << std::endl;
+    epochs++;
   }
 
-  plot_thread.join();
+  //plot_thread.join();
 
 
   return 0;

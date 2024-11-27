@@ -119,7 +119,7 @@ torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimati
 	int32_t mini_batch_size = general_advantage_estimation.size(0);
 	int32_t num_agents = general_advantage_estimation.size(1);
 	int32_t num_time_steps = general_advantage_estimation.size(2);
-	
+
 	torch::Tensor loss = torch::zeros(1);
 
 	/* Calculate the loss. */
@@ -139,7 +139,7 @@ torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimati
 
 torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value)
 {
-	
+
 	/* Get the shape of the tensors. */
 	int32_t num_mini_batches = current_values.size(0);
 	int32_t num_time_steps = current_values.size(1);
@@ -159,8 +159,8 @@ torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torc
 		{
 			for (int32_t t = 0; t < num_time_steps; t++)
 			{
-				torch::Tensor current_values_loss = torch::huber_loss(current_values[i][t], reward_to_go[i][j][t], 'Mean', 10);
-				torch::Tensor current_values_clipped_loss = torch::huber_loss(current_values_clipped[i][t], reward_to_go[i][j][t], 'Mean', 10);
+				torch::Tensor current_values_loss = torch::huber_loss(current_values[i][t], reward_to_go[i][j][t], at::Reduction::Mean, 10);
+				torch::Tensor current_values_clipped_loss = torch::huber_loss(current_values_clipped[i][t], reward_to_go[i][j][t], at::Reduction::Mean, 10);
 				loss += torch::max(current_values_loss, current_values_clipped_loss);
 			}
 		}

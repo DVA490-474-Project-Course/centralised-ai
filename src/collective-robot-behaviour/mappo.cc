@@ -46,8 +46,8 @@ static bool CheckModelParametersMatch(const std::vector<centralised_ai::collecti
                                  const centralised_ai::collective_robot_behaviour::CriticNetwork& loaded_critic) {
   bool check = true;
     for (size_t i = 0; i < saved_models.size(); ++i) {
-      auto saved_params = saved_models[i].policy_network->lstm->parameters();
-      auto loaded_params = loaded_models[i].policy_network->lstm->parameters();
+      auto saved_params = saved_models[i].policy_network->rnn->parameters();
+      auto loaded_params = loaded_models[i].policy_network->rnn->parameters();
 
       if (saved_params.size() != loaded_params.size()) {
         std::cerr << "Parameter count mismatch for agent " << i << std::endl;
@@ -63,8 +63,8 @@ static bool CheckModelParametersMatch(const std::vector<centralised_ai::collecti
     }
 
     // Check critic model parameters
-    auto saved_critic_params = saved_critic.lstm->parameters();
-    auto loaded_critic_params = loaded_critic.lstm->parameters();
+    auto saved_critic_params = saved_critic.rnn->parameters();
+    auto loaded_critic_params = loaded_critic.rnn->parameters();
 
     if (saved_critic_params.size() != loaded_critic_params.size()) {
       std::cerr << "Parameter count mismatch in critic network." << std::endl;
@@ -121,7 +121,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
   std::vector<DataBuffer> data_buffer; /*Initialise data buffer D*/
   Team opponent_team = ComputeOpponentTeam(own_team); /*Get opponent team class*/
-  
+
   torch::Tensor act_prob;
   torch::Tensor action;
   RunState run_state;
@@ -146,41 +146,34 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team, num_actions}));
 
       /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
-      auto [valNetOutput, V_hx, V_cx] = critic.Forward(state, trajectory[timestep-1].hidden_v.ht_p, trajectory[timestep-1].hidden_v.ct_p);
-
+      auto [valNetOutput, V_hx] = critic.Forward(state,trajectory[timestep-1].hidden_v.ht_p);
+      auto actionState = GetActionStates(state);
       /* For each agent in one timestep, get probabilities and hidden states*/
-      for (auto& agent : Models)
-      {
-        auto agent_state = state.clone();
+      for (auto& agent : Models) {
+        auto agent_state = actionState[agent.robotId].clone();
         agent_state.index({0, 0, 0}) = agent.robotId; /*Update the first index value to robot ID*/
 
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-        auto [act_prob, hx_new, ct_new] = agent.policy_network->Forward(
-          agent_state, trajectory[timestep - 1].hidden_p[agent.robotId].ht_p,
-          trajectory[timestep - 1].hidden_p[agent.robotId].ct_p);
+        auto [act_prob, hx_new] = Models[0].policy_network->Forward(agent_state, trajectory[timestep - 1].hidden_p[agent.robotId].ht_p);
 
-        prob_actions_stored.index_put_({agent.robotId}, act_prob[0][0].softmax(0)); /*Store probabilities*/
+        prob_actions_stored.index_put_({agent.robotId}, act_prob); /*Store probabilities*/
 
         /*Save hidden states*/
         new_states.ht_p = hx_new;
-        new_states.ct_p = ct_new;
         exp.hidden_p.push_back(new_states); /*Store hidden states*/
 
       } /*end for agent*/
-
+      auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
       /*Get the actions with the highest probabilities for each agent*/
-      exp.actions = std::get<1>(prob_actions_stored.max(1));
-      //std::cout << prob_actions_stored << std::endl;
+      exp.actions = std::get<1>(prob_actions_stored_softmax.max(1));
       /*
        *Action mask could be implemented here to define legal moves,
        *such as shooting/passing only if player have ball
       */
 
       /*Let agents run for 20 ms until next timestep*/
-      for(int a = 0; a < 20; a++)
-      {
-        SendActions(simulation_interfaces, exp.actions);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      for(int a = 0; a < 1; a++){
+      SendActions(simulation_interfaces,exp.actions);
       }
 
       /* Convert critic value from shape [1, 1] to a value. */
@@ -188,39 +181,37 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
       // TOOD: Fix to use the new state
       /*Update all values*/
-      exp.actions_prob = prob_actions_stored;
+      exp.actions_prob = prob_actions_stored_softmax;
       exp.state = state.clone();
-      exp.critic_value = critic_value;
+      exp.critic_value = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.hidden_v.ht_p = V_hx;
-      exp.hidden_v.ct_p = V_cx;
 
       /*Update state and use it for next itteration*/
       state = GetStates(referee, vision_client, own_team, opponent_team);
 
       /* Get rewards from the actions. */
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 0.0001, 0.0001});
-      assert(exp.rewards.size(0) == amount_of_players_in_team);
+      //assert(exp.rewards.size(0) == amount_of_players_in_team);
       trajectory.push_back(exp); /*Store into trajectories*/
-    
     } /*end for timestep*/
 
     /* Erase initial trajectory (First index in trajectories) */
     trajectory.erase(trajectory.begin());
 
     int32_t trajectory_length = trajectory.size();
-    std::cout << "Trajectory length: " << trajectory_length << std::endl;
+    //std::cout << "Trajectory length: " << trajectory_length << std::endl;
 
     /* Calculate Reward to go */
     torch::Tensor reward_to_go = torch::zeros({amount_of_players_in_team, trajectory_length});
     torch::Tensor rewards = torch::zeros({amount_of_players_in_team, trajectory_length});
-    for (int32_t a = 0; a < amount_of_players_in_team; a++)
+    for (int32_t a = 0; a < 2; a++)
     {
       for (int32_t t = 0; t < trajectory_length; t++)
       {
         assert(trajectory[t].rewards.size(0) == amount_of_players_in_team);
         rewards[a][t] = trajectory[t].rewards[a];
       }
- 
+
       reward_to_go[a] = ComputeRewardToGo(rewards[a], 0.99);
       assert(reward_to_go.size(0) == amount_of_players_in_team);
       assert(reward_to_go.size(1) == trajectory_length);
@@ -230,7 +221,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
     torch::Tensor critic_values = torch::zeros(trajectory_length);
     for (int32_t t = 0; t < trajectory_length; t++)
     {
-      critic_values[t] = trajectory[t].critic_value;
+      critic_values[t] = trajectory[t].critic_value[0];
     }
 
     torch::Tensor temporal_difference = ComputeTemporalDifference(critic_values, rewards, 0.99);
@@ -279,7 +270,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
   }/*end for batch_size*/
 
-  std::cout << "Returning data buffer " << " Size: " << data_buffer.size() << std::endl;
+  //std::cout << "Returning data buffer " << " Size: " << data_buffer.size() << std::endl;
   return data_buffer;
 }
 
@@ -289,8 +280,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
   * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
   * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
   */
-void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vector<DataBuffer> data_buffer)
-{
+void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vector<DataBuffer> data_buffer){
 
   /* Total number of chunks in D. */
   int data_buffer_size = data_buffer.size();
@@ -344,21 +334,21 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
         for(int agent = 0; agent < amount_of_players_in_team; agent++)
         {
           c0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ct_p.squeeze();
-          h0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ht_p.squeeze(); 
+          h0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ht_p.squeeze();
         }
     }
 
     for(int agent = 0; agent < amount_of_players_in_team; agent++)
     {
       auto model = Models[agent];
-      
+
       for (int c = 0; c < num_chunks; c++)
       {
         input[0][c][0] = model.robotId;
       }
 
       /*Update the policy networks hidden states */
-      model.policy_network->Forward(input, h0_policy[agent], c0_policy[agent]);
+      model.policy_network->Forward(input, h0_policy[agent]);
     }
 
     /*Update the critic networks hidden states */
@@ -370,7 +360,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
       }
     }
 
-    critic.Forward(input, c0_critic, h0_critic);
+    critic.Forward(input,h0_critic);
 
     /* Push chunk to min batch. */
     for (int c = 0; c < num_chunks; c++)
@@ -379,7 +369,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
     }
   }
 
-  std::cout << "Convert mini batch to tensors" << std::endl;
+  //std::cout << "Convert mini batch to tensors" << std::endl;
 
   /*Create the arrays fit update functions. */
   int num_chunks = mini_batch.size();
@@ -421,7 +411,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   {
     auto batch = mini_batch[c];
 
-    std::cout << "Batch " << c <<  " size: " << batch.t.size() << std::endl;
+    //std::cout << "Batch " << c <<  " size: " << batch.t.size() << std::endl;
 
     for (int32_t j = 0; j < amount_of_players_in_team; j++)
     {
@@ -430,12 +420,12 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
         auto state = batch.t[t].state; /*Get saved state for critic*/
         auto hs_c = batch.t[t].hidden_v.ht_p; /*Get hidden state for critic*/
         auto mc_c = batch.t[t].hidden_v.ct_p; /*Get memory cell for critic*/
-        auto old_ci = old_net_critic.Forward(state,hs_c,mc_c); /*Get predictions from old critic network*/
+        auto old_ci = old_net_critic.Forward(state,hs_c); /*Get predictions from old critic network*/
 
         old_predicts_c[c][t] = std::get<0>(old_ci).squeeze(); /*Array needs to be same value for all agents*/
-        new_predicts_c[c][t] = batch.t[t].critic_value;
+        new_predicts_c[c][t] = batch.t[t].critic_value[0];
 
-        std::cout << "Reward to go size: " << reward_to_go.sizes() << "Batch R: " << batch.R.sizes() << std::endl;
+        //std::cout << "Reward to go size: " << reward_to_go.sizes() << "Batch R: " << batch.R.sizes() << std::endl;
         assert(reward_to_go.size(1) == batch.R.size(0));
         assert(reward_to_go.size(2) == batch.R.size(1));
         reward_to_go[c][j] = batch.R[j]; /*Store Reward To Go*/
@@ -446,7 +436,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
 
         auto agent_state = state.clone();
         agent_state.index({0, 0, 0}) = j; /*Update the first index value to robot ID*/
-        auto old_pi = old_net[j].policy_network->Forward(agent_state, hs_p, mc_p); /*Make prediction from the agents old network*/
+        auto old_pi = old_net[j].policy_network->Forward(agent_state, hs_p); /*Make prediction from the agents old network*/
 
         /*Save new and old predicts for each agent*/
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze(); /*Output from old_net*/
@@ -482,6 +472,8 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   /*save updated models of all networks(Policy and Critic)*/
   SaveModels(Models,critic);
 
+
+  std::cout << "Old net validation: " << std::endl;
   /*This should be false after updateNets() if networks were updated correctly*/
   CheckModelParametersMatch(old_net, Models, old_net_critic, critic);
 

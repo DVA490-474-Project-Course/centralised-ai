@@ -38,8 +38,29 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     }
 }
 
-  torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
-  {
+std::vector<torch::Tensor> GetActionStates(torch::Tensor state) {
+
+std::vector<torch::Tensor> actionstate;
+torch::Tensor vector = state.clone().squeeze();
+torch::Tensor state_read = state.clone().squeeze();
+
+vector = vector.view({1, 1, input_size});
+actionstate.push_back(vector);
+
+vector = state.clone().squeeze();
+vector[3] = state_read[5];
+vector[4] = state_read[6];
+vector[5] = state_read[3];
+vector[6] = state_read[4];
+vector = vector.view({1, 1, input_size});
+actionstate.push_back(vector);
+
+return actionstate;
+
+}
+
+torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
+{
     vision_client.ReceivePacketsUntilAllDataRead();
     referee.AnalyzeGameState();
 

@@ -44,13 +44,12 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork()
   : num_layers(1),
   output_size(num_actions),
-  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
+  rnn(torch::nn::RNNOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
   output_layer(torch::nn::Linear(hidden_size, output_size)) {
 
-  register_module("lstm", lstm);
+  register_module("rnn", rnn);
   register_module("output_layer", output_layer);
-
-  for (const auto& param : lstm->named_parameters()) {
+  for (const auto& param : rnn->named_parameters()) {
     std::cout << param.key() << std::endl;  // Print the parameter names
 
     if (param.key() == "weight_ih_l0") {
@@ -65,30 +64,28 @@ PolicyNetwork::PolicyNetwork()
   }
 }
 
-std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
+std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
   torch::Tensor input,
-  torch::Tensor hx,
-  torch::Tensor cx)
+  torch::Tensor hx)
   {
-  auto hidden_states = std::make_tuple(hx, cx);
-  auto lstm_output = lstm->forward(input, hidden_states);
+  auto hidden_states = std::make_tuple(hx);
+  auto lstm_output = rnn->forward(input, hx);
   auto val = std::get<0>(lstm_output);
-  auto hx_new = std::get<0>(std::get<1>(lstm_output));
-  auto cx_new = std::get<1>(std::get<1>(lstm_output));
-
+  auto hx_new = std::get<1>(lstm_output);
+  //auto cx_new = std::get<1>(std::get<1>(lstm_output));
   auto value = output_layer(val); // Apply softmax on the last dimension
-  return std::make_tuple(value, hx_new, cx_new);
+  return std::make_tuple(value,hx_new);
 }
 
 CriticNetwork::CriticNetwork():
   num_layers(1),
-  lstm(torch::nn::LSTMOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
+  rnn(torch::nn::RNNOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
   value_layer(torch::nn::Linear(hidden_size, 1)) {
 
-  register_module("lstm", lstm);
+  register_module("lstm", rnn);
   register_module("value_layer", value_layer);
 
-  for (const auto& param : lstm->named_parameters()) {
+  for (const auto& param : rnn->named_parameters()) {
     std::cout << param.key() << std::endl;  // Print the parameter names
 
     if (param.key() == "weight_ih_l0") {
@@ -103,21 +100,19 @@ CriticNetwork::CriticNetwork():
   }
 }
 
-std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> CriticNetwork::Forward(
+std::tuple<torch::Tensor, torch::Tensor> CriticNetwork::Forward(
   torch::Tensor input,
-  torch::Tensor hx,
-  torch::Tensor cx) {
+  torch::Tensor hx){
 
-  auto hidden_states = std::make_tuple(hx, cx);
-  auto lstm_output = lstm->forward(input, hidden_states);
+  auto hidden_states = std::make_tuple(hx);
+  auto lstm_output = rnn->forward(input, hx);
   auto val = std::get<0>(lstm_output);
-  auto hx_new = std::get<0>(std::get<1>(lstm_output));
-  auto cx_new = std::get<1>(std::get<1>(lstm_output));
+  auto hx_new = std::get<1>(lstm_output);
 
   val = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
   auto value = value_layer(val);
 
-  return std::make_tuple(value, hx_new, cx_new);
+  return std::make_tuple(value, hx_new);
 }
 
 
@@ -125,7 +120,7 @@ std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
   std::vector<Agents> robots;
   for (int i = 0; i < amount_of_players_in_team; i++) {
     auto model = std::make_shared<PolicyNetwork>();
-    model->lstm->reset_parameters();
+    model->rnn->reset_parameters();
     robots.emplace_back(i, model);
   }
   return robots;
@@ -277,12 +272,11 @@ void UpdateNets(std::vector<Agents>& agents,
 
   // Set up Adam options
   torch::optim::AdamOptions adam_options;
-  adam_options.lr(1e-4);  // Learning rate
-  adam_options.betas(std::make_tuple(0.9, 0.999));  // Betas
+  adam_options.lr(5e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 
-  torch::optim::Adam opts({agents[0].policy_network->parameters(),agents[1].policy_network->parameters()},
+  torch::optim::Adam opts({agents[0].policy_network->parameters()},
                             adam_options);
   // Zero the gradients before the backward pass
   opts.zero_grad();
@@ -291,15 +285,18 @@ void UpdateNets(std::vector<Agents>& agents,
   pol_loss.requires_grad_();
   pol_loss.backward({},true);
 
+  torch::nn::utils::clip_grad_norm_(agents[0].policy_network->parameters(), 0.5);
+
   // Update the policy network for the current agent
   opts.step();
+
   /*Update critic network*/
-  critic.train();
   torch::optim::Adam critnet(critic.parameters(), adam_options);
   // Ensure that the critic loss requires gradients
   critnet.zero_grad();
   cri_loss.requires_grad_();
   cri_loss.backward();
+  torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
   critnet.step();
 
 

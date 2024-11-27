@@ -39,10 +39,9 @@ namespace collective_robot_behaviour
         }
 
         //std::cout << angles_to_ball << std::endl;
-        
+
         return angles_to_ball;
     }
-
     torch::Tensor RunState::ComputeActionMasks(const torch::Tensor & states)
     {
         return torch::ones({6, 10});
