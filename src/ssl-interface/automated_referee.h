@@ -12,7 +12,7 @@
 #define AUTOMATED_REFEREE_H
 
 /* C++ standard library headers */
-#include <string>
+#include "string"
 
 /* Project .h files */
 #include "ssl_vision_client.h"
@@ -85,65 +85,74 @@ public:
   void Print();
 
   /*!
-    * @brief @return the referee command.
+    * @brief Returns the referee command.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
+    *
+    * @return the referee command.
     */
   enum RefereeCommand GetRefereeCommand();
 
   /*!
-    * @brief @return the blue team score.
-    * 
+    * @brief Returns the blue team score.
+    *
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
+    *
+    * @return The score of the blue team.
     */
   int GetBlueTeamScore();
 
   /*!
-    * @brief @return the yellow team score.
-    * 
+    * @brief Returns the yellow team score.
+    *
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * beforehand.
+    *
+    * @return The score of the yellow team.
     */
   int GetYellowTeamScore();
 
   /*!
-    * @brief @return the X coordinate of the ball designated position.
-    * 
-    * @return the X coordinate in mm of the ball designated position. This value is
+    * @brief Returns the X coordinate of the ball designated position.This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
-    * 
+    *
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
+    *
+    * @return the X coordinate in mm of the ball designated position.
     */
   float GetBallDesignatedPositionX();
 
   /*!
-    * @brief @return the Y coordinate of the ball designated position.
-    * 
-    * @return the Y coordinate in mm of the ball designated position. This value is
+    * @brief Returns the Y coordinate of the ball designated position.This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
     * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
+    *
+    * @return the Y coordinate in mm of the ball designated position.
     */
   float GetBallDesignatedPositionY();
 
   /*!
-    * @brief @return the team that has been assigned to the positive half of the field.
-    * 
+    * @brief Returns the team that has been assigned to the positive half of the field.
+    *
+    * @return The team assigned to the positive half of the field. Returns `kUnknown`
+    * if no team is assigned to the positive half.
+    *
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
     */
   enum Team TeamOnPositiveHalf();
 
   /*!
-    * @brief @return the remaining stage time left.
+    * @brief Returns the remaining stage time left.
     * 
     * @return the remaining stage time left in seconds. If the stage time is passed
     * this value become negative.
@@ -154,7 +163,7 @@ public:
   int64_t GetStageTimeLeft();
 
   /*!
-    * @brief @return true if the specified robot is currently touching the ball.
+    * @brief Returns true if the specified robot is currently touching the ball.
     * 
     * @return true if the robot with the given id and team is currently touching
     * the ball.
@@ -179,7 +188,7 @@ protected:
   };
 
   /*********************/
-  /* Private variables */
+  /* Protected variables */
   /*********************/
 
   /*!
@@ -201,7 +210,7 @@ protected:
     * @brief distance in mm between robot and ball within which they are considered
     * to be touching each other.
     */
-  float collision_margin = 12;
+  static constexpr float collision_margin = 12;
 
   /*!
     * @brief Time in seconds that the commands PREPARE_KICKOFF_BLUE/YELLOW should
@@ -265,50 +274,109 @@ protected:
     */
   enum Team team_on_positive_half;
 
+  /*!
+    * @brief Indicates positive half X-coordinate for goal.
+    */
+  float goal_x_positive_half = 4500;
+
+  /*!
+    * @brief Indicates negative half X-coordinate for goal.
+    */
+  float goal_x_negative_half = -4500;
+
+  /*!
+    * @brief Indicates minimum Y-coordinate for goal width.
+    */
+  static constexpr float goal_width_min_y = -500;
+
+  /*!
+    * @brief Indicates maximum Y-coordinate for goal width.
+    */
+  static constexpr float goal_width_max_y = 500;
+
+  /*!
+    * @brief Indicates maximum Y-coordinate for ball out of field.
+    */
+  static constexpr float ball_out_of_field_max_y = 3000;
+
+  /*!
+    * @brief Indicates minimum Y-coordinate for ball out of field.
+    */
+  static constexpr float ball_out_of_field_min_y = -3000;
+
   /*******************/
-  /* Private methods */
+  /* Protected methods */
   /*******************/
 
   /*!
-    * @brief @return true if ball is out of field.
+    * @brief Returns true if the ball is out of the field.
+    *
+    * @param[in] ball_x The x-coordinate of the ball's position on the field.
+    * @param[in] ball_y The y-coordinate of the ball's position on the field.
+    *
+    * @return `true` if the ball is out of the field, otherwise `false`.
     */
   bool IsBallOutOfField(float ball_x, float ball_y);
 
   /*!
-    * @brief @return which team is currently touching the ball, @return kUnknown
-    * if no team is currently in contact with the ball.
+    * @brief Returns which team is currently touching the ball.
+    *
+    * @return The team currently touching the ball, or `kUnknown` if no team is in contact.
     */
   enum Team CheckForCollision();
 
   /*!
-    * @brief @return the distance between the specified robot and ball.
+    * @brief Returns the distance between the specified robot and ball.
+    *
+    * @param[in] id The ID of the robot for which the distance is to be calculated.
+    * @param[in] team The team to which the robot belongs.
+    *
+    * @return The distance between the specified robot and the ball.
     */
   float DistanceToBall(int id, enum Team team);
 
   /*!
-    * @brief @return the distance to ball and specified point.
+    * @brief Returns the distance to the ball and specified point.
+    *
+    * @param[in] x The x-coordinate of the specified point.
+    * @param[in] y The y-coordinate of the specified point.
+    *
+    * @return The distance between the ball and the specified point.
     */
   float DistanceToBall(float x, float y);
 
   /*!
-    * @brief @return true when ball is in the goal of the specified team.
+    * @brief Returns true when the ball is in the goal of the specified team.
+    *
+    * @param[in] team The team whose goal is being checked.
+    *
+    * @return True if the ball is in the specified team's goal, otherwise false.
     */
   bool IsBallInGoal(enum Team team);
 
   /*!
-    * @brief @return true when ball is in yellow teams goal.
+    * @brief Returns true when the ball is in the yellow team's goal.
+    *
+    * @param[in] ball_x The x-coordinate of the ball's position.
+    * @param[in] ball_y The y-coordinate of the ball's position.
+    *
+    * @return True if the ball is in the yellow team's goal, otherwise false.
     */
   bool IsBallInYellowGoal(float ball_x, float ball_y);
 
   /*!
-    * @brief Assuming ball is out of field, @return the point of where ball should
-    * be placed for freekick/cornerkick.
+    * @brief Assuming the ball is out of field, calculates the point where the ball
+    * should be placed for a free kick or corner kick.
+    *
+    * @return The point where the ball should be placed for the free kick or corner kick.
     */
   struct Point CalcBallDesignatedPosition();
 
   /*!
-    * @brief @return true when ball is considered 'successfully placed' according
-    * to ssl rules
+    * @brief Returns true when the ball is considered 'successfully placed'
+    * according to SSL rules.
+    *
+    * @return True if the ball is successfully placed, false otherwise.
     */
   bool BallSuccessfullyPlaced();
 

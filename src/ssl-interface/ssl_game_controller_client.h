@@ -12,10 +12,10 @@
 #define CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_
 
 /* C system headers */
-#include <arpa/inet.h>
+#include "arpa/inet.h"
 
 /* C++ standard library headers */
-#include <string> 
+#include "string"
 
 /* Project .h files */
 #include "../ssl-interface/generated/ssl_gc_referee_message.pb.h"
@@ -107,8 +107,8 @@ public:
 
   /*!
     * @brief Returns the X coordinate of the ball designated position.
-    * 
-    * Returns the X coordinate in mm of the ball designated position. This value is
+    *
+    * @return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -120,8 +120,8 @@ public:
 
   /*!
     * @brief Returns the Y coordinate of the ball designated position.
-    * 
-    * Returns the X coordinate in mm of the ball designated position. This value is
+    *
+    * @return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -135,8 +135,8 @@ public:
     * @brief Returns the remaining stage time left.
     * 
     * Returns the remaining stage time left in seconds. If the stage time is passed
-    * this value becomed negative.
-    * 
+    * this value becomes negative.
+    *
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
     */
@@ -151,24 +151,89 @@ public:
   enum Team GetTeamOnPositiveHalf();
   virtual ~GameControllerClient() = default;
 
-  /* enum RefereeCommand GetNextRefereeCommand(); */
+  /*!
+   * @brief Retrieve the next referee command.
+   *
+   * @pre In order to have the data available ReceivePacket() needs to be called
+   * beforehand.
+   */
+  enum RefereeCommand GetNextRefereeCommand();
 
 protected:
-  /* Helper methods */
+
+  /*!
+    * @brief Convert RefereeCommand enum to a corresponding string representation.
+    *
+    * @param referee_command The `RefereeCommand` enum value to convert.
+    *
+    * @return A string representing the `RefereeCommand` enum.
+    */
+  std::string RefereeCommandToString(enum RefereeCommand referee_command);
+
+  /*!
+    * @brief Read and store the relevant game state data from the Referee packet.
+    *
+    * @param packet The `Referee` packet containing game state information to be processed.
+    */
   void ReadGameStateData(Referee packet);
 
-  /* Network variables */
+  /*!
+    * @brief Convert a Protobuf `Referee_Command` enum to the project-specific `RefereeCommand` enum.
+    *
+    * @param command The Protobuf `Referee_Command` enum value to be converted.
+    *
+    * @return The corresponding `RefereeCommand` enum value.
+    */
+  enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command);
+
+  /*!
+    * @brief The sockaddr_in structure used to store the client's address.
+    */
   sockaddr_in client_address;
+
+  /*!
+    * @brief The socket descriptor used for UDP communication.
+    */
   int socket;
 
-  /* Game state data */
+  /*!
+    * @brief Current command received from the referee.
+    */
   enum RefereeCommand referee_command;
+
+  /*!
+    * @brief The next referee command in the game.
+    */
   enum RefereeCommand next_referee_command;
+
+  /*!
+    * @brief Blue team's score.
+    */
   int blue_team_score;
+
+  /*!
+    * @brief Yellow team's score.
+    */
   int yellow_team_score;
+
+  /*!
+    * @brief Remaining stage time.
+    */
   int64_t stage_time_left;
+
+  /*!
+    * @brief X coordinate of the ball's designated position.
+    */
   float ball_designated_position_x;
+
+  /*!
+    * @brief X coordinate of the ball's designated position.
+    */
   float ball_designated_position_y;
+
+  /*!
+    * @brief The team currently on the positive half of the field.
+    */
   enum Team team_on_positive_half;
 };
 

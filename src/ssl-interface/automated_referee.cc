@@ -12,10 +12,10 @@
 #include "automated_referee.h"
 
 /* C++ standard library headers */
-#include <cmath>
+#include "cmath"
 #include <cstdlib>
-#include <iostream>
-#include <string>
+#include "iostream"
+#include "string"
 
 /* Project .h files */
 #include "../ssl-interface/referee_command_functions.h"
@@ -197,24 +197,28 @@ bool AutomatedReferee::IsBallInGoal(enum Team team)
 
   if (team_on_positive_half == team)
   {
-    return (ball_x > 4500 && ball_y > -500 && ball_y < 500);
+    return (ball_x > goal_x_positive_half && ball_y > goal_width_min_y
+        && ball_y < goal_width_max_y);
   }
   else
   {
-    return (ball_x < -4500 && ball_y > -500 && ball_y < 500);
+    return (ball_x < goal_x_negative_half && ball_y > goal_width_min_y
+        && ball_y < goal_width_max_y);
   }
 }
 
 /* Returns true if ball is in yellow teams goal */
 bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y)
 {
-  return (ball_x < -4500 && ball_y > -500 && ball_y < 500);
+  return (ball_x < goal_x_negative_half && ball_y > goal_width_min_y &&
+      ball_y < goal_width_max_y);
 }
 
 /* Check if the ball has gone out of field */
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
 {
-  return (ball_x > 4500 || ball_x < -4500 || ball_y > 3000 || ball_y < -3000);
+  return (ball_x > goal_x_positive_half || ball_x < goal_x_negative_half
+      || ball_y > ball_out_of_field_max_y || ball_y < ball_out_of_field_min_y);
 }
 
 /* Returns true if the specified robot is currently touching the ball */
