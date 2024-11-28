@@ -47,9 +47,9 @@ class AutomatedRefereeDerived : public centralised_ai::ssl_interface::AutomatedR
 {
 public:
   AutomatedRefereeDerived(ssl_interface::VisionClient & vision_client, std::string ip, int port) : AutomatedReferee(vision_client, ip, port) {}
-  void SetRefereeCommand(centralised_ai::RefereeCommand command) {referee_command = command;}
-  void SetBlueTeamScore(int score) {blue_team_score = score;}
-  void SetYellowTeamScore(int score) {yellow_team_score = score;}
+  void SetRefereeCommand(centralised_ai::RefereeCommand command) {referee_command_ = command;}
+  void SetBlueTeamScore(int score) {blue_team_score_ = score;}
+  void SetYellowTeamScore(int score) {yellow_team_score_ = score;}
 };
 
 /* Sets all robot and ball posiitons to zero */
