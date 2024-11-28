@@ -76,7 +76,7 @@ namespace collective_robot_behaviour
         //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
         //std::cout << "Angle to ball reward: " << angle_to_ball_reward << std::endl;
         //std::cout << "states: " << states << std::endl;
-        return angle_to_ball_reward;
+        return angle_to_ball_reward+distance_to_ball_reward;
     }
 }
 }

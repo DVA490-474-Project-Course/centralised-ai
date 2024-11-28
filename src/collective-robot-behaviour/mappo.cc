@@ -153,6 +153,9 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
         auto agent_state = actionState[agent.robotId].clone();
         agent_state.index({0, 0, 0}) = agent.robotId; /*Update the first index value to robot ID*/
 
+
+        //std::cout << trajectory[timestep - 1].hidden_p[agent.robotId].ht_p  << std::endl;
+
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
         auto [act_prob, hx_new] = Models[0].policy_network->Forward(agent_state, trajectory[timestep - 1].hidden_p[agent.robotId].ht_p);
 
@@ -164,6 +167,9 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
       } /*end for agent*/
       auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
+
+      //std::cout << prob_actions_stored_softmax << std::endl;
+      std::cout << prob_actions_stored << std::endl;
       /*Get the actions with the highest probabilities for each agent*/
       exp.actions = std::get<1>(prob_actions_stored_softmax.max(1));
       /*
@@ -309,58 +315,60 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
     /* Create state tensor for the batch of all sequences. */
     int num_chunks = chunks.size();
     int num_layers = 1;
-    torch::Tensor input = torch::zeros({max_timesteps, num_chunks, input_size}); /* [sequence_len, batch_size, input_size] */
+    torch::Tensor input = torch::zeros({num_chunks,10,input_size}); /* [sequence_len, batch_size, input_size] */
     /* Create hidden state and cell state tensors for all agents. */
-    torch::Tensor c0_policy = torch::zeros({amount_of_players_in_team, num_layers, num_chunks, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
-    torch::Tensor c0_critic = torch::zeros({num_layers, num_chunks, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
-    torch::Tensor h0_critic = torch::zeros({num_layers, num_chunks, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
-    torch::Tensor h0_policy = torch::zeros({amount_of_players_in_team, num_layers, num_chunks, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
-
+    torch::Tensor h0_critic = torch::zeros({num_chunks,1, 1, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
+    torch::Tensor h0_policy = torch::zeros({num_chunks,1,amount_of_players_in_team, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
+    int num_time_steps =chunks[0].t.size();
     /* For each chunk in the mini batch, update hidden states from first hidden state. */
-    for (int c = 0; c < chunks.size(); c++)
+    for (int c = 0; c < num_chunks; c++)
     {
         auto chunk = chunks[c];
 
-        int num_time_steps = chunk.t.size();
-
-        c0_critic[0][c] = chunk.t[0].hidden_v.ct_p.squeeze();
-        h0_critic[0][c] = chunk.t[0].hidden_v.ht_p.squeeze();
+        h0_critic[c] = chunk.t[0].hidden_v.ht_p;
 
         for (int t = 0; t < num_time_steps; t++)
         {
-          input[t][c] = chunk.t[t].state.squeeze();
+          input[c][t] = chunk.t[t].state.squeeze();
         }
 
         for(int agent = 0; agent < amount_of_players_in_team; agent++)
         {
-          c0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ct_p.squeeze();
-          h0_policy[agent][0][c] = chunk.t[0].hidden_p[agent].ht_p.squeeze();
+          h0_policy[c][0][agent]= chunk.t[0].hidden_p[agent].ht_p.squeeze();
         }
     }
 
-    for(int agent = 0; agent < amount_of_players_in_team; agent++)
-    {
-      auto model = Models[agent];
+    /*Policy Network update by batch*/
+    for (int c = 0; c < num_chunks; c++){
+    auto h0_p = h0_policy[c]; /*Get first hidden state in new chunk*/
+    for (int t = 0; t < chunks[c].t.size(); t++){
+      /*Get observation states for policy network*/
+      auto state_action = GetActionStates(input[c][t].view({1, 1,input_size}));
+      auto input_state = torch::empty({1,amount_of_players_in_team,input_size});
 
-      for (int c = 0; c < num_chunks; c++)
-      {
-        input[0][c][0] = model.robotId;
+      for (int a = 0; a < amount_of_players_in_team; a++) {
+
+        state_action[0][0][0][0]  = a;
+        input_state[0][a] = state_action[a].squeeze();
       }
-
       /*Update the policy networks hidden states */
-      model.policy_network->Forward(input, h0_policy[agent]);
+      auto [pred,hx_new] = Models[0].policy_network->Forward(input_state, h0_p);
+      h0_p = hx_new;
+    }
     }
 
-    /*Update the critic networks hidden states */
-    for (int c = 0; c < num_chunks; c++)
-    {
-      for (int t = 0; t < max_timesteps; t++)
-      {
-        input[t][c][0] = -1;
+    /*Critic Network update by batch*/
+    /*Read each chunk*/
+    for (int c = 0; c < num_chunks; c++) {
+      auto h0_c = h0_critic[c]; /*Get first hidden state in new chunk*/
+      /*Read each timestep in chunk*/
+      for (int t = 0; t < chunks[c].t.size(); t++){
+        input[c][t][0] = -1;
+
+        auto[pred,h0_new] =critic.Forward(input[c][t].view({1,1,input_size}),h0_c);
+        h0_c = h0_new;
       }
     }
-
-    critic.Forward(input,h0_critic);
 
     /* Push chunk to min batch. */
     for (int c = 0; c < num_chunks; c++)
@@ -406,6 +414,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   assert(reward_to_go.size(1) == amount_of_players_in_team);
   assert(reward_to_go.size(2) == num_time_steps);
 
+
   /*Configure arrays from min_batch to fit into later functions*/
   for (int c = 0; c < num_chunks; c++) /* For each chunk in mini batch. */
   {
@@ -440,6 +449,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
 
         /*Save new and old predicts for each agent*/
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze(); /*Output from old_net*/
+        output_old_p =  torch::softmax(output_old_p,0);
         auto act = batch.t[t].actions[j].item<int>(); /*action did in the recorded timestep*/
         old_predicts_p[c][j][t] = output_old_p[act]; /*Save prediction of the old networks probability of agents done action in the timestep*/
         new_predicts_p[c][j][t] = batch.t[t].actions_prob[j][act]; /*Save stored prediction of the action*/
@@ -464,8 +474,8 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   torch::Tensor policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.9);
   torch::Tensor probability_ratios = ComputeProbabilityRatio(new_predicts_p, old_predicts_p);
 
-  torch::Tensor policy_loss = -ComputePolicyLoss(gae, probability_ratios, 0.2, policy_entropy);
-  torch::Tensor critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c, reward_to_go, 0.2);
+  torch::Tensor policy_loss = -ComputePolicyLoss(gae, probability_ratios, 1, policy_entropy);
+  torch::Tensor critic_loss = ComputeCriticLoss(new_predicts_c, old_predicts_c, reward_to_go, 1);
 
   UpdateNets(Models, critic, policy_loss, critic_loss);
 

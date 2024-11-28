@@ -150,38 +150,29 @@ torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface
   }
 
   void SendActions(std::vector<robot_controller_interface::simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids)
+{
+  for (int32_t i = 0; i < action_ids.size(0); i++)
   {
-    for (int32_t i = 0; i < action_ids.size(0); i++)
+    // 0: Stop, 1: Forward, 2: Backward
+    switch (action_ids[i].item<int>())
     {
-      // 0: Stop, 1: Forward, 2: Backward
-      switch (action_ids[i].item<int>())
-      {
       case 0:
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
-        break;
+      break;
       case 1:
-        /* Rotate left. */
-        robot_interfaces[i].SetVelocity(-3.0F, -3.0F, 3.0F, 3.0F);
-        break;
+        robot_interfaces[i].SetVelocity(1.5F, 0.0F, 0.0F);
+      break;
       case 2:
-        /* Rotate right. */
-        robot_interfaces[i].SetVelocity(3.0F, 3.0F, -3.0F, -3.0F);
-        break;
-      case 3:
         /* Rotate left. */
-        robot_interfaces[i].SetVelocity(-5.0F, -5.0F, 5.0F, 5.0F);
-        break;
-      case 4:
-        /* Rotate right. */
-        robot_interfaces[i].SetVelocity(5.0F, 5.0F, -5.0F, -5.0F);
-        break;
+        robot_interfaces[i].SetVelocity(0.50F, 0.50F, -0.50F, -5.0F);
+      break;
       default:
         break;
-      }
-
-      robot_interfaces[i].SendPacket();
     }
+
+    robot_interfaces[i].SendPacket();
   }
+}
 
 
 }/* namespace centralised_ai */

@@ -44,14 +44,16 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork()
   : num_layers(1),
   output_size(num_actions),
-  rnn(torch::nn::RNNOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
+  rnn(torch::nn::GRUOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
+  norm(torch::nn::LayerNormOptions({input_size})),  // Normalize input
   output_layer(torch::nn::Linear(hidden_size, output_size)) {
 
+  register_module("norm", norm);
   register_module("rnn", rnn);
   register_module("output_layer", output_layer);
+
   for (const auto& param : rnn->named_parameters()) {
     std::cout << param.key() << std::endl;  // Print the parameter names
-
     if (param.key() == "weight_ih_l0") {
       torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
     } else if (param.key() == "weight_hh_l0") {
@@ -64,56 +66,65 @@ PolicyNetwork::PolicyNetwork()
   }
 }
 
-std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
-  torch::Tensor input,
-  torch::Tensor hx)
-  {
-  auto hidden_states = std::make_tuple(hx);
-  auto lstm_output = rnn->forward(input, hx);
-  auto val = std::get<0>(lstm_output);
-  auto hx_new = std::get<1>(lstm_output);
-  //auto cx_new = std::get<1>(std::get<1>(lstm_output));
-  auto value = output_layer(val); // Apply softmax on the last dimension
-  return std::make_tuple(value,hx_new);
+  std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
+      torch::Tensor input,
+      torch::Tensor hx) {
+
+  auto normalized_x = norm->forward(input);  // Normalize input
+
+  auto lstm_output = rnn->forward(normalized_x, hx);  // GRU forward pass
+  auto h = std::get<1>(lstm_output);                 // Extract hidden state
+  auto lstm_pred = std::get<0>(lstm_output);         // Extract output
+  auto linear_output = output_layer->forward(lstm_pred);  // Apply linear layer
+  auto activated_output = torch::tanh(linear_output);     // Apply tanh activation
+
+  return std::make_tuple(activated_output, h);  // Return tuple of output and hidden state
 }
 
-CriticNetwork::CriticNetwork():
-  num_layers(1),
-  rnn(torch::nn::RNNOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
-  value_layer(torch::nn::Linear(hidden_size, 1)) {
 
-  register_module("lstm", rnn);
-  register_module("value_layer", value_layer);
+  CriticNetwork::CriticNetwork()
+      : rnn(torch::nn::GRUOptions(input_size, hidden_size).num_layers(1).batch_first(false)),
+        norm(torch::nn::LayerNormOptions({input_size})),  // Normalize input
+        value_layer(torch::nn::Linear(hidden_size, 1)) {   // Single output for value function
+
+  register_module("norm", norm);
+  register_module("rnn", rnn);
+  register_module("output_layer", value_layer);
 
   for (const auto& param : rnn->named_parameters()) {
     std::cout << param.key() << std::endl;  // Print the parameter names
 
-    if (param.key() == "weight_ih_l0") {
+    if (param.key().find("weight_ih") != std::string::npos) {
       torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
-    } else if (param.key() == "weight_hh_l0") {
+    } else if (param.key().find("weight_hh") != std::string::npos) {
       torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
-    } else if (param.key() == "bias_ih_l0") {
+    } else if (param.key().find("bias_ih") != std::string::npos) {
       torch::nn::init::zeros_(param.value());  // Initialize bias to zero
-    } else if (param.key() == "bias_hh_l0") {
+    } else if (param.key().find("bias_hh") != std::string::npos) {
       torch::nn::init::zeros_(param.value());  // Initialize bias to zero
     }
   }
 }
 
-std::tuple<torch::Tensor, torch::Tensor> CriticNetwork::Forward(
-  torch::Tensor input,
-  torch::Tensor hx){
+  std::tuple<torch::Tensor, torch::Tensor> CriticNetwork::Forward(
+      torch::Tensor input,
+      torch::Tensor hx) {
 
-  auto hidden_states = std::make_tuple(hx);
-  auto lstm_output = rnn->forward(input, hx);
-  auto val = std::get<0>(lstm_output);
-  auto hx_new = std::get<1>(lstm_output);
+  auto normalized_x = norm->forward(input);  // Normalize input
 
-  val = val.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
-  auto value = value_layer(val);
+  // Initialize hidden state to zeros if not provided
+  if (hx.sizes().size() == 0) {
+    hx = torch::zeros({rnn->options.num_layers(), input.size(0), hidden_size});
+  }
 
-  return std::make_tuple(value, hx_new);
+  auto lstm_output = rnn->forward(normalized_x, hx);  // GRU forward pass
+  auto h = std::get<1>(lstm_output);                 // Extract hidden state
+  auto lstm_pred = std::get<0>(lstm_output);         // Extract output
+  auto value = value_layer->forward(lstm_pred);  // Linear layer to get state value
+  // No tanh activation here
+  return std::make_tuple(value, h);  // Return value and hidden state
 }
+
 
 
 std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
@@ -272,7 +283,7 @@ void UpdateNets(std::vector<Agents>& agents,
 
   // Set up Adam options
   torch::optim::AdamOptions adam_options;
-  adam_options.lr(5e-4);  // Learning rate
+  adam_options.lr(7e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 

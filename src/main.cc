@@ -30,11 +30,11 @@
 int max_timesteps = 201;
 int steps = 0; /*move into mappo------------------------*/
 int step_max = 0;
-int buffer_length = 2;
-int batch_size = buffer_length * amount_of_players_in_team;
+int buffer_length = 5;
 int amount_of_players_in_team = 2;
+int batch_size = buffer_length * amount_of_players_in_team;
 int input_size = 9;
-int num_actions = 5;
+int num_actions = 3;
 int hidden_size = 64;
 
 std::vector<double> critic_loss;
@@ -67,11 +67,11 @@ void PlotLoss()
 int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
-  critic.rnn->reset_parameters();
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
-  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+   //models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
+ models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
