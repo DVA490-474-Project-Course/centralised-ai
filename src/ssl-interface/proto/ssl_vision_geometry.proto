@@ -139,7 +139,7 @@ message SSLGeometryModels
   optional SSLBallModelChipFixedLoss chip_fixed_loss = 2;
 }
 
-message SSLGeometryData
+message SslGeometryData
 {
   required SSLGeometryFieldSize field = 1;
   repeated SSLGeometryCameraCalibration calib = 2;

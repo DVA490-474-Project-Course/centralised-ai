@@ -12,13 +12,13 @@
 #include "simulation_reset.h"
 
 /* C system headers */
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
+#include "arpa/inet.h"
+#include "netinet/in.h"
+#include "sys/socket.h"
 
 /* C++ standard library headers */
-#include <memory>
-#include <string>
+#include "memory"
+#include "string"
 
 /* Project .h files */
 #include "generated/grsim_commands.pb.h"
@@ -29,9 +29,12 @@ namespace centralised_ai
 namespace ssl_interface
 {
 
-/* Initial position of yellow robots, for blue x values will have opposite sign */
-double initial_position_x[6] = {1.50, 1.50, 1.50, 0.55, 2.50, 3.60};
-double initial_position_y[6] = {1.12, 0.0, -1.12, 0.00, 0.00, 0.00};
+/* Initial positions of robots for both teams.
+ * These are defined globally to avoid redundancy and ensure consistent starting positions for both yellow and blue teams.
+ * For the blue team, the x-values have opposite sign to place them on the opposite side of the field.
+ */
+constexpr double initial_position_x[6] = {1.50, 1.50, 1.50, 0.55, 2.50, 3.60};
+constexpr double initial_position_y[6] = {1.12, 0.0, -1.12, 0.00, 0.00, 0.00};
 
 /* Send a grSim packet with UDP */
 void SendPacket(GrSimPacket packet, std::string ip, uint16_t port)

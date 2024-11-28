@@ -30,41 +30,41 @@ public:
 
   /* Methods to set the position and orientation of robots and the ball */
   void SetBlueRobotPositionX(int id, float value) {
-    blue_robot_positions_x[id] = value;
+    blue_robot_positions_x_[id] = value;
   }
   void SetBlueRobotPositionY(int id, float value) {
-    blue_robot_positions_y[id] = value;
+    blue_robot_positions_y_[id] = value;
   }
   void SetBlueRobotOrientation(int id, float value) {
-    blue_robot_orientations[id] = value;
+    blue_robot_orientations_[id] = value;
   }
   void SetYellowRobotPositionX(int id, float value) {
-    yellow_robot_positions_x[id] = value;
+    yellow_robot_positions_x_[id] = value;
   }
   void SetYellowRobotPositionY(int id, float value) {
-    yellow_robot_positions_y[id] = value;
+    yellow_robot_positions_y_[id] = value;
   }
   void SetYellowRobotOrientation(int id, float value) {
-    yellow_robot_orientations[id] = value;
+    yellow_robot_orientations_[id] = value;
   }
   void SetBallPositionX(float value) {
-    ball_position_x = value;
+    ball_position_x_ = value;
   }
   void SetBallPositionY(float value) {
-    ball_position_y = value;
+    ball_position_y_ = value;
   }
 
   /* Accessors for private members */
-  sockaddr_in& GetClientAddress() { return client_address; }
-  int& GetSocket() { return socket; }
+  sockaddr_in& GetClientAddress() { return client_address_; }
+  int& GetSocket() { return socket_; }
 };
 
 /* Test Fixture */
 class VisionClientDerived : public ::testing::Test {
 protected:
   MockVisionClient mock_client;
-  SSLWrapperPacket dummy_packet;
-  SSLDetectionFrame *detection;
+  SslWrapperPacket dummy_packet;
+  SslDetectionFrame *detection;
 
   VisionClientDerived() : mock_client("127.0.0.1", 10001) {
   detection = dummy_packet.mutable_detection();
@@ -81,7 +81,7 @@ protected:
     detection->set_camera_id(0);      
 
     /* Add a blue robot to the detection frame */
-    SSLDetectionRobot *robot_blue = detection->add_robots_blue();
+    SslDetectionRobot *robot_blue = detection->add_robots_blue();
     robot_blue->set_robot_id(1);
     robot_blue->set_x(50.0f);
     robot_blue->set_y(100.0f);
@@ -93,7 +93,7 @@ protected:
     robot_blue->set_pixel_y(600);
 
     /* Add a ball to the detection frame */
-    SSLDetectionBall *ball = detection->add_balls();
+    SslDetectionBall *ball = detection->add_balls();
     ball->set_x(75.0);
     ball->set_y(150.0);
 
@@ -139,7 +139,7 @@ TEST(VisionClientTest, HandlesEmptyPacket) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create an empty packet */
-  SSLWrapperPacket empty_packet;
+  SslWrapperPacket empty_packet;
 
   /* Serialize the empty packet */
   std::string serialized_data;
@@ -173,8 +173,8 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create a packet with a robot without orientation */
-  SSLWrapperPacket packet;
-  SSLDetectionFrame* detection = packet.mutable_detection();
+  SslWrapperPacket packet;
+  SslDetectionFrame* detection = packet.mutable_detection();
 
   /* Set required fields for the detection frame */
   detection->set_frame_number(1);
@@ -183,7 +183,7 @@ TEST(VisionClientTest, HandlesMissingRobotOrientation) {
   detection->set_camera_id(0);
 
   /* Add a blue robot without setting orientation */
-  SSLDetectionRobot* robot_blue = detection->add_robots_blue();
+  SslDetectionRobot* robot_blue = detection->add_robots_blue();
   robot_blue->set_robot_id(0);
   robot_blue->set_x(50.0f);
   robot_blue->set_y(100.0f);
@@ -223,8 +223,8 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
   MockVisionClient mock_client("127.0.0.1", 10006);
 
   /* Create a packet with multiple robots and a ball */
-  SSLWrapperPacket packet;
-  SSLDetectionFrame* detection = packet.mutable_detection();
+  SslWrapperPacket packet;
+  SslDetectionFrame* detection = packet.mutable_detection();
 
   /* Set required fields for the detection frame*/
   detection->set_frame_number(1);         /* Required frame number*/
@@ -234,7 +234,7 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
 
   /* Add blue robots with different positions and orientations */
   for (int i = 0; i < 6; ++i) {
-    SSLDetectionRobot* robot_blue = detection->add_robots_blue();
+    SslDetectionRobot* robot_blue = detection->add_robots_blue();
     robot_blue->set_robot_id(i);
     robot_blue->set_x(50.0f + i * 10.0f);
     robot_blue->set_y(100.0f + i * 5.0f);
@@ -245,7 +245,7 @@ TEST(VisionClientTest, HandlesMultipleRobotsAndBall) {
   }
 
   /* Add a single ball that is being tracked */
-  SSLDetectionBall* ball_1 = detection->add_balls();
+  SslDetectionBall* ball_1 = detection->add_balls();
   ball_1->set_x(75.0f);
   ball_1->set_y(150.0f);
   ball_1->set_confidence(1.0f);

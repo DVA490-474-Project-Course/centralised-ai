@@ -12,13 +12,13 @@
 #include "ssl_vision_client.h"
 
 /* C system headers */
-#include <arpa/inet.h> 
-#include <netinet/in.h>
-#include <stdio.h>
-#include <sys/socket.h> 
+#include "arpa/inet.h" 
+#include "netinet/in.h"
+#include "stdio.h"
+#include "sys/socket.h" 
 
 /* C++ standard library headers */
-#include <string> 
+#include "string" 
 
 /* Project .h files */
 #include "generated/ssl_vision_detection.pb.h"
@@ -34,26 +34,26 @@ namespace ssl_interface
 VisionClient::VisionClient(std::string ip, int port)
 {
   /* Define client address */
-  client_address.sin_family = AF_INET;
-  client_address.sin_port = htons(port);
-  client_address.sin_addr.s_addr = inet_addr(ip.c_str());
+  client_address_.sin_family = AF_INET;
+  client_address_.sin_port = htons(port);
+  client_address_.sin_addr.s_addr = inet_addr(ip.c_str());
 
   /* Create the client socket */
-  socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+  socket_ = ::socket(AF_INET, SOCK_DGRAM, 0);
      
   /* Bind the socket with the client address */
-  bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
+  bind(socket_, (const struct sockaddr *)&client_address_, sizeof(client_address_));
 }
 
 /* Receive one UDP packet and write the data to the output parameter */
 void VisionClient::ReceivePacket()
 {
-  SSLWrapperPacket packet;
+  SslWrapperPacket packet;
   int message_length;
-  char buffer[max_datagram_size];
+  char buffer[kMaxDatagramSize];
 
   /* Receive raw packet */
-  message_length = recv(socket, (char *)buffer, max_datagram_size, MSG_WAITALL);
+  message_length = recv(socket_, (char *)buffer, kMaxDatagramSize, MSG_WAITALL);
 
   if (message_length > 0)
   {
@@ -71,11 +71,11 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
   bool all_data_has_been_read;
 
   /* Set flags indicating that ball and robot positions have not been read yet */
-  ball_data_read = false;
+  ball_data_read_ = false;
   for (int id = 0; id < team_size; id++)
   {
-    blue_robot_positions_read[id] = false;
-    yellow_robot_positions_read[id] = false;
+    blue_robot_positions_read_[id] = false;
+    yellow_robot_positions_read_[id] = false;
   }
 
   do
@@ -85,9 +85,9 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
 
     for (int id = 0; id < team_size; id++)
     {
-      if (blue_robot_positions_read[id] == false ||
-          yellow_robot_positions_read[id] == false ||
-          ball_data_read == false)
+      if (blue_robot_positions_read_[id] == false ||
+          yellow_robot_positions_read_[id] == false ||
+          ball_data_read_ == false)
       {
         all_data_has_been_read = false;
         break;
@@ -97,11 +97,11 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
   while (all_data_has_been_read == false);
 }
 
-void VisionClient::ReadVisionData(SSLWrapperPacket packet)
+void VisionClient::ReadVisionData(SslWrapperPacket packet)
 {
-  SSLDetectionFrame detection;
-  SSLDetectionRobot robot;
-  SSLDetectionBall ball;
+  SslDetectionFrame detection;
+  SslDetectionRobot robot;
+  SslDetectionBall ball;
   int id;
 
   if (packet.has_detection())
@@ -116,12 +116,12 @@ void VisionClient::ReadVisionData(SSLWrapperPacket packet)
 
       if (id < team_size)
       {
-        blue_robot_positions_x[id] = robot.x();
-        blue_robot_positions_y[id] = robot.y();
+        blue_robot_positions_x_[id] = robot.x();
+        blue_robot_positions_y_[id] = robot.y();
         if (robot.has_orientation())
         {
-          blue_robot_orientations[id] = robot.orientation();
-          blue_robot_positions_read[id] = true;
+          blue_robot_orientations_[id] = robot.orientation();
+          blue_robot_positions_read_[id] = true;
         }
       }
     }
@@ -134,12 +134,12 @@ void VisionClient::ReadVisionData(SSLWrapperPacket packet)
 
       if (id < team_size)
       {
-        yellow_robot_positions_x[id] = robot.x();
-        yellow_robot_positions_y[id] = robot.y();
+        yellow_robot_positions_x_[id] = robot.x();
+        yellow_robot_positions_y_[id] = robot.y();
         if (robot.has_orientation())
         {
-          yellow_robot_orientations[id] = robot.orientation();
-          yellow_robot_positions_read[id] = true;
+          yellow_robot_orientations_[id] = robot.orientation();
+          yellow_robot_positions_read_[id] = true;
         }
       }
     }
@@ -148,14 +148,14 @@ void VisionClient::ReadVisionData(SSLWrapperPacket packet)
     if (detection.balls_size() > 0)
     {
       ball = detection.balls(0);    // Assume only one ball is in play
-      ball_position_x = ball.x();
-      ball_position_y = ball.y();
-      ball_data_read = true;
+      ball_position_x_ = ball.x();
+      ball_position_y_ = ball.y();
+      ball_data_read_ = true;
     }
   }
 
   /* Get timestamp */
-  timestamp = detection.t_capture();
+  timestamp_ = detection.t_capture();
 }
 
 /* Method to print position data, used for debugging/demo */
@@ -164,35 +164,35 @@ void VisionClient::Print()
   for (int id = 0; id < team_size; id++)
   {
     printf("BLUE ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>  ", id,
-      blue_robot_positions_x[id],
-      blue_robot_positions_y[id],
-      blue_robot_orientations[id]);
+        blue_robot_positions_x_[id],
+        blue_robot_positions_y_[id],
+        blue_robot_orientations_[id]);
     printf("YELLOW ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>\n", id,
-      yellow_robot_positions_x[id],
-      yellow_robot_positions_y[id],
-      yellow_robot_orientations[id]);
+        yellow_robot_positions_x_[id],
+        yellow_robot_positions_y_[id],
+        yellow_robot_orientations_[id]);
   }
   
   printf("BALL POS=<%9.2f,%9.2f> TIME=<%f> \n\n",
-    ball_position_x,
-    ball_position_y,
-    timestamp);
+      ball_position_x_,
+      ball_position_y_,
+      timestamp_);
 }
 
 double VisionClient::GetTimestamp()
 {
-  return timestamp;
+  return timestamp_;
 }
 
 float VisionClient::GetRobotPositionX(int id, enum Team team)
 {
   if (team == Team::kBlue)
   {
-    return blue_robot_positions_x[id];
+    return blue_robot_positions_x_[id];
   }
   else if (team == Team::kYellow)
   {
-    return yellow_robot_positions_x[id];
+    return yellow_robot_positions_x_[id];
   }
   else
   {
@@ -205,11 +205,11 @@ float VisionClient::GetRobotPositionY(int id, enum Team team)
 {
   if (team == Team::kBlue)
   {
-    return blue_robot_positions_y[id];
+    return blue_robot_positions_y_[id];
   }
   else if (team == Team::kYellow)
   {
-    return yellow_robot_positions_y[id];
+    return yellow_robot_positions_y_[id];
   }
   else
   {
@@ -222,11 +222,11 @@ float VisionClient::GetRobotOrientation(int id, enum Team team)
 {
   if (team == Team::kBlue)
   {
-    return blue_robot_orientations[id];
+    return blue_robot_orientations_[id];
   }
   else if (team == Team::kYellow)
   {
-    return yellow_robot_orientations[id];
+    return yellow_robot_orientations_[id];
   }
   else
   {
@@ -237,12 +237,12 @@ float VisionClient::GetRobotOrientation(int id, enum Team team)
 
 float VisionClient::GetBallPositionX()
 {
-  return ball_position_x;
+  return ball_position_x_;
 }
 
 float VisionClient::GetBallPositionY()
 {
-  return ball_position_y;
+  return ball_position_y_;
 }
 
 } /* namespace ssl_interface */
