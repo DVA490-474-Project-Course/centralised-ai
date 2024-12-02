@@ -23,7 +23,7 @@
 #include "utils.h"
 #include "run_state.h"
 #include "../simulation-interface/simulation_interface.h"
-#include "config.h"
+#include "../common_types.h"
 
 
 namespace centralised_ai {
@@ -167,7 +167,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       assert(exp.hidden_p.size() == amount_of_players_in_team);
 
       auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
-      std::cout << prob_actions_stored_softmax << std::endl;
+
       /*Get the actions with the highest probabilities for each agent*/
       exp.actions = std::get<1>(prob_actions_stored_softmax.max(1));
       /*
@@ -334,9 +334,6 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
 
         for(int agent = 0; agent < amount_of_players_in_team; agent++)
         {
-          std::cout << h0_policy[c][0] << std::endl;
-          std::cout << chunk.t[0].hidden_p[agent].ht_p.squeeze() << std::endl;
-
           h0_policy[c][0][agent]= chunk.t[0].hidden_p[agent].ht_p.squeeze();
         }
     }
@@ -488,7 +485,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
 
   std::cout << "Old net validation: " << std::endl;
   /*This should be false after updateNets() if networks were updated correctly*/
-  CheckModelParametersMatch(old_net, Models, old_net_critic, critic);
+  //CheckModelParametersMatch(old_net, Models, old_net_critic, critic);
 
   std::cout << "Training of buffer done! " << std::endl;
   std::cout << "Policy loss: " << policy_loss << std::endl;

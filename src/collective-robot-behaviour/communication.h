@@ -16,7 +16,7 @@
 #include "../common_types.h"
 #include "world.h"
 #include <vector>
-#include "config.h"
+#include "../common_types.h"
 
 namespace centralised_ai
 {

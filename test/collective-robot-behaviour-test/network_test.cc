@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <torch/torch.h>
 #include "../../src/collective-robot-behaviour/network.h"
-#include "../../src/collective-robot-behaviour/config.h"
+#include "../../src/common_types.h"
 
 
 namespace centralised_ai

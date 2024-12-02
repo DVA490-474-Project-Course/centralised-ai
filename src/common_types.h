@@ -22,6 +22,53 @@
 namespace centralised_ai
 {
 
+
+/*! 
+ * @brief The maximum number of timesteps for the simulation or training.
+ */
+const int max_timesteps = 201;
+
+/*!
+ * @brief Initial step count, starting from zero.
+ */
+const int steps = 0;
+
+/*!
+ * @brief Maximum steps per episode or iteration.
+ */
+const int step_max = 0;
+
+/*!
+ * @brief Length of the experience replay buffer.
+ */
+const int buffer_length = 2;
+
+/*!
+ * @brief Number of players per team in the simulation or game.
+ */
+const int amount_of_players_in_team = 2;
+
+/*!
+ * @brief Batch size for training, calculated as buffer length multiplied by the number of players in the team.
+ */
+const int batch_size = buffer_length * amount_of_players_in_team;
+
+/*!
+ * @brief Input size for neural networks, typically representing the number of features in the state or observation.
+ */
+const int input_size = 9;
+
+/*!
+ * @brief Number of possible actions each agent can take.
+ */
+const int num_actions = 3;
+
+/*!
+ * @brief Size of the hidden layer in LSTM or RNN-based neural networks.
+ */
+const int hidden_size = 64;
+
+
 /*! 
  * @brief The robot radius in mm.
  */

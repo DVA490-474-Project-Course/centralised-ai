@@ -20,13 +20,13 @@
 #include "simulation-interface/simulation_interface.h"
 
 #include "collective-robot-behaviour/communication.h"
-#include "collective-robot-behaviour/config.h"
+#include "common_types.h"
 
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
 #include <matplotlibcpp.h>
 #include <iostream>
-
+#include "common_types.h"
 
 std::vector<double> critic_loss;
 
@@ -60,7 +60,7 @@ int main() {
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
+   models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
    //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
 
@@ -114,11 +114,11 @@ int main() {
       {
         for (int32_t j = 0; j < databuffer[i].t.size(); j++)
         {
-          mean_reward += databuffer[i].t[j].rewards.sum().div(amount_of_players_in_team).item<float>();
+          mean_reward += databuffer[i].t[j].rewards.sum().div(centralised_ai::amount_of_players_in_team).item<float>();
         }
       }
 
-      mean_reward /= static_cast<float>(max_timesteps);
+      mean_reward /= static_cast<float>(centralised_ai::max_timesteps);
 
       critic_loss.push_back(mean_reward);
       /* Push the mean reward for each time step in the returned epoch. */

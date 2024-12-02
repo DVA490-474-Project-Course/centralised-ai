@@ -12,7 +12,7 @@
 #include <torch/script.h>
 #include "network.h"
 #include "mappo.h"
-#include "config.h"
+#include "../common_types.h"
 
 namespace centralised_ai {
 namespace collective_robot_behaviour{
