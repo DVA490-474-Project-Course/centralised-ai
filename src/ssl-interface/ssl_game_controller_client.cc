@@ -9,13 +9,13 @@
  */
 
 /* Related .h files */
-#include "ssl_game_controller_client.h"
+#include "../ssl-interface/ssl_game_controller_client.h"
 
 /* C system headers */
-#include <arpa/inet.h>
+#include "arpa/inet.h"
 
 /* C++ standard library headers */
-#include <string> 
+#include "string"
 
 /* Project .h files */
 #include "../ssl-interface/referee_command_functions.h"
@@ -39,7 +39,9 @@ GameControllerClient::GameControllerClient(std::string ip, int port)
   socket = ::socket(AF_INET, SOCK_DGRAM, 0);
      
   /* Bind the socket with the client address */
-  bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
+  //bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
+  bind(socket, reinterpret_cast<const struct sockaddr*>(&client_address),
+      sizeof(client_address));
 
   /* Set initial values for game state data */
   referee_command = RefereeCommand::kUnknownCommand;
@@ -60,8 +62,8 @@ void GameControllerClient::ReceivePacket()
   char buffer[max_datagram_size];
 
   /* Receive raw packet */
-  message_length = recv(socket, (char *)buffer, max_datagram_size,  
-              MSG_WAITALL);
+  message_length = recv(socket, buffer,max_datagram_size, MSG_WAITALL);
+
 
   if (message_length > 0)
   {
