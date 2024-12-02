@@ -18,8 +18,8 @@
 #include "string" 
 
 /* Project .h files */
-#include "generated/ssl_vision_detection.pb.h"
-#include "generated/ssl_vision_wrapper.pb.h"
+#include "../ssl-interface/generated/ssl_vision_detection.pb.h"
+#include "../ssl-interface/generated/ssl_vision_wrapper.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
@@ -198,8 +198,21 @@ class VisionClient
    */
   float ball_position_y_;
 
+  /*!
+   * @brief Array indicating whether the position data of each blue
+   * team robot has been read.
+   */
   float blue_robot_positions_read_[team_size];
+
+  /*!
+   * @brief Array indicating whether the position data of each yellow
+   * team robot has been read.
+   */
   float yellow_robot_positions_read_[team_size];
+
+  /*!
+   *@brief Flag indicating whether the ball position data has been read.
+   */
   bool ball_data_read_;
 
   /**************************/

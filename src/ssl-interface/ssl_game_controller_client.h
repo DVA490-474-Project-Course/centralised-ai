@@ -29,7 +29,7 @@ namespace ssl_interface
 /*
  * @brief Max datagram size of received UDP packets
  */
-const int max_datagram_size = 65536;
+const int kMaxDatagramSize = 65536;
 
 /*!
  * @brief Class for communicating with ssl game controller.
@@ -173,53 +173,53 @@ protected:
   /*!
     * @brief The sockaddr_in structure used to store the client's address.
     */
-  sockaddr_in client_address;
+  sockaddr_in client_address_;
 
   /*!
     * @brief The socket descriptor used for UDP communication.
     */
-  int socket;
+  int socket_;
 
   /* Game state data */
   /*!
     * @brief Current command received from the referee.
     */
-  enum RefereeCommand referee_command;
+  enum RefereeCommand referee_command_;
 
   /*!
     * @brief The next referee command in the game.
     */
-  enum RefereeCommand next_referee_command;
+  enum RefereeCommand next_referee_command_;
 
   /*!
     * @brief Blue team's score.
     */
-  int blue_team_score;
+  int blue_team_score_;
 
   /*!
     * @brief Yellow team's score.
     */
-  int yellow_team_score;
+  int yellow_team_score_;
 
   /*!
     * @brief Remaining stage time.
     */
-  int64_t stage_time_left;
+  int64_t stage_time_left_;
 
   /*!
     * @brief X coordinate of the ball's designated position.
     */
-  float ball_designated_position_x;
+  float ball_designated_position_x_;
 
   /*!
     * @brief X coordinate of the ball's designated position.
     */
-  float ball_designated_position_y;
+  float ball_designated_position_y_;
 
     /*!
     * @brief The team currently on the positive half of the field.
     */
-  enum Team team_on_positive_half;
+  enum Team team_on_positive_half_;
 };
 
 } /* namespace ssl_interface */

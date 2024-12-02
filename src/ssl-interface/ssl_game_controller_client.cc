@@ -31,27 +31,27 @@ namespace ssl_interface
 GameControllerClient::GameControllerClient(std::string ip, int port)
 {
   /* Define client address */
-  client_address.sin_family = AF_INET;
-  client_address.sin_port = htons(port);
-  client_address.sin_addr.s_addr = inet_addr(ip.c_str());
+  client_address_.sin_family = AF_INET;
+  client_address_.sin_port = htons(port);
+  client_address_.sin_addr.s_addr = inet_addr(ip.c_str());
 
   /* Create the client socket */
-  socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+  socket_ = ::socket(AF_INET, SOCK_DGRAM, 0);
      
   /* Bind the socket with the client address */
   //bind(socket, (const struct sockaddr *)&client_address, sizeof(client_address));
-  bind(socket, reinterpret_cast<const struct sockaddr*>(&client_address),
-      sizeof(client_address));
+  bind(socket_, reinterpret_cast<const struct sockaddr*>(&client_address_),
+      sizeof(client_address_));
 
   /* Set initial values for game state data */
-  referee_command = RefereeCommand::kUnknownCommand;
-  next_referee_command = RefereeCommand::kUnknownCommand;
-  blue_team_score = 0;
-  yellow_team_score = 0;
-  stage_time_left = 0;
-  ball_designated_position_x = 0.0F;
-  ball_designated_position_y = 0.0F;
-  Team team_on_positive_half = Team::kUnknown;
+  referee_command_ = RefereeCommand::kUnknownCommand;
+  next_referee_command_ = RefereeCommand::kUnknownCommand;
+  blue_team_score_ = 0;
+  yellow_team_score_ = 0;
+  stage_time_left_ = 0;
+  ball_designated_position_x_ = 0.0F;
+  ball_designated_position_y_ = 0.0F;
+  Team team_on_positive_half_ = Team::kUnknown;
 }
 
 /* Read a UDP packet from game controller and return the game state */
@@ -59,10 +59,10 @@ void GameControllerClient::ReceivePacket()
 {
   Referee packet;
   int message_length;
-  char buffer[max_datagram_size];
+  char buffer[kMaxDatagramSize];
 
   /* Receive raw packet */
-  message_length = recv(socket, buffer,max_datagram_size, MSG_WAITALL);
+  message_length = recv(socket_, buffer,kMaxDatagramSize, MSG_WAITALL);
 
 
   if (message_length > 0)
@@ -78,61 +78,76 @@ void GameControllerClient::ReceivePacket()
 /* Read and store the data we are interested in from the protobuf message */
 void GameControllerClient::ReadGameStateData(Referee packet)
 {
-  referee_command = ConvertRefereeCommand(packet.command());
-  blue_team_score = packet.blue().score();
-  yellow_team_score = packet.yellow().score();
+  referee_command_ = ConvertRefereeCommand(packet.command());
+  blue_team_score_ = packet.blue().score();
+  yellow_team_score_ = packet.yellow().score();
 
   if (packet.has_designated_position())
   {
-    ball_designated_position_x = packet.designated_position().x();
-    ball_designated_position_y = packet.designated_position().y();
+    ball_designated_position_x_ = packet.designated_position().x();
+    ball_designated_position_y_ = packet.designated_position().y();
   }
 
   if (packet.has_blue_team_on_positive_half())
   {
     if (packet.blue_team_on_positive_half())
     {
-      team_on_positive_half = Team::kBlue;
+      team_on_positive_half_ = Team::kBlue;
     }
     else
     {
-      team_on_positive_half = Team::kYellow;
+      team_on_positive_half_ = Team::kYellow;
     }
   }
 
   if (packet.has_next_command())
   {
-    next_referee_command = ConvertRefereeCommand(packet.next_command());
+    next_referee_command_ = ConvertRefereeCommand(packet.next_command());
   }
   else
   {
-    next_referee_command = RefereeCommand::kUnknownCommand;
+    next_referee_command_ = RefereeCommand::kUnknownCommand;
   }
 
   if (packet.has_stage_time_left())
   {
-    stage_time_left = packet.stage_time_left();
+    stage_time_left_ = packet.stage_time_left();
   }
 }
 
 /* Method to print the game state, used for debugging/demo */
 void GameControllerClient::Print()
 {
-  printf("referee command: <%s> next command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
-    RefereeCommandToString(referee_command).c_str(),
-    RefereeCommandToString(next_referee_command).c_str(),
-    blue_team_score, yellow_team_score, ball_designated_position_x, ball_designated_position_y,
-    stage_time_left);
+  printf("referee command: <%s> next command: <%s> score: <%i, %i> designated position <%f, "
+      "%f> stage time left: <%li>\n",
+    RefereeCommandToString(referee_command_).c_str(),
+    RefereeCommandToString(next_referee_command_).c_str(),
+    blue_team_score_, yellow_team_score_, ball_designated_position_x_, ball_designated_position_y_,
+    stage_time_left_);
 }
 
 /* Public getters */
-enum RefereeCommand GameControllerClient::GetRefereeCommand() {return referee_command;}
-int GameControllerClient::GetBlueTeamScore() {return blue_team_score;}
-int GameControllerClient::GetYellowTeamScore() {return yellow_team_score;}
-float GameControllerClient::GetBallDesignatedPositionX() {return ball_designated_position_x;}
-float GameControllerClient::GetBallDesignatedPositionY() {return ball_designated_position_y;}
-int64_t GameControllerClient::GetStageTimeLeft() {return stage_time_left;}
-enum Team GameControllerClient::GetTeamOnPositiveHalf() {return team_on_positive_half;}
+enum RefereeCommand GameControllerClient::GetRefereeCommand() {
+  return referee_command_;
+}
+int GameControllerClient::GetBlueTeamScore() {
+  return blue_team_score_;
+}
+int GameControllerClient::GetYellowTeamScore() {
+  return yellow_team_score_;
+}
+float GameControllerClient::GetBallDesignatedPositionX() {
+  return ball_designated_position_x_;
+}
+float GameControllerClient::GetBallDesignatedPositionY() {
+  return ball_designated_position_y_;
+}
+int64_t GameControllerClient::GetStageTimeLeft() {
+  return stage_time_left_;
+}
+enum Team GameControllerClient::GetTeamOnPositiveHalf() {
+  return team_on_positive_half_;
+}
 /* enum RefereeCommand GameControllerClient::GetNextRefereeCommand() {return next_referee_command;} */
 
 } /* namespace ssl_interface */

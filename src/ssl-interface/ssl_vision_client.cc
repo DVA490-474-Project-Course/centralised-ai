@@ -9,7 +9,7 @@
  */
 
 /* Related .h files */
-#include "ssl_vision_client.h"
+#include "../ssl-interface/ssl_vision_client.h"
 
 /* C system headers */
 #include "arpa/inet.h" 
@@ -21,8 +21,8 @@
 #include "string" 
 
 /* Project .h files */
-#include "generated/ssl_vision_detection.pb.h"
-#include "generated/ssl_vision_wrapper.pb.h"
+#include "../ssl-interface/generated/ssl_vision_detection.pb.h"
+#include "../ssl-interface/generated/ssl_vision_wrapper.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
@@ -42,7 +42,9 @@ VisionClient::VisionClient(std::string ip, int port)
   socket_ = ::socket(AF_INET, SOCK_DGRAM, 0);
      
   /* Bind the socket with the client address */
-  bind(socket_, (const struct sockaddr *)&client_address_, sizeof(client_address_));
+  //bind(socket_, (const struct sockaddr *)&client_address_, sizeof(client_address_));
+  bind(socket_, reinterpret_cast<const struct sockaddr*>(&client_address_),
+      sizeof(client_address_));
 }
 
 /* Receive one UDP packet and write the data to the output parameter */
