@@ -200,9 +200,27 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic);
  */
 std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
 
-
+/*!
+ * @brief Load old network models via the /models/old_agents folder.
+ *
+ * @param[in]  player_count amount of players to load in
+ * @param[in] critic A reference to the CriticNetwork
+ * @param[out] Returns Agent vector of all policy networks for each robot.
+ */
 std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic);
 
+  /*!
+ * @brief Save the old agents models and the critic network in models/old_agents folder.
+ *
+ * This function serializes the parameters of the given agents' policy networks
+ * and the critic network into a file. This allows for the preservation of the
+ * trained models' weights, enabling later recovery or continuation of training.
+ *
+ * @param[in] models A constant reference to a vector of old Agents containing the
+ *               individual agent models to be saved.
+ * @param[in] critic A reference to the old CriticNetwork instance that will also
+ *               be saved along with the agents' models.
+ */
 void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic);
 
 
@@ -213,7 +231,7 @@ void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic);
  * @param[in] critic A reference to the CriticNetwork
  * @param[in] exper_buff experience buffer vector.
  */
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
+void UpdateNets(std::vector<Agents>& agents, CriticNetwork &critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //NETWORK_H

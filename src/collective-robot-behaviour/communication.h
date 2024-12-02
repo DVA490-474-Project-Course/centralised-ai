@@ -16,12 +16,7 @@
 #include "../common_types.h"
 #include "world.h"
 #include <vector>
-
-/*Extern values*/
-extern int input_size;
-extern int num_actions;
-extern int amount_of_players_in_team;
-extern int hidden_size;
+#include "config.h"
 
 namespace centralised_ai
 {

@@ -14,7 +14,7 @@
 /* C++ library */
 #include <tuple>
 #include <vector>
-
+#include "config.h"
 /* PyTorch C++ API library  */
 #include <torch/torch.h>
 
@@ -24,11 +24,7 @@
 #include "../simulation-interface/simulation_interface.h"
 
 /*Configuration values, change in MAPPO.cc if needed*/
-extern  int max_timesteps;
-extern  int steps;
-extern int step_max;
-extern int batch_size;
-extern int amount_of_players_in_team;
+
 namespace centralised_ai {
 namespace collective_robot_behaviour {
  /*!
@@ -51,6 +47,7 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
                                   const std::vector<centralised_ai::collective_robot_behaviour::Agents>& loaded_models,
                                   const centralised_ai::collective_robot_behaviour::CriticNetwork& saved_critic,
                                   const centralised_ai::collective_robot_behaviour::CriticNetwork& loaded_critic);
+
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

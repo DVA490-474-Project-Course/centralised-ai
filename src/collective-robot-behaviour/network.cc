@@ -12,13 +12,7 @@
 #include <torch/script.h>
 #include "network.h"
 #include "mappo.h"
-/*!
-* Configuration values of the networks
-*/
-extern int input_size; // Number of input features
-extern int num_actions;
-extern int amount_of_players_in_team;
-extern int hidden_size;
+#include "config.h"
 
 namespace centralised_ai {
 namespace collective_robot_behaviour{
@@ -53,7 +47,7 @@ PolicyNetwork::PolicyNetwork()
   register_module("output_layer", output_layer);
 
   for (const auto& param : rnn->named_parameters()) {
-    std::cout << param.key() << std::endl;  // Print the parameter names
+    //std::cout << param.key() << std::endl;  // Print the parameter names
     if (param.key() == "weight_ih_l0") {
       torch::nn::init::orthogonal_(param.value());  // Apply orthogonal initialization
     } else if (param.key() == "weight_hh_l0") {
@@ -126,7 +120,6 @@ PolicyNetwork::PolicyNetwork()
 }
 
 
-
 std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
   std::vector<Agents> robots;
   for (int i = 0; i < amount_of_players_in_team; i++) {
@@ -165,7 +158,7 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
   }
 }
 
-  std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
+std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   std::vector<Agents> agents;
 
   /* Load all policy networks and assign to each agent */
@@ -283,7 +276,7 @@ void UpdateNets(std::vector<Agents>& agents,
 
   // Set up Adam options
   torch::optim::AdamOptions adam_options;
-  adam_options.lr(7e-4);  // Learning rate
+  adam_options.lr(5e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 

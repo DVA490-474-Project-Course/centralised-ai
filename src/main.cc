@@ -20,22 +20,13 @@
 #include "simulation-interface/simulation_interface.h"
 
 #include "collective-robot-behaviour/communication.h"
+#include "collective-robot-behaviour/config.h"
 
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
 #include <matplotlibcpp.h>
 #include <iostream>
 
-/*Configuration values*/
-int max_timesteps = 201;
-int steps = 0; /*move into mappo------------------------*/
-int step_max = 0;
-int buffer_length = 5;
-int amount_of_players_in_team = 2;
-int batch_size = buffer_length * amount_of_players_in_team;
-int input_size = 9;
-int num_actions = 3;
-int hidden_size = 64;
 
 std::vector<double> critic_loss;
 
@@ -69,8 +60,8 @@ int main() {
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-   //models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
- models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+   models = centralised_ai::collective_robot_behaviour::CreateAgents(amount_of_players_in_team);
+   //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
 
   /* Define the IP and port for the VisionClient */
