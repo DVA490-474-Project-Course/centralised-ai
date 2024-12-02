@@ -26,11 +26,6 @@ namespace centralised_ai
 namespace ssl_interface
 {
 
-/*
- * @brief Max datagram size of received UDP packets
- */
-const int max_datagram_size = 65536;
-
 /*!
  * @brief Class for communicating with ssl game controller.
  * 
@@ -162,29 +157,11 @@ public:
 protected:
 
   /*!
-    * @brief Convert RefereeCommand enum to a corresponding string representation.
-    *
-    * @param referee_command The `RefereeCommand` enum value to convert.
-    *
-    * @return A string representing the `RefereeCommand` enum.
-    */
-  std::string RefereeCommandToString(enum RefereeCommand referee_command);
-
-  /*!
     * @brief Read and store the relevant game state data from the Referee packet.
     *
     * @param packet The `Referee` packet containing game state information to be processed.
     */
   void ReadGameStateData(Referee packet);
-
-  /*!
-    * @brief Convert a Protobuf `Referee_Command` enum to the project-specific `RefereeCommand` enum.
-    *
-    * @param command The Protobuf `Referee_Command` enum value to be converted.
-    *
-    * @return The corresponding `RefereeCommand` enum value.
-    */
-  enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command);
 
   /*!
     * @brief The sockaddr_in structure used to store the client's address.

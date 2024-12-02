@@ -27,11 +27,6 @@ namespace centralised_ai
 namespace ssl_interface
 {
 
-/*
- * @brief Max datagram size of received UDP packets
- */
-const int max_datagram_size = 65536;
-
 /*!
  * @brief Class for communicating with ssl Vision.
  * 

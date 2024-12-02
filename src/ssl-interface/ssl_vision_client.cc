@@ -50,10 +50,10 @@ void VisionClient::ReceivePacket()
 {
   SSLWrapperPacket packet;
   int message_length;
-  char buffer[max_datagram_size];
+  char buffer[max_udp_packet_size];
 
   /* Receive raw packet */
-  message_length = recv(socket, (char *)buffer, max_datagram_size, MSG_WAITALL);
+  message_length = recv(socket, (char *)buffer, max_udp_packet_size, MSG_WAITALL);
 
   if (message_length > 0)
   {

@@ -58,10 +58,10 @@ void GameControllerClient::ReceivePacket()
 {
   Referee packet;
   int message_length;
-  char buffer[max_datagram_size];
+  char buffer[max_udp_packet_size];
 
   /* Receive raw packet */
-  message_length = recv(socket, buffer,max_datagram_size,
+  message_length = recv(socket, buffer,max_udp_packet_size,
       MSG_WAITALL);
 
   if (message_length > 0)
