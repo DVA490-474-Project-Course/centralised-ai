@@ -14,7 +14,7 @@
 #include "../ssl-interface/automated_referee.h"
 #include "../simulation-interface/simulation_interface.h"
 #include "../common_types.h"
-#include "world.h"
+#include "reward.h"
 #include <vector>
 #include "../common_types.h"
 
@@ -22,18 +22,6 @@ namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-
-/*!
-*@brief Struct representing the observation of the state of the world.
-*/
-struct Observation
-{
-  /* Tensor representing the rewards for each agent, with the shape [num_agents].*/
-  torch::Tensor rewards;
-  /* Tensor representing the state of the world, with the shape [num_states]*/
-  torch::Tensor state;
-};
-
 /*!
 *@brief Struct representing the configuration of the rewards.
 */
@@ -54,15 +42,16 @@ typedef struct RewardConfiguration
 /*!
 * @brief Calculates the opponent team from the own team.
 * @returns The opponent team.
+* @param[In] own_team: The team that the robots are on.
 */
 Team ComputeOpponentTeam(Team own_team);
 
 /*!
-*@brief Get the current state from grSim
+*@brief Get the current global state of the world from grSim
 *
 *@returns A tensor representing the states of the world, with the shape [1, 1, num_states].
 * The states are as follows:
-* [0] - Reserved for the robot id as input to each policy network.
+* [0] - Reserved for the robot id as input to the policy network.
 * [1] - The x-coordinate of the ball.
 * [2] - The y-coordinate of the ball.
 * [3] - The x-coordinate of the teammate robot 0.
@@ -104,7 +93,6 @@ Team ComputeOpponentTeam(Team own_team);
 * [39] - The opponent robot 5 have ball boolean.
 * [40] - The remaining time in the current stage.
 * [41] - The referee command.
-* [42] - The remaining time until the next referee command (if applicable, i.e. from kickoff to start).
 *
 *@pre The following preconditions must be met before using this class:
 * - A connection to grSim.
@@ -114,11 +102,8 @@ Team ComputeOpponentTeam(Team own_team);
 *@param[In] vision_client: The vision client, which is the source of the current state of the world.
 *@param[In] own_team: The team that the robots are on.
 *@param[In] opponent_team: The team that the robots are playing against.
-*@param[In] num_robots: The number of robots on each team.
 */
-torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
-
-std::vector<torch::Tensor> GetActionStates(torch::Tensor state);
+torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
 
 /*!
 *@brief Send actions to the robots.

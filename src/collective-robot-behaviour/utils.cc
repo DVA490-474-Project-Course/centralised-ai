@@ -190,13 +190,13 @@ torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, 
 			{
 				torch::Tensor probabitilies = actions_probabilities[i][k][t];
 
-				entropy += -torch::sum(probabitilies.log());
+				entropy += -torch::sum(probabitilies.log2().mul(probabitilies));
 			}
 		}
 	}
 
 	/* Calculate the average entropy over the chunks. */
-	return entropy_coefficient * entropy.div(num_mini_batch * num_agents);
+	return entropy_coefficient * entropy.div(num_mini_batch * num_agents * num_time_steps);
 }
 
 }

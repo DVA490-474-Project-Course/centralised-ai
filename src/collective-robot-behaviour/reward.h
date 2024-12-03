@@ -2,43 +2,19 @@
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
 // Last modified: 2024-11-06 by Jacob Johansson
-// Description: Headers for world.cc.
+// Description: Headers for reward.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef REWARD_H
+#define REWARD_H
 
-#include <vector>
 #include <torch/torch.h>
-#include "communication.h"
 
 namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-/*!
-* @brief Base class for all game states which are responsible for calculating the legal actions and reward per agent for the given state.
-*/
-class GameStateBase
-{
-  public:
-    /* Virtual destructor intended for this polymorphic base class.*/
-    virtual ~GameStateBase() = default;
-
-  /*!
-  * @brief Calculates the action masks for the given state.
-  * @returns A tensor representing the action mask for the given state, with the shape [num_agents, num_actions].
-  */
-    virtual torch::Tensor ComputeActionMasks(const torch::Tensor & states) = 0;
-    /*!
-    * @brief Calculates the rewards for the given state.
-    * @returns A tensor representing the reward for the given state, with the shape [num_agents].
-    * @param[In] states: The states of the world, with the shape [num_states].
-    * @param[In] reward_configuration: The configuration of the rewards.
-    */
-    virtual torch::Tensor ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration) = 0;
-};
 
 /*!
   @returns a tensor representing the reward given by the average distance between all robots, with the shape [num_agents].
@@ -62,6 +38,14 @@ torch::Tensor ComputeDistanceToBallReward(torch::Tensor & positions, torch::Tens
 */
 torch::Tensor ComputeHaveBallReward(torch::Tensor & have_ball_flags, float reward);
 
+/*!
+* @brief Computes the reward given by the angle between the robots and the ball, where the angle is in range [-1, 1] (-1 when the robot is looking away from the ball, 1 when the robot is looking towards the ball).
+* @returns a tensor representing the reward given by the angle between the robots and the ball, with the shape [num_agents].
+* @param[In] orientations: A tensor of all the orientations of all the robots, with the shape [num_agents].
+* @param[In] positions: A tensor of all the positions of all the robots, with the shape [2, num_agents].
+* @param[In] ball_position: A tensor of the position of the ball, with the shape [2, 1].
+*/
+torch::Tensor ComputeAngleToBallReward(const torch::Tensor & orientations, const torch::Tensor & positions, const torch::Tensor & ball_position);
 
 }
 }

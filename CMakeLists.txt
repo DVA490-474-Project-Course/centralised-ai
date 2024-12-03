@@ -31,6 +31,6 @@ include_directories(${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
 # add_subdirectories must be last
 
 add_subdirectory(src)
-#add_subdirectory(test)
+add_subdirectory(test)
 
 #===============================================================================

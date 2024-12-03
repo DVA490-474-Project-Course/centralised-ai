@@ -131,8 +131,8 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
     std::vector<Trajectory> trajectory; /*Create trajectory vector*/
 
     std::tie(trajectory, act_prob, action) = ResetHidden(); /* Reset/initialise hidden states for timestep 0 */
-    torch::Tensor state = GetStates(referee, vision_client, own_team, opponent_team); /*Get current state as vector*/
-    state = GetStates(referee, vision_client, own_team, opponent_team); /*because of first read gets wrong info, duplicate get state, further investigation needed*/
+    torch::Tensor state = GetGlobalState(referee, vision_client, own_team, opponent_team); /*Get current state as vector*/
+    state = GetGlobalState(referee, vision_client, own_team, opponent_team); /*because of first read gets wrong info, duplicate get state, further investigation needed*/
 
     /*Loop for amount of timestamps in each bach
     * Start at 1 because timestep 0 is initalised, and hidden states is following previous input (timestep - 1).
@@ -142,21 +142,20 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       /*Initialise values*/
       Trajectory exp;
       HiddenStates new_states;
-      torch::Tensor prob_actions_stored(torch::zeros({amount_of_players_in_team, num_actions}));
+      torch::Tensor prob_actions_stored = torch::zeros({amount_of_players_in_team, num_actions});
 
       /* Get hidden states and output probabilities for critic network, input is state and previous timestep (initialised values)*/
       auto [valNetOutput, V_hx] = critic.Forward(state,trajectory[timestep-1].hidden_v.ht_p);
-      auto actionState = GetActionStates(state);
+
       /* For each agent in one timestep, get probabilities and hidden states*/
-      for (auto& agent : Models) {
-        auto agent_state = actionState[agent.robotId].clone();
+      for (auto& agent : Models)
+      {
+        auto agent_state = state.clone();
         agent_state.index({0, 0, 0}) = agent.robotId; /*Update the first index value to robot ID*/
-        //std::cout << trajectory[timestep - 1].hidden_p[agent.robotId].ht_p  << std::endl;
 
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
         auto [act_prob, hx_new] = Models[0].policy_network->Forward(agent_state, trajectory[timestep - 1].hidden_p[agent.robotId].ht_p);
-
-        prob_actions_stored.index_put_({agent.robotId}, act_prob); /*Store probabilities*/
+        prob_actions_stored[agent.robotId] = act_prob[0][0]; /*Store probabilities*/
 
         /*Save hidden states*/
         new_states.ht_p = hx_new;
@@ -164,26 +163,23 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
       } /*end for agent*/
 
-      assert(exp.hidden_p.size() == amount_of_players_in_team);
-
+      
       auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
 
       /*Get the actions with the highest probabilities for each agent*/
-      exp.actions = std::get<1>(prob_actions_stored_softmax.max(1));
+      exp.actions = prob_actions_stored_softmax.argmax(1);
+
       /*
        *Action mask could be implemented here to define legal moves,
        *such as shooting/passing only if player have ball
       */
 
       /*Let agents run for 20 ms until next timestep*/
-      for(int a = 0; a < 1; a++){
       SendActions(simulation_interfaces,exp.actions);
-      }
 
       /* Convert critic value from shape [1, 1] to a value. */
       auto critic_value = valNetOutput.squeeze();
 
-      // TOOD: Fix to use the new state
       /*Update all values*/
       exp.actions_prob = prob_actions_stored_softmax;
       exp.state = state.clone();
@@ -191,7 +187,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       exp.hidden_v.ht_p = V_hx;
 
       /*Update state and use it for next itteration*/
-      state = GetStates(referee, vision_client, own_team, opponent_team);
+      state = GetGlobalState(referee, vision_client, own_team, opponent_team);
 
       /* Get rewards from the actions. */
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0),
@@ -205,7 +201,6 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
     trajectory.erase(trajectory.begin());
 
     int32_t trajectory_length = trajectory.size();
-    //std::cout << "Trajectory length: " << trajectory_length << std::endl;
 
     /* Calculate Reward to go */
     torch::Tensor reward_to_go = torch::zeros({amount_of_players_in_team, trajectory_length});
@@ -339,22 +334,26 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
     }
 
     /*Policy Network update by batch*/
-    for (int c = 0; c < num_chunks; c++){
-    auto h0_p = h0_policy[c]; /*Get first hidden state in new chunk*/
-    for (int t = 0; t < chunks[c].t.size(); t++){
-      /*Get observation states for policy network*/
-      auto state_action = GetActionStates(input[c][t].view({1, 1,input_size}));
-      auto input_state = torch::empty({1,amount_of_players_in_team,input_size});
+    for (int c = 0; c < num_chunks; c++)
+    {
+      auto h0_p = h0_policy[c]; /*Get first hidden state in new chunk*/
+    
+      for (int t = 0; t < chunks[c].t.size(); t++)
+      {
+        /*Get observation states for policy network*/
+        auto state_action = input[c][t].view({1, 1, input_size});
+        auto input_state = torch::empty({1, amount_of_players_in_team, input_size});
 
-      for (int a = 0; a < amount_of_players_in_team; a++) {
+        for (int a = 0; a < amount_of_players_in_team; a++)
+        {
+          state_action[0][0][0] = a;
+          input_state[0][a] = state_action[a].squeeze();
+        }
 
-        state_action[0][0][0][0]  = a;
-        input_state[0][a] = state_action[a].squeeze();
+        /*Update the policy networks hidden states */
+        auto [pred,hx_new] = Models[0].policy_network->Forward(input_state, h0_p);
+        h0_p = hx_new;
       }
-      /*Update the policy networks hidden states */
-      auto [pred,hx_new] = Models[0].policy_network->Forward(input_state, h0_p);
-      h0_p = hx_new;
-    }
     }
 
     /*Critic Network update by batch*/
@@ -369,7 +368,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
         h0_c = h0_new;
       }
     }
-
+ 
     /* Push chunk to min batch. */
     for (int c = 0; c < num_chunks; c++)
     {

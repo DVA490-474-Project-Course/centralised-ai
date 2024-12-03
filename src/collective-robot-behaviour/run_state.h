@@ -9,9 +9,10 @@
 #ifndef RUN_STATE_H
 #define RUN_STATE_H
 
-#include "world.h"
+#include "reward.h"
 #include <torch/torch.h>
 #include "communication.h"
+#include "state.h"
 
 namespace centralised_ai
 {

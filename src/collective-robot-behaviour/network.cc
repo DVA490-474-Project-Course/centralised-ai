@@ -35,15 +35,20 @@ HiddenStates::HiddenStates()
       ct_p(torch::zeros({1, 1, hidden_size}))   /*Cell state tensor initialized to zeros*/
 {}
 
-PolicyNetwork::PolicyNetwork()
-  : num_layers(1),
+PolicyNetwork::PolicyNetwork() : 
+  num_layers(1),
   output_size(num_actions),
   rnn(torch::nn::GRUOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
   norm(torch::nn::LayerNormOptions({input_size})),  // Normalize input
-  output_layer(torch::nn::Linear(hidden_size, output_size)) {
+  layer1(torch::nn::Linear(hidden_size, hidden_size)),
+  layer2(torch::nn::Linear(hidden_size, hidden_size)),
+  output_layer(torch::nn::Linear(hidden_size, output_size))
+{
 
   register_module("norm", norm);
   register_module("rnn", rnn);
+  register_module("layer1", layer1);
+  register_module("layer2", layer2);
   register_module("output_layer", output_layer);
 
   for (const auto& param : rnn->named_parameters()) {
@@ -60,19 +65,23 @@ PolicyNetwork::PolicyNetwork()
   }
 }
 
-  std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(
-      torch::Tensor input,
-      torch::Tensor hx) {
+std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor input, torch::Tensor hx)
+{
+  //auto normalized_x = norm->forward(input);  // Normalize input
 
-  auto normalized_x = norm->forward(input);  // Normalize input
+  auto gru_output = rnn->forward(input, hx);  // GRU forward pass
+  auto h = std::get<1>(gru_output);                 // Extract hidden state
+  auto gru_out = std::get<0>(gru_output);         // Extract output
 
-  auto lstm_output = rnn->forward(normalized_x, hx);  // GRU forward pass
-  auto h = std::get<1>(lstm_output);                 // Extract hidden state
-  auto lstm_pred = std::get<0>(lstm_output);         // Extract output
-  auto linear_output = output_layer->forward(lstm_pred);  // Apply linear layer
-  auto activated_output = torch::tanh(linear_output);     // Apply tanh activation
+  //auto gru_out_normalized = norm->forward(h);  // Normalize output
+  
+  auto layer1_output = layer1->forward(gru_out).relu();  // Apply linear layer
+  auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
+  auto output = output_layer(layer2_output).tanh();  // Apply linear layer
 
-  return std::make_tuple(activated_output, h);  // Return tuple of output and hidden state
+  //std::cout << "Output: " << output << std::endl;
+
+  return std::make_tuple(output, h);
 }
 
 

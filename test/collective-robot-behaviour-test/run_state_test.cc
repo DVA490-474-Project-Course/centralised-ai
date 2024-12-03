@@ -15,19 +15,6 @@ namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-/*
-TEST(RunStateTest, ComputeReward_Test_Shape)
-{
-    RunState state;
 
-    torch::Tensor states = torch::ones(43);
-    RewardConfiguration reward_configuration = {1, 1, 1};
-    Team own_team = Team::kBlue;
-
-    torch::Tensor output = ComputeRewards(states, reward_configuration, own_team);
-
-    EXPECT_EQ(output.size(0), 6);
-}
-*/
 }
 }

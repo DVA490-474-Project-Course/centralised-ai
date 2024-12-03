@@ -104,6 +104,9 @@ struct PolicyNetwork : torch::nn::Module {
   torch::nn::LayerNorm norm{nullptr};
   torch::nn::Linear output_layer{nullptr};
 
+  torch::nn::Linear layer1{nullptr};
+  torch::nn::Linear layer2{nullptr};
+
   PolicyNetwork();
   /*!
   * @brief Forward function for the LSTM Policy Network
