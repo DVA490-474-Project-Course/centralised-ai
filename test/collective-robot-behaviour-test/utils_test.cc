@@ -155,13 +155,13 @@ TEST(ComputeTemporalDifferenceTest, Test_2)
   EXPECT_NEAR(output[5][2].item<float>(), 0.74, 0.00001);
   EXPECT_NEAR(output[5][3].item<float>(), 0.60, 0.00001);
   
-  }
+}
 
 TEST(ComputeGAETest, Test_1)
 {
   torch::Tensor temporaldiffs = torch::zeros({1, 4});
-  double discount = 2;
-  double gae_parameter = 2;
+  double discount = 0.1;
+  double gae_parameter = 0.1;
 
   torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
@@ -177,43 +177,41 @@ TEST(ComputeGAETest, Test_1)
 
 TEST(ComputeGAETest, Test_2)
 {
-  torch::Tensor temporaldiffs = torch::zeros({1, 4});
-  temporaldiffs[0][0] = 1;
-  temporaldiffs[0][1] = 2;
-  temporaldiffs[0][2] = 3;
-  temporaldiffs[0][3] = 4;
+  torch::Tensor temporaldiffs = torch::ones({1, 3});
 
-  double discount = 2;
-  double gae_parameter = 2;
+  double discount = 0.1;
+  double gae_parameter = 0.1;
 
   torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
   EXPECT_EQ(temporaldiffs.size(0), 1);
-  EXPECT_EQ(temporaldiffs.size(1), 4);
+  EXPECT_EQ(temporaldiffs.size(1), 3);
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 2);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 3);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 4);
+  EXPECT_EQ(output.size(1), 3);
+  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.0101);
+  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.01);
+  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
 }
 
 TEST(ComputeGAETest, Test_3)
 {
-  torch::Tensor temporaldiffs = torch::ones({1, 4});
+  torch::Tensor temporaldiffs = torch::ones({1, 3});
+  temporaldiffs[0][0] = 0.1;
+  temporaldiffs[0][1] = 0.2;
+  temporaldiffs[0][2] = 0.3;
 
-  double discount = 1;
-  double gae_parameter = 1;
+  double discount = 0.1;
+  double gae_parameter = 0.1;
 
   torch::Tensor output = ComputeGeneralAdvantageEstimation(temporaldiffs, discount, gae_parameter);
 
-  EXPECT_EQ(temporaldiffs.size(1), 4);
+  EXPECT_EQ(temporaldiffs.size(0), 1);
+  EXPECT_EQ(temporaldiffs.size(1), 3);
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
+  EXPECT_EQ(output.size(1), 3);
+  EXPECT_NEAR(output[0][0].item<float>(), 0.10203, 0.00001);
+  EXPECT_NEAR(output[0][1].item<float>(), 0.203, 0.00001);
+  EXPECT_NEAR(output[0][2].item<float>(), 0.3, 0.00001);
 }
 
 TEST(ComputeProbabilityRatio, Test_1)
