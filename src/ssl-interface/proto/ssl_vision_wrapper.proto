@@ -3,8 +3,8 @@ import "ssl_vision_detection.proto";
 import "ssl_vision_geometry.proto";
 
 /* Definition of Protobuf message from SSL Vision */
-message SSLWrapperPacket
+message SslWrapperPacket
 {
-  optional SSLDetectionFrame detection = 1;
-  optional SSLGeometryData geometry = 2;
+  optional SslDetectionFrame detection = 1;
+  optional SslGeometryData geometry = 2;
 }

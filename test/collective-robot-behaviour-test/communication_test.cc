@@ -31,15 +31,15 @@ class VisionClientDerived : public centralised_ai::ssl_interface::VisionClient
 {
 public:
   VisionClientDerived(std::string ip, int port) : VisionClient(ip, port) {}
-  void SetBlueRobotPositionX(int id, float value) {blue_robot_positions_x[id] = value;}
-  void SetBlueRobotPositionY(int id, float value) {blue_robot_positions_y[id] = value;}
-  void SetBlueRobotOrientation(int id, float value) {blue_robot_orientations[id] = value;}
-  void SetYellowRobotPositionX(int id, float value) {yellow_robot_positions_y[id] = value;}
-  void SetYellowRobotPositionY(int id, float value) {yellow_robot_positions_x[id] = value;}
-  void SetYellowRobotOrientation(int id, float value) {yellow_robot_orientations[id] = value;}
-  void SetBallPositionX(float value) {ball_position_x = value;}
-  void SetBallPositionY(float value) {ball_position_y = value;}
-  void SetTimestamp (double value) {timestamp = value;}
+  void SetBlueRobotPositionX(int id, float value) {blue_robot_positions_x_[id] = value;}
+  void SetBlueRobotPositionY(int id, float value) {blue_robot_positions_y_[id] = value;}
+  void SetBlueRobotOrientation(int id, float value) {blue_robot_orientations_[id] = value;}
+  void SetYellowRobotPositionX(int id, float value) {yellow_robot_positions_y_[id] = value;}
+  void SetYellowRobotPositionY(int id, float value) {yellow_robot_positions_x_[id] = value;}
+  void SetYellowRobotOrientation(int id, float value) {yellow_robot_orientations_[id] = value;}
+  void SetBallPositionX(float value) {ball_position_x_ = value;}
+  void SetBallPositionY(float value) {ball_position_y_ = value;}
+  void SetTimestamp (double value) {timestamp_ = value;}
 };
 
 /* Mock class for AutomatedReferee. */
@@ -47,9 +47,9 @@ class AutomatedRefereeDerived : public centralised_ai::ssl_interface::AutomatedR
 {
 public:
   AutomatedRefereeDerived(ssl_interface::VisionClient & vision_client, std::string ip, int port) : AutomatedReferee(vision_client, ip, port) {}
-  void SetRefereeCommand(centralised_ai::RefereeCommand command) {referee_command = command;}
-  void SetBlueTeamScore(int score) {blue_team_score = score;}
-  void SetYellowTeamScore(int score) {yellow_team_score = score;}
+  void SetRefereeCommand(centralised_ai::RefereeCommand command) {referee_command_ = command;}
+  void SetBlueTeamScore(int score) {blue_team_score_ = score;}
+  void SetYellowTeamScore(int score) {yellow_team_score_ = score;}
 };
 
 /* Sets all robot and ball posiitons to zero */

@@ -47,8 +47,8 @@ public:
     * @param[in] port The command listen port of grSim. This should
     * be set to the same value as that which is set in the grSim configuration.
     */
-  AutomatedReferee(VisionClient& vision_client, std::string grsim_ip,
-    uint16_t grsim_port);
+  AutomatedReferee(VisionClient& vision_client, std::string grsim_ip_,
+    uint16_t grsim_port_);
 
   /*!
     * @brief Analyze the game state, needs to be called continously.
@@ -66,8 +66,8 @@ public:
     * 
     * @param[in] stage_time The stage time duration.
     */
-  void StartGame(enum Team starting_team, enum Team team_on_positive_half,
-    double prepare_kickoff_duration, int64_t stage_time);
+  void StartGame(enum Team starting_team, enum Team team_on_positive_half_,
+    double prepare_kickoff_duration_, int64_t stage_time_);
 
   /*!
     * @brief Stop the automated referee, outputs will no longer be updated.
@@ -115,7 +115,9 @@ public:
   int GetYellowTeamScore();
 
   /*!
-    * @brief Returns the X coordinate of the ball designated position.This value is
+    * @brief Returns the X coordinate of the ball designated position.
+    * 
+    * Return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -123,12 +125,14 @@ public:
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
     *
-    * @return the X coordinate in mm of the ball designated position.
+    * @return The X coordinate in mm of the ball designated position.
     */
   float GetBallDesignatedPositionX();
 
   /*!
-    * @brief Returns the Y coordinate of the ball designated position.This value is
+    * @brief Returns the Y coordinate of the ball designated position.
+    * 
+    * Return the Y coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
@@ -136,7 +140,7 @@ public:
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
     *
-    * @return the Y coordinate in mm of the ball designated position.
+    * @return The Y coordinate in mm of the ball designated position.
     */
   float GetBallDesignatedPositionY();
 
@@ -154,11 +158,11 @@ public:
   /*!
     * @brief Returns the remaining stage time left.
     * 
-    * @return the remaining stage time left in seconds. If the stage time is passed
-    * this value become negative.
-    * 
     * @pre In order to have the data available AnalyzeGameState() needs to be called
     * continously.
+    *
+    * @return the remaining stage time left in seconds. If the stage time is passed
+    * this value become negative.
     */
   int64_t GetStageTimeLeft();
 
@@ -187,9 +191,9 @@ protected:
     float y;
   };
 
-  /*********************/
+  /***********************/
   /* Protected variables */
-  /*********************/
+  /***********************/
 
   /*!
     * @brief Reference to the vision client.
@@ -199,12 +203,12 @@ protected:
   /*!
     * @brief IP address of grSim.
     */
-  std::string grsim_ip;
+  std::string grsim_ip_;
 
   /*!
     * @brief grSim Command listen port.
     */
-  uint16_t grsim_port;
+  uint16_t grsim_port_;
 
   /*!
     * @brief distance in mm between robot and ball within which they are considered
@@ -216,63 +220,63 @@ protected:
     * @brief Time in seconds that the commands PREPARE_KICKOFF_BLUE/YELLOW should
     * stay at.
     */
-  double prepare_kickoff_duration;
+  double prepare_kickoff_duration_;
 
   /*!
     * @brief Time at which latest PREPARE_KICKOFF_BLUE/YELLOW command is issued.
     */
-  double prepare_kickoff_start_time;
+  double prepare_kickoff_start_time_;
 
   /*!
     * @brief Time at which StartGame() was called.
     */
-  double time_at_game_start;
+  double time_at_game_start_;
 
   /*!
     * @brief Flag indicating whether Automatic Referee is running.
     */
-  bool game_running;
+  bool game_running_;
 
   /*!
     * @brief Team that touched the ball last.
     */
-  enum Team last_kicker_team;
+  enum Team last_kicker_team_;
 
   /*!
     * @brief Remaining stage time.
     */
-  int64_t stage_time_left;
+  int64_t stage_time_left_;
 
   /*!
     * @brief Stage time.
     */
-  int64_t stage_time;
+  int64_t stage_time_;
 
   /*!
     * @brief The latest issued referee command.
     */
-  RefereeCommand referee_command;
+  RefereeCommand referee_command_;
 
   /*!
     * @brief Blue team's score.
     */
-  int blue_team_score;
+  int blue_team_score_;
 
   /*!
     * @brief Yellow team's score.
     */
-  int yellow_team_score;
+  int yellow_team_score_;
 
   /*!
     * @brief When the BALL_PLACEMENT_YELLOW/BLUE commands are issued, indicates
     * where the ball should be brought for a free kick.
     */
-  struct Point designated_position;
+  struct Point designated_position_;
 
   /*!
     * @brief Indicates which team is on the positive half of the field.
     */
-  enum Team team_on_positive_half;
+  enum Team team_on_positive_half_;
 
   /*!
     * @brief Indicates positive half X-coordinate for goal.
@@ -304,9 +308,9 @@ protected:
     */
   static constexpr float ball_out_of_field_min_y = -3000;
 
-  /*******************/
+  /*********************/
   /* Protected methods */
-  /*******************/
+  /*********************/
 
   /*!
     * @brief Returns true if the ball is out of the field.
@@ -388,6 +392,6 @@ protected:
 };
 
 } /* namespace ssl_interface */
-} /* namespace centralised_ai */
+} /* namespace centralised_ai   */
 
 #endif /* automated_referee_H */

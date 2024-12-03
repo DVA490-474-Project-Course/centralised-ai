@@ -12,14 +12,14 @@
 #define CENTRALISEDAI_SSLVISIONCLIENT_H_
 
 /* C system headers */
-#include <arpa/inet.h>
+#include "arpa/inet.h"
 
 /* C++ standard library headers */
-#include <string> 
+#include "string" 
 
 /* Project .h files */
-#include "generated/ssl_vision_detection.pb.h"
-#include "generated/ssl_vision_wrapper.pb.h"
+#include "../ssl-interface/generated/ssl_vision_detection.pb.h"
+#include "../ssl-interface/generated/ssl_vision_wrapper.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
@@ -37,7 +37,7 @@ namespace ssl_interface
  */
 class VisionClient
 {
-public:
+ public:
   /*!
     * @brief Constructor that sets up connection to ssl Vision
     *
@@ -129,7 +129,7 @@ public:
     */
   void ReceivePacketsUntilAllDataRead();
  
-protected:
+ protected:
   /*********************/
   /* Network variables */
   /*********************/
@@ -137,12 +137,12 @@ protected:
   /*!
    * @brief Address of grSim.
    */
-  sockaddr_in client_address;
+  sockaddr_in client_address_;
 
   /*!
    * @brief socket file descriptor.
    */
-  int socket;
+  int socket_;
 
   /**************************/
   /* Position data and time */
@@ -151,51 +151,64 @@ protected:
   /*!
    * @brief The Unix timestamp of the latest packet that has been received.
    */
-  double timestamp;
+  double timestamp_;
 
   /*!
    * @brief Array containing the x coordinates of the blue team robots.
    */
-  float blue_robot_positions_x[team_size];
+  float blue_robot_positions_x_[team_size];
 
   /*!
    * @brief Array containing the y coordinates of the blue team robots.
    */
-  float blue_robot_positions_y[team_size];
+  float blue_robot_positions_y_[team_size];
 
   /*!
    * @brief Array containing the theta coordinates of the blue team robots.
    */
-  float blue_robot_orientations[team_size];
+  float blue_robot_orientations_[team_size];
 
   /*!
    * @brief Array containing the x coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_x[team_size];
+  float yellow_robot_positions_x_[team_size];
 
   /*!
    * @brief Array containing the y coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_y[team_size];
+  float yellow_robot_positions_y_[team_size];
 
   /*!
    * @brief Array containing the theta coordinates of the yellow team robots.
    */
-  float yellow_robot_orientations[team_size];
+  float yellow_robot_orientations_[team_size];
 
   /*!
    * @brief X coordinate of the ball.
    */
-  float ball_position_x;
+  float ball_position_x_;
 
   /*!
    * @brief Y coordinate of the ball.
    */
-  float ball_position_y;
+  float ball_position_y_;
 
-  float blue_robot_positions_read[team_size];
-  float yellow_robot_positions_read[team_size];
-  bool ball_data_read;
+  /*!
+   * @brief Array indicating whether the position data of each blue
+   * team robot has been read.
+   */
+  float blue_robot_positions_read_[team_size];
+
+  /*!
+   * @brief Array indicating whether the position data of each yellow
+   * team robot has been read.
+   */
+  float yellow_robot_positions_read_[team_size];
+
+  /*!
+   *@brief Flag indicating whether the ball position data has been read.
+   */
+  bool ball_data_read_;
 
   /**************************/
   /* Private methods */
@@ -205,7 +218,7 @@ protected:
    * @brief Read the data from the protobuf data in the argument and store it locally
    * in the class instance.
    */
-  void ReadVisionData(SSLWrapperPacket packet);
+  void ReadVisionData(SslWrapperPacket packet);
 };
 
 } /* namespace ssl_interface */
