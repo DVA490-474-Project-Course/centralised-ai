@@ -176,6 +176,7 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
 
       /*Let agents run for 20 ms until next timestep*/
       SendActions(simulation_interfaces,exp.actions);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
       /* Convert critic value from shape [1, 1] to a value. */
       auto critic_value = valNetOutput.squeeze();
@@ -310,7 +311,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
     /* Create state tensor for the batch of all sequences. */
     int num_chunks = chunks.size();
     int num_layers = 1;
-    torch::Tensor input = torch::zeros({num_chunks,10,input_size}); /* [sequence_len, batch_size, input_size] */
+    torch::Tensor input = torch::zeros({num_chunks,10,input_size}); /* [batch_size, sequence_len, input_size] */
     /* Create hidden state and cell state tensors for all agents. */
     torch::Tensor h0_critic = torch::zeros({num_chunks,1, 1, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
     torch::Tensor h0_policy = torch::zeros({num_chunks,1,amount_of_players_in_team, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
@@ -333,6 +334,8 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
         }
     }
 
+    //std::cout << "Input size: " << input.sizes() << std::endl;
+
     /*Policy Network update by batch*/
     for (int c = 0; c < num_chunks; c++)
     {
@@ -341,13 +344,13 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
       for (int t = 0; t < chunks[c].t.size(); t++)
       {
         /*Get observation states for policy network*/
-        auto state_action = input[c][t].view({1, 1, input_size});
+        auto state_action = input[c][t];
         auto input_state = torch::empty({1, amount_of_players_in_team, input_size});
 
         for (int a = 0; a < amount_of_players_in_team; a++)
         {
-          state_action[0][0][0] = a;
-          input_state[0][a] = state_action[a].squeeze();
+          state_action[0] = a;
+          input_state[0][a] = state_action;
         }
 
         /*Update the policy networks hidden states */
@@ -356,18 +359,26 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
       }
     }
 
+    //std::cout << "Policy update" << std::endl;
+
     /*Critic Network update by batch*/
     /*Read each chunk*/
-    for (int c = 0; c < num_chunks; c++) {
-      auto h0_c = h0_critic[c]; /*Get first hidden state in new chunk*/
+    for (int c = 0; c < num_chunks; c++) 
+    {
+      /*Get first hidden state in new chunk*/
+      auto h0_c = h0_critic[c];
+     
       /*Read each timestep in chunk*/
-      for (int t = 0; t < chunks[c].t.size(); t++){
+      for (int t = 0; t < chunks[c].t.size(); t++)
+      {
         input[c][t][0] = -1;
 
-        auto[pred,h0_new] =critic.Forward(input[c][t].view({1,1,input_size}),h0_c);
+        auto[pred,h0_new] = critic.Forward(input[c][t].view({1,1,input_size}),h0_c);
         h0_c = h0_new;
       }
     }
+
+    //std::cout << "Critic update" << std::endl;
  
     /* Push chunk to min batch. */
     for (int c = 0; c < num_chunks; c++)
@@ -392,7 +403,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
 
   std::vector<Agents> old_net; /*Create Models class for each robot.*/
   CriticNetwork old_net_critic;
-  old_net = LoadOldAgents(amount_of_players_in_team,old_net_critic);
+  old_net = LoadOldAgents(amount_of_players_in_team, old_net_critic);
 
   /* Assert sizes. */
   assert(old_predicts_p.size(0) == num_chunks);
@@ -419,7 +430,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   {
     auto batch = mini_batch[c];
 
-    //std::cout << "Batch " << c <<  " size: " << batch.t.size() << std::endl;
+    std::cout << "Batch " << c <<  " size: " << batch.t.size() << std::endl;
 
     for (int32_t j = 0; j < amount_of_players_in_team; j++)
     {

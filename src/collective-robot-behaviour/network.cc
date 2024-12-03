@@ -38,17 +38,15 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork() : 
   num_layers(1),
   output_size(num_actions),
-  rnn(torch::nn::GRUOptions(input_size, hidden_size).num_layers(num_layers).batch_first(false)),
-  norm(torch::nn::LayerNormOptions({input_size})),  // Normalize input
-  layer1(torch::nn::Linear(hidden_size, hidden_size)),
+  layer1(torch::nn::Linear(input_size, hidden_size)),
   layer2(torch::nn::Linear(hidden_size, hidden_size)),
+  rnn(torch::nn::GRUOptions(hidden_size, hidden_size).num_layers(num_layers).batch_first(false)),
   output_layer(torch::nn::Linear(hidden_size, output_size))
 {
 
-  register_module("norm", norm);
-  register_module("rnn", rnn);
   register_module("layer1", layer1);
   register_module("layer2", layer2);
+  register_module("rnn", rnn);
   register_module("output_layer", output_layer);
 
   for (const auto& param : rnn->named_parameters()) {
@@ -67,32 +65,30 @@ PolicyNetwork::PolicyNetwork() :
 
 std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor input, torch::Tensor hx)
 {
-  //auto normalized_x = norm->forward(input);  // Normalize input
+  auto layer1_output = layer1->forward(input).relu();  // Apply linear layer
+  auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
 
-  auto gru_output = rnn->forward(input, hx);  // GRU forward pass
+  auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
   auto h = std::get<1>(gru_output);                 // Extract hidden state
   auto gru_out = std::get<0>(gru_output);         // Extract output
 
-  //auto gru_out_normalized = norm->forward(h);  // Normalize output
-  
-  auto layer1_output = layer1->forward(gru_out).relu();  // Apply linear layer
-  auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
-  auto output = output_layer(layer2_output).tanh();  // Apply linear layer
-
-  //std::cout << "Output: " << output << std::endl;
+  auto output = output_layer(h).tanh();  // Apply linear layer
 
   return std::make_tuple(output, h);
 }
 
 
   CriticNetwork::CriticNetwork()
-      : rnn(torch::nn::GRUOptions(input_size, hidden_size).num_layers(1).batch_first(false)),
-        norm(torch::nn::LayerNormOptions({input_size})),  // Normalize input
-        value_layer(torch::nn::Linear(hidden_size, 1)) {   // Single output for value function
+      : 
+        layer1(torch::nn::Linear(input_size, hidden_size)),
+        layer2(torch::nn::Linear(hidden_size, hidden_size)),
+        rnn(torch::nn::GRUOptions(hidden_size, hidden_size).num_layers(1).batch_first(false)),
+        output_layer(torch::nn::Linear(hidden_size, 1)) {   // Single output for value function
 
-  register_module("norm", norm);
+  register_module("layer1", layer1);
+  register_module("layer2", layer2);
   register_module("rnn", rnn);
-  register_module("output_layer", value_layer);
+  register_module("output_layer", output_layer);
 
   for (const auto& param : rnn->named_parameters()) {
     std::cout << param.key() << std::endl;  // Print the parameter names
@@ -113,21 +109,22 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
       torch::Tensor input,
       torch::Tensor hx) {
 
-  auto normalized_x = norm->forward(input);  // Normalize input
-
   // Initialize hidden state to zeros if not provided
   if (hx.sizes().size() == 0) {
     hx = torch::zeros({rnn->options.num_layers(), input.size(0), hidden_size});
   }
 
-  auto lstm_output = rnn->forward(normalized_x, hx);  // GRU forward pass
-  auto h = std::get<1>(lstm_output);                 // Extract hidden state
-  auto lstm_pred = std::get<0>(lstm_output);         // Extract output
-  auto value = value_layer->forward(lstm_pred);  // Linear layer to get state value
-  // No tanh activation here
-  return std::make_tuple(value, h);  // Return value and hidden state
-}
+  auto layer1_output = layer1->forward(input).relu();  // Apply linear layer
+  auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
 
+  auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
+  auto h = std::get<1>(gru_output);                 // Extract hidden state
+  auto lstm_pred = std::get<0>(gru_output);         // Extract output
+  auto output = output_layer->forward(h);  // Linear layer to get state value
+
+  // No tanh activation here
+  return std::make_tuple(output, h);  // Return value and hidden state
+}
 
 std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
   std::vector<Agents> robots;

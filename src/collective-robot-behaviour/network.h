@@ -99,13 +99,11 @@ struct DataBuffer {
 struct PolicyNetwork : torch::nn::Module {
   const int num_layers;
   const int output_size;
-
-  torch::nn::GRU rnn{nullptr};
-  torch::nn::LayerNorm norm{nullptr};
-  torch::nn::Linear output_layer{nullptr};
-
+  
   torch::nn::Linear layer1{nullptr};
   torch::nn::Linear layer2{nullptr};
+  torch::nn::GRU rnn{nullptr};
+  torch::nn::Linear output_layer{nullptr};
 
   PolicyNetwork();
   /*!
@@ -132,9 +130,10 @@ struct PolicyNetwork : torch::nn::Module {
  *Contains robotid, x_pos, y_pos and poliycnetwork
  */
 struct CriticNetwork : torch::nn::Module {
+  torch::nn::Linear layer1{nullptr};
+  torch::nn::Linear layer2{nullptr};
   torch::nn::GRU rnn{nullptr};
-  torch::nn::LayerNorm norm{nullptr};
-  torch::nn::Linear value_layer{nullptr};
+  torch::nn::Linear output_layer{nullptr};
 
   CriticNetwork();
 

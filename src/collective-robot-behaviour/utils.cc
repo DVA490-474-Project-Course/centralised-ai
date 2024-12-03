@@ -79,6 +79,16 @@ torch::Tensor  ComputeGeneralAdvantageEstimation(const torch::Tensor & temporal_
 	int32_t num_agents = temporal_differences.size(0);
 	int32_t num_time_steps = temporal_differences.size(1);
 
+	//torch::Tensor gae = torch::zeros({num_agents, num_time_steps});
+	//for (int32_t j = 0; j < num_agents; j++)
+	//{
+	//	for(int32_t t = 0; t < num_time_steps; t++)
+	//	{
+	//		
+	//	}
+	//}
+
+
 	/* Calculate the factors for each time step. */
 	torch::Tensor  factors = torch::empty(num_time_steps);
 	double discount_times_gae_parameter = discount * gae_parameter;

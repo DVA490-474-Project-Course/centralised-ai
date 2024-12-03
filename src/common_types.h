@@ -46,7 +46,7 @@ const int buffer_length = 2;
 /*!
  * @brief Number of players per team in the simulation or game.
  */
-const int amount_of_players_in_team = 2;
+const int amount_of_players_in_team = 6;
 
 /*!
  * @brief Batch size for training, calculated as buffer length multiplied by the number of players in the team.
@@ -56,12 +56,12 @@ const int batch_size = buffer_length * amount_of_players_in_team;
 /*!
  * @brief Input size for neural networks, typically representing the number of features in the state or observation.
  */
-const int input_size = 9;
+const int input_size = 42;
 
 /*!
  * @brief Number of possible actions each agent can take.
  */
-const int num_actions = 3;
+const int num_actions = 7;
 
 /*!
  * @brief Size of the hidden layer in LSTM or RNN-based neural networks.
@@ -82,7 +82,7 @@ const float ball_radius = 21.5;
 /*! 
  * @brief The number of robots in each team.
  */
-const int team_size = 2;
+const int team_size = amount_of_players_in_team;
 
 /*! 
  * @brief Enum representing player team selection.

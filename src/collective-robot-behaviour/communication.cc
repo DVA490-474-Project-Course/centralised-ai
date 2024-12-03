@@ -125,37 +125,39 @@ void SendActions(std::vector<robot_controller_interface::simulation_interface::S
     {
       case 0: /* Idle */
         robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
-      continue;
+      break;
       case 1: /* Forward */
         robot_interfaces[i].SetVelocity(0.5F, 0.0F, 0.0F);
-      continue;
+      break;
       case 2:
         /* Backward */
         robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
-      continue;
+      break;
       case 3: /* Left */
         robot_interfaces[i].SetVelocity(0.0F, 0.5F, 0.0F);
-        continue;
+        break;
       case 4: /* Right */
         robot_interfaces[i].SetVelocity(0.0F, -0.5F, 0.0F);
-        continue;
+        break;
       case 5: /* Diagonal forward-left */
-        robot_interfaces[i].SetVelocity(0.5F, 0.5F, 0.0F);
-        continue;
+        //robot_interfaces[i].SetVelocity(0.5F, 0.5F, 0.0F);
+        robot_interfaces[i].SetVelocity(0, 0, 0.15F);
+        break;
       case 6: /* Diagonal forward-right */
-        robot_interfaces[i].SetVelocity(0.5F, -0.5F, 0.0F);
-        continue;
-      case 7: /* Diagonal backward-left*/
-        robot_interfaces[i].SetVelocity(-0.5F, 0.5F, 0.0F);
-        continue;
-      case 8: /* Diagonal backward-right */
-        robot_interfaces[i].SetVelocity(-0.5F, -0.5F, 0.0F);
-        continue;
-      case 9: /* Shoot */
-        robot_interfaces[i].SetKickerSpeed(10.0F);
-        continue;
+        //robot_interfaces[i].SetVelocity(0.5F, -0.5F, 0.0F);
+        robot_interfaces[i].SetVelocity(0, 0, -0.15F);
+        break;
+      //case 7: /* Diagonal backward-left*/
+      //  robot_interfaces[i].SetVelocity(-0.5F, 0.5F, 0.0F);
+      //  continue;
+      //case 8: /* Diagonal backward-right */
+      //  robot_interfaces[i].SetVelocity(-0.5F, -0.5F, 0.0F);
+      //  continue;
+      //case 9: /* Shoot */
+      //  robot_interfaces[i].SetKickerSpeed(10.0F);
+      //  continue;
       default:
-        continue;
+        break;
     }
 
     robot_interfaces[i].SendPacket();
