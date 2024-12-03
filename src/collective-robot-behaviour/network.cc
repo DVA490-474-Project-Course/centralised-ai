@@ -69,10 +69,10 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
   auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
 
   auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
-  auto h = std::get<1>(gru_output);                 // Extract hidden state
+  auto h = std::get<1>(gru_output).tanh();                 // Extract hidden state
   auto gru_out = std::get<0>(gru_output);         // Extract output
 
-  auto output = output_layer(h).tanh();  // Apply linear layer
+  auto output = output_layer(h);  // Apply linear layer
 
   return std::make_tuple(output, h);
 }
@@ -113,12 +113,11 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
   if (hx.sizes().size() == 0) {
     hx = torch::zeros({rnn->options.num_layers(), input.size(0), hidden_size});
   }
-
   auto layer1_output = layer1->forward(input).relu();  // Apply linear layer
   auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
 
   auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
-  auto h = std::get<1>(gru_output);                 // Extract hidden state
+  auto h = std::get<1>(gru_output).tanh();                 // Extract hidden state
   auto lstm_pred = std::get<0>(gru_output);         // Extract output
   auto output = output_layer->forward(h);  // Linear layer to get state value
 

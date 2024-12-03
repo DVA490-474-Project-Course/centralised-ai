@@ -79,33 +79,15 @@ torch::Tensor  ComputeGeneralAdvantageEstimation(const torch::Tensor & temporal_
 	int32_t num_agents = temporal_differences.size(0);
 	int32_t num_time_steps = temporal_differences.size(1);
 
-	//torch::Tensor gae = torch::zeros({num_agents, num_time_steps});
-	//for (int32_t j = 0; j < num_agents; j++)
-	//{
-	//	for(int32_t t = 0; t < num_time_steps; t++)
-	//	{
-	//		
-	//	}
-	//}
-
-
-	/* Calculate the factors for each time step. */
-	torch::Tensor  factors = torch::empty(num_time_steps);
-	double discount_times_gae_parameter = discount * gae_parameter;
-	for (int32_t t = 0; t < num_time_steps; t++)
-	{
-		factors[t] = pow(discount_times_gae_parameter, t);
-	}
-
-	/* Calculate the GAE. */
 	torch::Tensor gae = torch::zeros({num_agents, num_time_steps});
 	for (int32_t j = 0; j < num_agents; j++)
 	{
-		for (int32_t t = 0; t < num_time_steps; t++)
+		for(int32_t t = 0; t < num_time_steps; t++)
 		{
-			torch::Tensor remaining_factors = factors.slice(0, 0, num_time_steps - t);
-			torch::Tensor remaining_temporal_differences = temporal_differences[j].index({torch::indexing::Slice(t, num_time_steps)});
-			gae[j][t] = remaining_factors.matmul(remaining_temporal_differences);
+			for(int32_t m = 0; m <= num_time_steps - t - 1; m++)
+			{
+				gae[j][t] += pow(discount * gae_parameter, m) * temporal_differences[j][t + m];
+			}
 		}
 	}
 
