@@ -12,7 +12,6 @@
 #include <vector>
 
 /* Project .h files */
-#include "collective-robot-behaviour/world.h"
 #include "collective-robot-behaviour/utils.h"
 #include "collective-robot-behaviour/network.h"
 #include "collective-robot-behaviour/mappo.h"
@@ -60,9 +59,8 @@ int main() {
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-   models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
-   //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
-
+  models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
+  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";

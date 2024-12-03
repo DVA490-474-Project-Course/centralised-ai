@@ -2,17 +2,43 @@
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
 // Last modified: 2024-11-01 by Jacob Johansson
-// Description: Source file for all code related to the world representation.
+// Description: Source file for all code related to the reward functions.
 // License: See LICENSE file for license details.
 //==============================================================================
 
 #include <torch/torch.h>
-#include "world.h"
+#include "reward.h"
 
 namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
+
+torch::Tensor ComputeAngleToBallReward(const torch::Tensor & orientations, const torch::Tensor & positions, const torch::Tensor & ball_position)
+{
+	torch::Tensor angles_to_ball = torch::empty(orientations.size(0));
+
+	torch::Tensor robots_to_ball = ball_position - positions;
+
+	for (int32_t i = 0; i < orientations.size(0); i++)
+	{
+		torch::Tensor world_forward = torch::zeros(2);
+		world_forward[0] = orientations[i].cos();
+		world_forward[1] = orientations[i].sin();
+
+		torch::Tensor robot_to_ball = torch::zeros(2);
+		robot_to_ball[0] = robots_to_ball[0][i];
+		robot_to_ball[1] = robots_to_ball[1][i];
+
+		torch::Tensor robot_to_ball_normalized = robot_to_ball.div(robot_to_ball.norm());
+
+		torch::Tensor ball_product = robot_to_ball_normalized.dot(world_forward);
+
+		angles_to_ball[i] = ball_product;
+	}
+
+	return angles_to_ball;
+}
 
 torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_distance, float max_reward)
 {
@@ -33,20 +59,20 @@ torch::Tensor ComputeDistanceToBallReward(torch::Tensor & positions, torch::Tens
 
 torch::Tensor ComputeHaveBallReward(torch::Tensor & have_ball_flags, float reward)
 {
-	torch::Tensor rewards = torch::empty(have_ball_flags.size(0));
+	torch::Tensor rewards = torch::zeros(have_ball_flags.size(0));
+
 	for (int32_t i = 0; i < have_ball_flags.size(0); i++)
 	{
-		int32_t flag = have_ball_flags[i].item<int>();
-		if(flag > 0)
+		if(have_ball_flags[i].item<int>() > 0)
 		{
-			rewards[i] += 1;
-			std::cerr << "TOUCHED BALL REWARD!" << reward << std::endl;
+			rewards[i] += reward;
 		}
 		else
 		{
-			rewards[i] = -reward;
+			rewards[i] -= reward;
 		}
 	}
+	
 	return rewards;
 }
 

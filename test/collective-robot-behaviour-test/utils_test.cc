@@ -285,43 +285,44 @@ TEST(ClipProbabilityRatio, Test_3)
 
 TEST(ComputePolicyEntropy, Test_1)
 {
-  torch::Tensor actions_probabilities = torch::ones({2, 4, 4});
+  torch::Tensor actions_probabilities = torch::ones({1, 6, 2, 3});
   float entropy_coefficient = 1;
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
-  EXPECT_NEAR(output.item<float>(), 0, 0.0001);
+  EXPECT_EQ(actions_probabilities.size(0), 1);
+  EXPECT_EQ(actions_probabilities.size(1), 6);
+  EXPECT_EQ(actions_probabilities.size(2), 2);
+  EXPECT_EQ(actions_probabilities.size(3), 3);
+  EXPECT_NEAR(output.item<float>(), 0, 0.00001);
 }
 
 TEST(ComputePolicyEntropy, Test_2)
 {
-  torch::Tensor actions_probabilities = torch::ones({2, 4, 4}) * 0.5;
+  torch::Tensor actions_probabilities = torch::ones({1, 6, 2, 3}) * 0.5;
   float entropy_coefficient = 1;
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 2);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.5);
-  EXPECT_NEAR(output.item<float>(), -4*log(0.5), 0.0001);
+  EXPECT_EQ(actions_probabilities.size(0), 1);
+  EXPECT_EQ(actions_probabilities.size(1), 6);
+  EXPECT_EQ(actions_probabilities.size(2), 2);
+  EXPECT_EQ(actions_probabilities.size(3), 3);
+  EXPECT_NEAR(output.item<float>(), 1.5, 0.00001);
 }
 
 TEST(ComputePolicyEntropy, Test_3)
 {
-  torch::Tensor actions_probabilities = torch::ones({4, 4, 4}) * 0.25;
-  float entropy_coefficient = 2;
+  torch::Tensor actions_probabilities = torch::ones({1, 6, 2, 3}) * 0.25;
+  float entropy_coefficient = 0.1;
 
   torch::Tensor output = ComputePolicyEntropy(actions_probabilities, entropy_coefficient);
 
-  EXPECT_FLOAT_EQ(actions_probabilities.size(0), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(1), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities.size(2), 4);
-  EXPECT_FLOAT_EQ(actions_probabilities[0][0][0].item<float>(), 0.25);
-  EXPECT_NEAR(output.item<float>(), -8*log(0.25), 0.0001);
+  EXPECT_EQ(actions_probabilities.size(0), 1);
+  EXPECT_EQ(actions_probabilities.size(1), 6);
+  EXPECT_EQ(actions_probabilities.size(2), 2);
+  EXPECT_EQ(actions_probabilities.size(3), 3);
+  EXPECT_NEAR(output.item<float>(), 0.15, 0.00001);
 }
 
 TEST(ComputePolicyLoss, Test_1)
