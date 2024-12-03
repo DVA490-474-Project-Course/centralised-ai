@@ -69,79 +69,91 @@ TEST(ComputeRewardToGoTest, Test_3)
 
 TEST(ComputeTemporalDifferenceTest, Test_1)
 {
-  torch::Tensor critic_values = torch::zeros({4, 1});
-  torch::Tensor rewards = torch::zeros({4, 6});
+  torch::Tensor critic_values = torch::zeros(4);
+  torch::Tensor rewards = torch::zeros({6, 4});
   double discount = 0;
 
   torch::Tensor output = ComputeTemporalDifference(critic_values, rewards, discount);
 
-  EXPECT_EQ(output.size(0), 4);
-  EXPECT_EQ(output.size(1), 6);
+  EXPECT_EQ(output.size(0), 6);
+  EXPECT_EQ(output.size(1), 4);
   EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[0][1].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[0][2].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[0][4].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[0][5].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[1][0].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[1][1].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[1][2].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[1][3].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[1][4].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[1][5].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[2][0].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[2][1].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[2][2].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[2][3].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[2][4].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[2][5].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[3][0].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[3][1].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[3][2].item<float>(), 0);
   EXPECT_FLOAT_EQ(output[3][3].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[3][4].item<float>(), 0);
-  EXPECT_FLOAT_EQ(output[3][5].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[4][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[4][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[4][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[4][3].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[5][0].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[5][1].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[5][2].item<float>(), 0);
+  EXPECT_FLOAT_EQ(output[5][3].item<float>(), 0);
 }
 
 TEST(ComputeTemporalDifferenceTest, Test_2)
 {
-  torch::Tensor critic_values = torch::zeros({4, 1});
-  torch::Tensor rewards = torch::ones({4, 6});
-  double discount = 2;
+  torch::Tensor critic_values = torch::zeros(4);
+  torch::Tensor rewards = torch::ones({6, 4});
+  double discount = 0.1;
 
-  critic_values[0][0] = 0.1;
-  critic_values[1][0] = 0.2;
-  critic_values[2][0] = 0.3;
-  critic_values[3][0] = 0.4;
+  critic_values[0] = 0.1;
+  critic_values[1] = 0.2;
+  critic_values[2] = 0.3;
+  critic_values[3] = 0.4;
 
   torch::Tensor output = ComputeTemporalDifference(critic_values, rewards, discount);
 
-  EXPECT_EQ(output.size(0), 4);
-  EXPECT_EQ(output.size(1), 6);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[0][4].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[0][5].item<float>(), 1.3);
-  EXPECT_FLOAT_EQ(output[1][0].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[1][1].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[1][2].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[1][4].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[1][5].item<float>(), 1.4);
-  EXPECT_FLOAT_EQ(output[2][0].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[2][1].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[2][2].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[2][3].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[2][4].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[2][5].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[3][0].item<float>(), 0.6);
-  EXPECT_FLOAT_EQ(output[3][1].item<float>(), 0.6);
-  EXPECT_FLOAT_EQ(output[3][2].item<float>(), 0.6);
-  EXPECT_FLOAT_EQ(output[3][3].item<float>(), 0.6);
-  EXPECT_FLOAT_EQ(output[3][4].item<float>(), 0.6);
-  EXPECT_FLOAT_EQ(output[3][5].item<float>(), 0.6);
+  EXPECT_EQ(output.size(0), 6);
+  EXPECT_EQ(output.size(1), 4);
+  EXPECT_NEAR(output[0][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[0][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[0][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[0][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[0][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[0][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[1][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[1][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[1][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[1][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[1][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[1][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[2][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[2][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[2][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[2][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[2][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[2][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[3][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[3][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[3][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[3][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[3][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[3][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[4][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[4][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[4][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[4][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[4][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[4][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[5][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[5][3].item<float>(), 0.60, 0.00001);
+  EXPECT_NEAR(output[5][0].item<float>(), 0.92, 0.00001);
+  EXPECT_NEAR(output[5][1].item<float>(), 0.83, 0.00001);
+  EXPECT_NEAR(output[5][2].item<float>(), 0.74, 0.00001);
+  EXPECT_NEAR(output[5][3].item<float>(), 0.60, 0.00001);
   
   }
 
