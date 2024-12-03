@@ -27,6 +27,20 @@
 
 namespace centralised_ai {
 namespace collective_robot_behaviour {
+/*!
+ *@brief Resets hidden states and initializes trajectories for agents in a MAPPO implementation.
+ *
+ *@param[in] amount_of_players_in_team Number of agents on the team whose hidden states need resetting.
+ *@param[in] hidden_size Size of the hidden state for the LSTM network.
+ *@param[in] num_actions Number of possible actions an agent can take.
+ *
+ *@return A tuple containing:
+ * - A vector of `Trajectory` objects, each containing the reset hidden states for all agents.
+ * - A tensor of zeros representing the initial action probabilities (`act_prob`) for all actions.
+ * - An uninitialized tensor for storing the agent's actions.
+ */
+std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden();
+
  /*!
   *@brief MAPPO algorithm for training and running in the grSim environment.
   *

@@ -91,7 +91,7 @@ namespace collective_robot_behaviour {
 /*Reset the initalise state of the networks and hidden states.
  *This for timestep 0 used in MappoRun
  */
-static std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden(){
+std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden(){
   std::vector<Trajectory> trajectories;
   HiddenStates reset_states;
   reset_states.ct_p = torch::zeros({1, 1, hidden_size});
@@ -483,7 +483,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   SaveModels(Models,critic);
 
 
-  std::cout << "Old net validation: " << std::endl;
+  //std::cout << "Old net validation: " << std::endl;
   /*This should be false after updateNets() if networks were updated correctly*/
   //CheckModelParametersMatch(old_net, Models, old_net_critic, critic);
 
