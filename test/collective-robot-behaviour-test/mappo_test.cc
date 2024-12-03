@@ -21,7 +21,7 @@ namespace collective_robot_behaviour
   }
   */
 
-  /*TEST(ParametersNewTest, NewParameters) {
+  TEST(ParametersNewTest, NewParameters) {
     auto models = CreateAgents(amount_of_players_in_team);
     auto old_models = CreateAgents(amount_of_players_in_team);
     CriticNetwork critic_network;
@@ -61,7 +61,7 @@ namespace collective_robot_behaviour
     // Ensure the action tensor is uninitialized (should have no values yet)
     EXPECT_EQ(action.numel(), 0) << "Action tensor should initially be uninitialized.";
   }
-  */
+
 
 
 }
