@@ -11,6 +11,8 @@ add_subdirectory(collective-robot-behaviour)
 add_subdirectory(ssl-interface)
 add_subdirectory(simulation-interface)
 
+include_directories(../include)
+
 #===============================================================================
 # Dependencies
 
