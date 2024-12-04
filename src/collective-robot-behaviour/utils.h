@@ -60,7 +60,7 @@ namespace collective_robot_behaviour
     torch::Tensor  ClipProbabilityRatio(const torch::Tensor & probability_ratio, float clip_value);
 
     /*!
-    @returns the policy loss over a number of time steps.
+    @returns the policy loss over a number of time steps as a single tensor value.
     @param[In] general_advantage_estimation for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] probability_ratio: Probability ratio for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] clip_value: The parameter used to clip the probability ratio.

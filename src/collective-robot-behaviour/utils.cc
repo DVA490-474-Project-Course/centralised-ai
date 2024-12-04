@@ -107,7 +107,8 @@ torch::Tensor  ClipProbabilityRatio(const torch::Tensor & probability_ratio, flo
 torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimation, const torch::Tensor & probability_ratio, float clip_value, const torch::Tensor & policy_entropy)
 {
 	/* Clip the probability ratio. */
-	torch::Tensor  probability_ratio_clipped = ClipProbabilityRatio(probability_ratio, clip_value);
+	torch::Tensor  probability_ratio_clipped = probability_ratio.clamp(1 - clip_value, 1 + clip_value);
+
 	int32_t mini_batch_size = general_advantage_estimation.size(0);
 	int32_t num_agents = general_advantage_estimation.size(1);
 	int32_t num_time_steps = general_advantage_estimation.size(2);
