@@ -12,10 +12,10 @@
 #define CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_
 
 /* C system headers */
-#include <arpa/inet.h>
+#include "arpa/inet.h"
 
 /* C++ standard library headers */
-#include <string> 
+#include "string"
 
 /* Project .h files */
 #include "../ssl-interface/generated/ssl_gc_referee_message.pb.h"
@@ -25,11 +25,6 @@ namespace centralised_ai
 {
 namespace ssl_interface
 {
-
-/*
- * @brief Max datagram size of received UDP packets
- */
-const int max_datagram_size = 65536;
 
 /*!
  * @brief Class for communicating with ssl game controller.
@@ -86,6 +81,7 @@ public:
     * 
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The current referee command as an enumeration of type `RefereeCommand`.
     */
   enum RefereeCommand GetRefereeCommand();
 
@@ -94,6 +90,7 @@ public:
     * 
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The score of the blue team as an integer.
     */
   int GetBlueTeamScore();
 
@@ -102,32 +99,35 @@ public:
     * 
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The score of the yellow team as an integer.
     */
   int GetYellowTeamScore();
 
   /*!
     * @brief Returns the X coordinate of the ball designated position.
-    * 
-    * Returns the X coordinate in mm of the ball designated position. This value is
+    *
+    * @return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
     * 
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The X coordinate of the ball's designated position in millimeters.
     */
   float GetBallDesignatedPositionX();
 
   /*!
     * @brief Returns the Y coordinate of the ball designated position.
-    * 
-    * Returns the X coordinate in mm of the ball designated position. This value is
+    *
+    * @return the X coordinate in mm of the ball designated position. This value is
     * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
     * issued by the referee, which means that a robot has to bring the ball to the
     * designated position.
     * 
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The Y coordinate of the ball's designated position in millimeters.
     */
   float GetBallDesignatedPositionY();
 
@@ -135,10 +135,12 @@ public:
     * @brief Returns the remaining stage time left.
     * 
     * Returns the remaining stage time left in seconds. If the stage time is passed
-    * this value becomed negative.
-    * 
+    * this value becomes negative.
+    *
     * @pre In order to have the data available ReceivePacket() needs to be called
     * beforehand.
+    * @return The remaining stage time in seconds. A negative value indicates that
+    * the stage time has passed.
     */
   int64_t GetStageTimeLeft();
 
@@ -151,25 +153,71 @@ public:
   enum Team GetTeamOnPositiveHalf();
   virtual ~GameControllerClient() = default;
 
-  /* enum RefereeCommand GetNextRefereeCommand(); */
+  /*!
+   * @brief Retrieve the next referee command.
+   *
+   * @pre In order to have the data available ReceivePacket() needs to be called
+   * beforehand.
+   */
+  enum RefereeCommand GetNextRefereeCommand();
 
 protected:
-  /* Helper methods */
+  /*!
+    * @brief Read and store the relevant game state data from the Referee packet.
+    *
+    * @param packet The `Referee` packet containing game state information to be processed.
+    */
   void ReadGameStateData(Referee packet);
 
-  /* Network variables */
-  sockaddr_in client_address;
-  int socket;
+  /*!
+    * @brief The sockaddr_in structure used to store the client's address.
+    */
+  sockaddr_in client_address_;
 
-  /* Game state data */
-  enum RefereeCommand referee_command;
-  enum RefereeCommand next_referee_command;
-  int blue_team_score;
-  int yellow_team_score;
-  int64_t stage_time_left;
-  float ball_designated_position_x;
-  float ball_designated_position_y;
-  enum Team team_on_positive_half;
+  /*!
+    * @brief The socket descriptor used for UDP communication.
+    */
+  int socket_;
+
+  /*!
+    * @brief Current command received from the referee.
+    */
+  enum RefereeCommand referee_command_;
+
+  /*!
+    * @brief The next referee command in the game.
+    */
+  enum RefereeCommand next_referee_command_;
+
+  /*!
+    * @brief Blue team's score.
+    */
+  int blue_team_score_;
+
+  /*!
+    * @brief Yellow team's score.
+    */
+  int yellow_team_score_;
+
+  /*!
+    * @brief Remaining stage time.
+    */
+  int64_t stage_time_left_;
+
+  /*!
+    * @brief X coordinate of the ball's designated position.
+    */
+  float ball_designated_position_x_;
+
+  /*!
+    * @brief X coordinate of the ball's designated position.
+    */
+  float ball_designated_position_y_;
+
+    /*!
+    * @brief The team currently on the positive half of the field.
+    */
+  enum Team team_on_positive_half_;
 };
 
 } /* namespace ssl_interface */

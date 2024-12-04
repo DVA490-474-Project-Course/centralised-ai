@@ -22,6 +22,12 @@
 namespace centralised_ai
 {
 
+/*!
+ * @brief Maximum size of UDP packets received from SSL Vision and
+ * SSL Game Controller.
+ */
+constexpr int max_udp_packet_size = 65536;
+
 /*! 
  * @brief The robot radius in mm.
  */
