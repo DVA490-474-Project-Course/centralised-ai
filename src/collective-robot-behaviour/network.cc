@@ -65,8 +65,8 @@ PolicyNetwork::PolicyNetwork() :
 
 std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor input, torch::Tensor hx)
 {
-  auto layer1_output = layer1->forward(input).relu();  // Apply linear layer
-  auto layer2_output = layer2->forward(layer1_output).relu();  // Apply linear layer
+  auto layer1_output = layer1->forward(input).tanh();  // Apply linear layer
+  auto layer2_output = layer2->forward(layer1_output).tanh();  // Apply linear layer
 
   auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
   auto h = std::get<1>(gru_output).tanh();                 // Extract hidden state
@@ -136,18 +136,18 @@ std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
 }
 
 void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
-  for (const auto& agent : models) {
-    std::string model_path = "../models/agent_network" + std::to_string(agent.robotId) + ".pt";
+
+    std::string model_path = "../models/agent_network0.pt";
 
     try {
       torch::serialize::OutputArchive output_archive;
-      agent.policy_network->save(output_archive);
+      models[0].policy_network->save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
-      std::cerr << "Error saving model for agent " << agent.robotId << ": " << e.what() << std::endl;
+      std::cerr << "Error saving model for agent " <<0 << ": " << e.what() << std::endl;
     }
-  }
+
 
   /*Save Crtitc network in models folder*/
   try {
@@ -167,9 +167,9 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
   std::vector<Agents> agents;
 
   /* Load all policy networks and assign to each agent */
-  for (int i = 0; i < player_count; ++i) {
+  for (int i = 0; i < 1; ++i) {
     try {
-      std::string model_path = "../models/agent_network" + std::to_string(i) + ".pt";
+      std::string model_path = "../models/agent_network0.pt";
       torch::serialize::InputArchive input_archive;
 
       input_archive.load_from(model_path);
@@ -205,18 +205,18 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
 }
 
 void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic) {
-  for (const auto& agent : models) {
-    std::string model_path = "../models/old_agents/agent_network" + std::to_string(agent.robotId) + ".pt";
+
+    std::string model_path = "../models/old_agents/agent_network0.pt";
 
     try {
       torch::serialize::OutputArchive output_archive;
-      agent.policy_network->save(output_archive);
+      models[0].policy_network->save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
-      std::cerr << "Error saving model for agent " << agent.robotId << ": " << e.what() << std::endl;
+      std::cerr << "Error saving model for agent " << 0 << ": " << e.what() << std::endl;
     }
-  }
+
 
   /*Save Crtitc network in models folder*/
   try {
@@ -237,7 +237,7 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
 
   /* Load all policy networks and assign to each agent */
 
-  for (int i = 0; i < player_count; ++i) {
+  for (int i = 0; i < 1; ++i) {
     try {
       std::string model_path = "../models/old_agents/agent_network" + std::to_string(i) + ".pt";
       torch::serialize::InputArchive input_archive;
@@ -272,10 +272,10 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
   return agents;
 }
 
-void UpdateNets(std::vector<Agents>& agents,
-  CriticNetwork& critic,
-  torch::Tensor pol_loss,
-  torch::Tensor cri_loss) {
+  void UpdateNets(std::vector<Agents>& agents,
+    CriticNetwork& critic,
+    torch::Tensor pol_loss,
+    torch::Tensor cri_loss) {
 
   // Backpropagate for each agent
 

@@ -118,6 +118,11 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
 ssl_interface::VisionClient & vision_client, Team own_team,
 std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces) {
 
+
+  critic.eval();
+  Models[0].policy_network->eval();
+  torch::NoGradGuard no_grad;
+
   std::vector<DataBuffer> data_buffer; /*Initialise data buffer D*/
   Team opponent_team = ComputeOpponentTeam(own_team); /*Get opponent team class*/
 
@@ -148,22 +153,23 @@ std::vector<robot_controller_interface::simulation_interface::SimulationInterfac
       auto [valNetOutput, V_hx] = critic.Forward(state,trajectory[timestep-1].hidden_v.ht_p);
 
       /* For each agent in one timestep, get probabilities and hidden states*/
-      for (auto& agent : Models)
+      for (int agent = 0; agent < amount_of_players_in_team; agent++)
       {
         auto agent_state = state.clone();
-        agent_state.index({0, 0, 0}) = agent.robotId; /*Update the first index value to robot ID*/
+        agent_state.index({0, 0, 0}) = agent; /*Update the first index value to robot ID*/
 
         /*Get action probabilities and hidden states, input is previous timestep hidden state for the robots index*/
-        auto [act_prob, hx_new] = Models[0].policy_network->Forward(agent_state, trajectory[timestep - 1].hidden_p[agent.robotId].ht_p);
-        prob_actions_stored[agent.robotId] = act_prob[0][0]; /*Store probabilities*/
-
+        auto [act_prob, hx_new] = Models[0].policy_network->Forward(agent_state, trajectory[timestep - 1].hidden_p[agent].ht_p);
+        prob_actions_stored[agent] = act_prob[0][0]; /*Store probabilities*/
+        assert(act_prob.requires_grad() == 0);
         /*Save hidden states*/
         new_states.ht_p = hx_new;
         exp.hidden_p.push_back(new_states); /*Store hidden states*/
 
+
       } /*end for agent*/
 
-      
+
       auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
 
       /*Get the actions with the highest probabilities for each agent*/
@@ -291,7 +297,8 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   std::vector<DataBuffer> mini_batch;
 
   std::cout << "Updating hidden states" << std::endl;
-
+  Models[0].policy_network->train();
+  critic.rnn->train();
   /*Create random min batches that the agents network will update on
   * from papaer, should be set to 1
   */
@@ -440,7 +447,6 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
         auto hs_c = batch.t[t].hidden_v.ht_p; /*Get hidden state for critic*/
         auto mc_c = batch.t[t].hidden_v.ct_p; /*Get memory cell for critic*/
         auto old_ci = old_net_critic.Forward(state,hs_c); /*Get predictions from old critic network*/
-
         old_predicts_c[c][t] = std::get<0>(old_ci).squeeze(); /*Array needs to be same value for all agents*/
         new_predicts_c[c][t] = batch.t[t].critic_value[0];
 

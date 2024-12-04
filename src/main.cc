@@ -59,8 +59,8 @@ int main() {
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
-  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  //models = centralised_ai::collective_robot_behaviour::CreateAgents(1);
+  models = LoadAgents(centralised_ai::amount_of_players_in_team,critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -95,10 +95,9 @@ int main() {
   //std::thread plot_thread(PlotLoss);
 
   SaveOldModels(models,critic);
-  critic.train();
-  for (auto &model : models) {
-    model.policy_network->train();
-  }
+
+
+
   int epochs = 0;
   std::cout << "Running" << std::endl;
   while (true) {

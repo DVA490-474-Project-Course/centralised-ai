@@ -29,16 +29,6 @@ namespace centralised_ai
 const int max_timesteps = 201;
 
 /*!
- * @brief Initial step count, starting from zero.
- */
-const int steps = 0;
-
-/*!
- * @brief Maximum steps per episode or iteration.
- */
-const int step_max = 0;
-
-/*!
  * @brief Length of the experience replay buffer.
  */
 const int buffer_length = 2;
