@@ -120,7 +120,7 @@ Team ComputeOpponentTeam(Team own_team)
   }
 }
 
-void SendActions(std::vector<robot_controller_interface::simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids)
+void SendActions(std::vector<simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids)
 {
   for (int32_t i = 0; i < action_ids.size(0); i++)
   {

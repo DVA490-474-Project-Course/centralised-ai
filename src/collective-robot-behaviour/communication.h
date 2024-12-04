@@ -111,7 +111,7 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
 *@param[In] robot_interfaces: Array of robot interfaces of all robots.
 *@param[In] action_ids: The ids of the actions which will be sent to all robots.
 */
-void SendActions(std::vector<robot_controller_interface::simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids);
+void SendActions(std::vector<simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/

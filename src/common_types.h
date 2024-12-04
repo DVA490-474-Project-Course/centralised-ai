@@ -86,8 +86,7 @@ constexpr float ball_radius = 21.5;
 /*! 
  * @brief The number of robots in each team.
  */
-constexpr int team_size = 6;
-const int team_size = amount_of_players_in_team;
+constexpr int team_size = amount_of_players_in_team;
 
 /*! 
  * @brief Enum representing player team selection.
@@ -188,18 +187,5 @@ enum class RefereeCommand
   kUnknownCommand = -1
 };
 } /* namespace centralised_ai */
-
-namespace robot_controller_interface
-{
-  /*! 
- * @brief Enum representing player team selection.
- */
-  enum class Team
-  {
-    kBlue = 0,
-    kYellow = 1,
-    kUnknown = -1
-  };
-}
 
 #endif /* CENTRALISEDAI_COMMONTYPES_H_ */

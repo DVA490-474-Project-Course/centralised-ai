@@ -7,7 +7,7 @@
 //==============================================================================
 
 #include <gtest/gtest.h>
-#include "../../src/collective-robot-behaviour/world.h"
+#include "../../src/collective-robot-behaviour/reward.h"
 
 namespace centralised_ai
 {

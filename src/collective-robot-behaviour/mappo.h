@@ -55,7 +55,7 @@ void Mappo_Update(std::vector<Agents> &models,CriticNetwork &critic,std::vector<
 std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee,
  ssl_interface::VisionClient & vision_client,
  Team own_team,
- std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces);
+ std::vector<simulation_interface::SimulationInterface> simulation_interfaces);
 
  bool CheckModelParametersMatch(const std::vector<centralised_ai::collective_robot_behaviour::Agents>& saved_models,
                                   const std::vector<centralised_ai::collective_robot_behaviour::Agents>& loaded_models,

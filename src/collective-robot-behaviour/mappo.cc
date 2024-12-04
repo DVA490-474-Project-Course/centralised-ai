@@ -116,7 +116,7 @@ std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden(){
  */
 std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork critic,ssl_interface::AutomatedReferee & referee,
 ssl_interface::VisionClient & vision_client, Team own_team,
-std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces) {
+std::vector<simulation_interface::SimulationInterface> simulation_interfaces) {
 
   std::vector<DataBuffer> data_buffer; /*Initialise data buffer D*/
   Team opponent_team = ComputeOpponentTeam(own_team); /*Get opponent team class*/

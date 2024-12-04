@@ -17,8 +17,8 @@
 
 int main(int argc, char *argv[])
 {
-  robot_controller_interface::simulation_interface::SimulationInterface simulation_interface(
-    "127.0.0.1", 20011, 3, robot_controller_interface::Team::kBlue);
+  centralised_ai::simulation_interface::SimulationInterface simulation_interface(
+    "127.0.0.1", 20011, 3, centralised_ai::Team::kBlue);
   simulation_interface.SetVelocity(10.0F, 0.0F, 0.0F);
 
   /* Run a loop to send commands and then reset the robot after 600 iterations */

@@ -81,10 +81,10 @@ int main() {
   /* Start the automated referee */
   referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
 
-  std::vector<robot_controller_interface::simulation_interface::SimulationInterface> simulation_interfaces;
+  std::vector<simulation_interface::SimulationInterface> simulation_interfaces;
   for (int32_t id = 0; id < 6; id++)
   {
-    simulation_interfaces.push_back(robot_controller_interface::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, robot_controller_interface::Team::kBlue));
+    simulation_interfaces.push_back(simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, Team::kBlue));
     //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
 
