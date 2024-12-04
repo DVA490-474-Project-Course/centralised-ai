@@ -399,59 +399,61 @@ TEST(ComputePolicyLoss, Test_4)
 
 TEST(ComputeCriticLoss, Test_1)
 {
-  torch::Tensor current_values = torch::ones({1, 6});
-  torch::Tensor previous_values = torch::zeros({1, 6});
-  torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+  torch::Tensor current_values = torch::ones({1, 2});
+  torch::Tensor previous_values = torch::zeros({1, 2});
+  torch::Tensor rewards_to_go = torch::ones({1, 6, 2}) * 0.1;
   float clip_value = 0;
 
   torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
   EXPECT_EQ(current_values.size(0), 1);
-  EXPECT_EQ(current_values.size(1), 6);
+  EXPECT_EQ(current_values.size(1), 2);
   EXPECT_EQ(previous_values.size(0), 1);
-  EXPECT_EQ(previous_values.size(1), 6);
+  EXPECT_EQ(previous_values.size(1), 2);
   EXPECT_EQ(rewards_to_go.size(0), 1);
-  EXPECT_EQ(rewards_to_go.size(1), 1);
-  EXPECT_EQ(output.size(0), 1);
-  EXPECT_FLOAT_EQ(output[0].item<float>(), 0.81);
+  EXPECT_EQ(rewards_to_go.size(1), 6);
+  EXPECT_EQ(rewards_to_go.size(2), 2);
+  EXPECT_FLOAT_EQ(output.item<float>(), 0.405);
 }
 
 TEST(ComputeCriticLoss, Test_2)
 {
-  torch::Tensor current_values = torch::ones({1, 6});
-  torch::Tensor previous_values = torch::zeros({1, 6});
-  torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+  torch::Tensor current_values = torch::ones({1, 2});
+  torch::Tensor previous_values = torch::zeros({1, 2});
+  torch::Tensor rewards_to_go = torch::ones({1, 6, 2}) * 0.1;
   float clip_value = 0.2;
 
   torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
   EXPECT_EQ(current_values.size(0), 1);
-  EXPECT_EQ(current_values.size(1), 6);
+  EXPECT_EQ(current_values.size(1), 2);
   EXPECT_EQ(previous_values.size(0), 1);
-  EXPECT_EQ(previous_values.size(1), 6);
+  EXPECT_EQ(previous_values.size(1), 2);
   EXPECT_EQ(rewards_to_go.size(0), 1);
-  EXPECT_EQ(rewards_to_go.size(1), 1);
+  EXPECT_EQ(rewards_to_go.size(1), 6);
+  EXPECT_EQ(rewards_to_go.size(2), 2);
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_FLOAT_EQ(output[0].item<float>(), 0.81);
+  EXPECT_FLOAT_EQ(output[0].item<float>(), 0.405);
 }
 
 TEST(ComputeCriticLoss, Test_3)
 {
-  torch::Tensor current_values = torch::ones({4, 6}) * 0.5;
-  torch::Tensor previous_values = torch::ones({4, 6}) * 0.2;
-  torch::Tensor rewards_to_go = torch::ones({1, 1}) * 0.1;
+  torch::Tensor current_values = torch::ones({1, 2}) * 0.5;
+  torch::Tensor previous_values = torch::ones({1, 2}) * 0.2;
+  torch::Tensor rewards_to_go = torch::ones({1, 6, 2}) * 0.1;
   float clip_value = 0.2;
 
   torch::Tensor output = ComputeCriticLoss(current_values, previous_values, rewards_to_go, clip_value);
 
-  EXPECT_EQ(current_values.size(0), 4);
-  EXPECT_EQ(current_values.size(1), 6);
-  EXPECT_EQ(previous_values.size(0), 4);
-  EXPECT_EQ(previous_values.size(1), 6);
+  EXPECT_EQ(current_values.size(0), 1);
+  EXPECT_EQ(current_values.size(1), 2);
+  EXPECT_EQ(previous_values.size(0), 1);
+  EXPECT_EQ(previous_values.size(1), 2);
   EXPECT_EQ(rewards_to_go.size(0), 1);
-  EXPECT_EQ(rewards_to_go.size(1), 1);
+  EXPECT_EQ(rewards_to_go.size(1), 6);
+  EXPECT_EQ(rewards_to_go.size(2), 2);
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_FLOAT_EQ(output[0].item<float>(), 0.16);
+  EXPECT_FLOAT_EQ(output[0].item<float>(), 0.08);
 }
 
 }

@@ -127,7 +127,6 @@ torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimati
 
 torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value)
 {
-
 	/* Get the shape of the tensors. */
 	int32_t num_mini_batches = current_values.size(0);
 	int32_t num_time_steps = current_values.size(1);
