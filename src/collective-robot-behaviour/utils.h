@@ -30,16 +30,16 @@ namespace collective_robot_behaviour
     torch::Tensor NormalizeRewardToGo(const torch::Tensor & reward_to_go);
 
     /*!
-    @returns the temporal differences with the shape [num_time_steps, num_agents].
-    @param[In] critic_values: Values from the critic network per time step with the shape [num_time_steps, 1].
-    @param[In] rewards: Reward per time step per actor with the shape [num_time_steps, num_actors].
+    @returns the temporal differences with the shape [num_agents, num_time_steps].
+    @param[In] critic_values: Values from the critic network per time step with the shape [num_time_steps].
+    @param[In] rewards: Reward per time step per actor with the shape [num_agents, num_time_steps].
     @param[In] discount: Discount factor.
     */
     torch::Tensor  ComputeTemporalDifference(const torch::Tensor & critic_values, const torch::Tensor & rewards, double discount);
 
     /*!
-    @returns the general advantage estimation represented by a tensor of shape [num_time_steps, num_agents].
-    @param[In] temporal_differences: Tensor of shape [num_time_steps, num_agents].
+    @returns the general advantage estimation represented by a tensor of shape [num_agents, num_time_steps].
+    @param[In] temporal_differences: Tensor of shape [num_agents, num_time_steps].
     @param[In] discount: Discount factor.
     @param[In] gae_parameter: GAE parameter.
     */
@@ -61,8 +61,8 @@ namespace collective_robot_behaviour
 
     /*!
     @returns the policy loss over a number of time steps.
-    @param[In] GAE for each agent for each time step with the shape [num_time_steps, num_agents].
-    @param[In] probability_ratio: Probability ratio for each agent for each time step with the shape [num_time_steps, num_agents].
+    @param[In] general_advantage_estimation for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
+    @param[In] probability_ratio: Probability ratio for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] clip_value: The parameter used to clip the probability ratio.
     @param[In] policy_entropy: Average Policy entropy over the time steps and agents.
     @param[In] entropy_coefficient: The parameter used to determine the weight of the entropies.
@@ -71,16 +71,16 @@ namespace collective_robot_behaviour
 
     /*!
     @returns the critic loss over a number of time steps.
-    @param[In] current_values: Values from the Critic network with current parameters for each agent and time step, with shape [num_time_steps, num_agents].
-    @param[In] previous_values: Values from the Critic network with previous parameters for each agent and time step, with shape [num_time_steps, num_agents].
-    @param[In] reward_to_go: The discounted reward-to-go values for each time step, with shape [num_time_steps, 1].
+    @param[In] current_values: Values from the Critic network with current parameters for each agent and chunk in the mini batch, with shape [mini_batch_size, num_time_steps].
+    @param[In] previous_values: Values from the Critic network with previous parameters for each agent and chunk in the mini batch, with shape [mini_batch_size, num_time_steps].
+    @param[In] reward_to_go: The discounted reward-to-go values for chunk in the mini batch, with shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] clip_value: The parameter used to clip the critic network values.
     */
     torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torch::Tensor & previous_values, const torch::Tensor & reward_to_go, float clip_value);
 
     /*!
     @returns the policy entropy.
-    @param[In] actions_probabilities: Probabilities of all the actions for each agent and time step, with the shape [num_time_steps, num_agents, num_actions].
+    @param[In] actions_probabilities: Probabilities of all the actions for each agent and time step, with the shape [mini_batch_size, num_agents, num_time_steps, num_actions].
     @param[In] entropy_coefficient: The parameter used to determine the weight of the entropy.
     */
     torch::Tensor ComputePolicyEntropy(const torch::Tensor & actions_probabilities, float entropy_coefficient);

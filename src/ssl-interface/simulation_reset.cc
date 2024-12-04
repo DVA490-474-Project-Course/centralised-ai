@@ -136,8 +136,8 @@ void ResetRobotsAndBall(std::string ip, uint16_t port, enum Team team_on_positiv
 
   /* Replacement packet for ball */
   ball_replacement = packet.mutable_replacement()->mutable_ball();
-  ball_replacement->set_x(0.0F);
-  ball_replacement->set_y(0.0F);
+  ball_replacement->set_x(-1.0F);
+  ball_replacement->set_y(-1.0F);
   ball_replacement->set_vx(0.0F);
   ball_replacement->set_vy(0.0F);
 

@@ -11,7 +11,6 @@ add_subdirectory(collective-robot-behaviour)
 add_subdirectory(ssl-interface)
 add_subdirectory(simulation-interface)
 
-
 #===============================================================================
 # Dependencies
 
@@ -19,6 +18,7 @@ add_subdirectory(simulation-interface)
 target_link_libraries(main_exe
     mappo_lib
     ssl_interface_lib
+    simulation_interface_lib
 )
 
 #===============================================================================

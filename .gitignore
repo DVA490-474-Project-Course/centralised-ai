@@ -10,3 +10,4 @@
 *.idea*
 *.gitmodules*
 *.vscode*
+matplotlibcpp.h
