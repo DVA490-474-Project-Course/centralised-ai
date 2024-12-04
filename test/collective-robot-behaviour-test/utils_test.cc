@@ -216,81 +216,50 @@ TEST(ComputeGAETest, Test_3)
 
 TEST(ComputeProbabilityRatio, Test_1)
 {
-  torch::Tensor currrentprobs = torch::ones({1, 4});
-  torch::Tensor previousprobs = torch::ones({1, 4});
+  torch::Tensor currrentprobs = torch::ones({1, 6, 2});
+  torch::Tensor previousprobs = torch::ones({1, 6, 2});
 
   torch::Tensor output = ComputeProbabilityRatio(currrentprobs, previousprobs);
 
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
+  EXPECT_EQ(output.size(1), 6);
+  EXPECT_EQ(output.size(2), 2);
+  EXPECT_FLOAT_EQ(output[0][0][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][1][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][2][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][3][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][4][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][5][0].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][0][1].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][1][1].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][2][1].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][3][1].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][4][1].item<float>(), 1);
+  EXPECT_FLOAT_EQ(output[0][5][1].item<float>(), 1);
 }
 
 TEST(ComputeProbabilityRatio, Test_2)
 {
-  torch::Tensor currrentprobs = torch::ones({1, 4});
-  torch::Tensor previousprobs = torch::ones({1, 4}) * 2;
+  torch::Tensor currrentprobs = torch::ones({1, 6, 2});
+  torch::Tensor previousprobs = torch::ones({1, 6, 2}) * 2;
 
   torch::Tensor output = ComputeProbabilityRatio(currrentprobs, previousprobs);
 
   EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 0.5);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 0.5);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 0.5);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 0.5);
-}
-
-TEST(ClipProbabilityRatio, Test_1)
-{
-  torch::Tensor probabilities = torch::ones({1, 4});
-  float clip_value = 2;
-
-  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
-
-  EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1);
-}
-
-TEST(ClipProbabilityRatio, Test_2)
-{
-  torch::Tensor probabilities = torch::ones({1, 4}) * 2;
-  float clip_value = 0.5;
-
-  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
-
-  EXPECT_EQ(output.size(0), 1);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.5);
-}
-
-TEST(ClipProbabilityRatio, Test_3)
-{
-  torch::Tensor probabilities = torch::ones({2, 4}) * 2;
-  float clip_value = 0.5;
-
-  torch::Tensor output = ClipProbabilityRatio(probabilities, clip_value);
-
-  EXPECT_EQ(output.size(0), 2);
-  EXPECT_EQ(output.size(1), 4);
-  EXPECT_FLOAT_EQ(output[0][0].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][1].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][2].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[0][3].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[1][0].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[1][1].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[1][2].item<float>(), 1.5);
-  EXPECT_FLOAT_EQ(output[1][3].item<float>(), 1.5);
+  EXPECT_EQ(output.size(1), 6);
+  EXPECT_EQ(output.size(2), 2);
+  EXPECT_FLOAT_EQ(output[0][0][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][1][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][2][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][3][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][4][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][5][0].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][0][1].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][1][1].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][2][1].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][3][1].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][4][1].item<float>(), 0.5);
+  EXPECT_FLOAT_EQ(output[0][5][1].item<float>(), 0.5);
 }
 
 TEST(ComputePolicyEntropy, Test_1)

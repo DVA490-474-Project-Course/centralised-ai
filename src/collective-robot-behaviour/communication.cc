@@ -39,7 +39,7 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     vision_client.ReceivePacket();
     referee.AnalyzeGameState();
     
-    torch::Tensor states = torch::zeros(42);
+    torch::Tensor states = torch::zeros(9);
 
     /* Reserved for the robot id */
     states[0] = 0;
@@ -53,53 +53,57 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     states[4] = vision_client.GetRobotPositionY(0, own_team);
     states[5] = vision_client.GetRobotPositionX(1, own_team);
     states[6] = vision_client.GetRobotPositionY(1, own_team);
-    states[7] = vision_client.GetRobotPositionX(2, own_team);
-    states[8] = vision_client.GetRobotPositionY(2, own_team);
-    states[9] = vision_client.GetRobotPositionX(3, own_team);
-    states[10] = vision_client.GetRobotPositionY(3, own_team);
-    states[11] = vision_client.GetRobotPositionX(4, own_team);
-    states[12] = vision_client.GetRobotPositionY(4, own_team);
-    states[13] = vision_client.GetRobotPositionX(5, own_team);
-    states[14] = vision_client.GetRobotPositionY(5, own_team);
-
+    //states[7] = vision_client.GetRobotPositionX(2, own_team);
+    //states[8] = vision_client.GetRobotPositionY(2, own_team);
+    //states[9] = vision_client.GetRobotPositionX(3, own_team);
+    //states[10] = vision_client.GetRobotPositionY(3, own_team);
+    //states[11] = vision_client.GetRobotPositionX(4, own_team);
+    //states[12] = vision_client.GetRobotPositionY(4, own_team);
+    //states[13] = vision_client.GetRobotPositionX(5, own_team);
+    //states[14] = vision_client.GetRobotPositionY(5, own_team);
+//
     /* Opponent team positions */
-    states[15] = vision_client.GetRobotPositionX(0, opponent_team);
-    states[16] = vision_client.GetRobotPositionY(0, opponent_team);
-    states[17] = vision_client.GetRobotPositionX(1, opponent_team);
-    states[18] = vision_client.GetRobotPositionY(1, opponent_team);
-    states[19] = vision_client.GetRobotPositionX(2, opponent_team);
-    states[20] = vision_client.GetRobotPositionY(2, opponent_team);
-    states[21] = vision_client.GetRobotPositionX(3, opponent_team);
-    states[22] = vision_client.GetRobotPositionY(3, opponent_team);
-    states[23] = vision_client.GetRobotPositionX(4, opponent_team);
-    states[24] = vision_client.GetRobotPositionY(4, opponent_team);
-    states[25] = vision_client.GetRobotPositionX(5, opponent_team);
-    states[26] = vision_client.GetRobotPositionY(5, opponent_team);
+    //states[15] = vision_client.GetRobotPositionX(0, opponent_team);
+    //states[16] = vision_client.GetRobotPositionY(0, opponent_team);
+    //states[17] = vision_client.GetRobotPositionX(1, opponent_team);
+    //states[18] = vision_client.GetRobotPositionY(1, opponent_team);
+    //states[19] = vision_client.GetRobotPositionX(2, opponent_team);
+    //states[20] = vision_client.GetRobotPositionY(2, opponent_team);
+    //states[21] = vision_client.GetRobotPositionX(3, opponent_team);
+    //states[22] = vision_client.GetRobotPositionY(3, opponent_team);
+    //states[23] = vision_client.GetRobotPositionX(4, opponent_team);
+    //states[24] = vision_client.GetRobotPositionY(4, opponent_team);
+    //states[25] = vision_client.GetRobotPositionX(5, opponent_team);
+    //states[26] = vision_client.GetRobotPositionY(5, opponent_team);
+
+    /* Own team orientations */
+    states[7] = vision_client.GetRobotOrientation(0, own_team);
+    states[8] = vision_client.GetRobotOrientation(1, own_team);
 
     /* Goal difference */
-    states[27] = ComputeGoalDifference(referee, own_team);
+    //states[27] = ComputeGoalDifference(referee, own_team);
 
     /* Own team have ball */
-    states[28] = referee.IsTouchingBall(0, own_team);
-    states[29] = referee.IsTouchingBall(1, own_team);
-    states[30] = referee.IsTouchingBall(2, own_team);
-    states[31] = referee.IsTouchingBall(3, own_team);
-    states[32] = referee.IsTouchingBall(4, own_team);
-    states[33] = referee.IsTouchingBall(5, own_team);
+    //states[9] = referee.IsTouchingBall(0, own_team);
+    //states[10] = referee.IsTouchingBall(1, own_team);
+    //states[30] = referee.IsTouchingBall(2, own_team);
+    //states[31] = referee.IsTouchingBall(3, own_team);
+    //states[32] = referee.IsTouchingBall(4, own_team);
+    //states[33] = referee.IsTouchingBall(5, own_team);
 
     /* Opponent team have ball */
-    states[34] = referee.IsTouchingBall(0, opponent_team);
-    states[35] = referee.IsTouchingBall(1, opponent_team);
-    states[36] = referee.IsTouchingBall(2, opponent_team);
-    states[37] = referee.IsTouchingBall(3, opponent_team);
-    states[38] = referee.IsTouchingBall(4, opponent_team);
-    states[39] = referee.IsTouchingBall(5, opponent_team);
+    //states[34] = referee.IsTouchingBall(0, opponent_team);
+    //states[35] = referee.IsTouchingBall(1, opponent_team);
+    //states[36] = referee.IsTouchingBall(2, opponent_team);
+    //states[37] = referee.IsTouchingBall(3, opponent_team);
+    //states[38] = referee.IsTouchingBall(4, opponent_team);
+    //states[39] = referee.IsTouchingBall(5, opponent_team);
 
     /* Remaining time in the current stage */
-    states[40] = referee.GetStageTimeLeft();
+    //states[40] = referee.GetStageTimeLeft();
 
     /* Referee command */
-    states[41] = static_cast<int32_t>(referee.GetRefereeCommand());
+    //states[41] = static_cast<int32_t>(referee.GetRefereeCommand());
 
     /* Reshape the states to [1, 1, num_states], but keeping the data in the third dimension. */
     return states.view({1, 1, states.size(0)});

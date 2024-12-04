@@ -99,11 +99,6 @@ torch::Tensor  ComputeProbabilityRatio(const torch::Tensor & current_probabiliti
 	return current_probabilities.divide(previous_probabilities);
 }
 
-torch::Tensor  ClipProbabilityRatio(const torch::Tensor & probability_ratio, float clip_value)
-{
-	return probability_ratio.clamp(1-clip_value, 1+clip_value);
-}
-
 torch::Tensor ComputePolicyLoss(const torch::Tensor & general_advantage_estimation, const torch::Tensor & probability_ratio, float clip_value, const torch::Tensor & policy_entropy)
 {
 	/* Clip the probability ratio. */
@@ -152,8 +147,8 @@ torch::Tensor ComputeCriticLoss(const torch::Tensor & current_values, const torc
 		{
 			for (int32_t t = 0; t < num_time_steps; t++)
 			{
-				torch::Tensor current_values_loss = torch::huber_loss(current_values[i][t], reward_to_go[i][j][t], at::Reduction::Mean, 10);
-				torch::Tensor current_values_clipped_loss = torch::huber_loss(current_values_clipped[i][t], reward_to_go[i][j][t], at::Reduction::Mean, 10);
+				torch::Tensor current_values_loss = torch::huber_loss(current_values[i][t], reward_to_go[i][j][t], at::Reduction::None, 10);
+				torch::Tensor current_values_clipped_loss = torch::huber_loss(current_values_clipped[i][t], reward_to_go[i][j][t], at::Reduction::None, 10);
 				loss += torch::max(current_values_loss, current_values_clipped_loss);
 			}
 		}

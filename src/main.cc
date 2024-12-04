@@ -82,7 +82,7 @@ int main() {
   referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
 
   std::vector<centralised_ai::simulation_interface::SimulationInterface> simulation_interfaces;
-  for (int32_t id = 0; id < 6; id++)
+  for (int32_t id = 0; id < centralised_ai::amount_of_players_in_team; id++)
   {
     simulation_interfaces.push_back(centralised_ai::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, centralised_ai::Team::kBlue));
     //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
