@@ -31,7 +31,7 @@ const int max_timesteps = 201;
 /*!
  * @brief Length of the experience replay buffer.
  */
-const int buffer_length = 2;
+const int buffer_length = 5;
 
 /*!
  * @brief Number of players per team in the simulation or game.
@@ -51,7 +51,7 @@ const int input_size = 42;
 /*!
  * @brief Number of possible actions each agent can take.
  */
-const int num_actions = 7;
+const int num_actions = 5;
 
 /*!
  * @brief Size of the hidden layer in LSTM or RNN-based neural networks.

@@ -69,7 +69,7 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
   auto layer2_output = layer2->forward(layer1_output).tanh();  // Apply linear layer
 
   auto gru_output = rnn->forward(layer2_output, hx);  // GRU forward pass
-  auto h = std::get<1>(gru_output).tanh();                 // Extract hidden state
+  auto h = std::get<1>(gru_output);                 // Extract hidden state
   auto gru_out = std::get<0>(gru_output);         // Extract output
 
   auto output = output_layer(h);  // Apply linear layer
@@ -281,30 +281,27 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
 
   // Set up Adam options
   torch::optim::AdamOptions adam_options;
-  adam_options.lr(5e-4);  // Learning rate
+  adam_options.lr(7e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 
   torch::optim::Adam opts({agents[0].policy_network->parameters()},
                             adam_options);
+
   // Zero the gradients before the backward pass
   opts.zero_grad();
 
-  // Ensure we retain the graph for subsequent backward calls
-  pol_loss.requires_grad_();
   pol_loss.backward({},true);
 
   torch::nn::utils::clip_grad_norm_(agents[0].policy_network->parameters(), 0.5);
-
   // Update the policy network for the current agent
   opts.step();
 
   /*Update critic network*/
   torch::optim::Adam critnet(critic.parameters(), adam_options);
-  // Ensure that the critic loss requires gradients
+
   critnet.zero_grad();
-  cri_loss.requires_grad_();
-  cri_loss.backward();
+  cri_loss.backward({},true);
   torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
   critnet.step();
 
