@@ -19,6 +19,7 @@
 #include "simulation-interface/simulation_interface.h"
 
 #include "collective-robot-behaviour/communication.h"
+#include "collective-robot-behaviour/evaluation.h"
 #include "common_types.h"
 
 #include <pybind11/embed.h>
@@ -26,6 +27,7 @@
 #include <matplotlibcpp.h>
 #include <iostream>
 #include "common_types.h"
+#include <ctime>
 
 std::vector<double> critic_loss;
 
@@ -94,6 +96,20 @@ int main() {
   // Launch the plotting in a separate thread
   //std::thread plot_thread(PlotLoss);
 
+  /* Generate the file name from date. */
+  /* Get current time */
+  auto now = std::chrono::system_clock::now();
+  std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+
+  /* Convert to local time and format */
+  std::tm local_time = *std::localtime(&now_time);
+  std::ostringstream oss;
+  oss << std::put_time(&local_time, "%Y-%m-%d_%H-%M-%S");  // e.g., "2024-09-12_14-30-00"
+
+  /* Create the file name */
+  std::string file_name = "../reward_to_go_" + oss.str() + ".csv";
+  std::cout << "File name to save reward to go: " << file_name << std::endl;
+
   SaveOldModels(models,critic);
   critic.train();
   for (auto &model : models) {
@@ -127,6 +143,9 @@ int main() {
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
+
+    torch::Tensor reward_to_go = torch::ones({4, 10});
+    centralised_ai::collective_robot_behaviour::SaveRewardToGoToFile(reward_to_go, file_name);
 
     std::cout << "* Epochs: " << epochs << std::endl;
     epochs++;
