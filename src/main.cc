@@ -122,30 +122,23 @@ int main() {
     /*run actions and save  to buffer*/
     auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue,simulation_interfaces);
 
-      /* Calcuate the mean episode reward */
-      float mean_reward = 0.0;
-      for (int32_t i = 0; i < databuffer.size(); i++)
-      {
-        for (int32_t j = 0; j < databuffer[i].t.size(); j++)
-        {
-          mean_reward += databuffer[i].t[j].rewards.sum().div(centralised_ai::amount_of_players_in_team).item<float>();
-        }
-      }
-
-      mean_reward /= static_cast<float>(centralised_ai::max_timesteps);
-
-      critic_loss.push_back(mean_reward);
-      /* Push the mean reward for each time step in the returned epoch. */
-      //for (int32_t t = 0; t < databuffer[0].t.size(); t++)
-      //{
-      //  /* Todo: Push critic loss to the list. */
-      //}
-
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
     centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
 
-    torch::Tensor reward_to_go = torch::ones({4, 10});
-    centralised_ai::collective_robot_behaviour::SaveRewardToGoToFile(reward_to_go, file_name);
+    /*Save the reward to go to a file*/
+    int32_t num_batches = databuffer.size();
+    int32_t num_time_steps = databuffer[0].t.size();
+    torch::Tensor rewards = torch::zeros({num_batches, num_time_steps});
+    
+    for (int32_t b = 0; b < databuffer.size(); b++)
+    {
+      for (int32_t t = 0; t < databuffer[b].t.size(); t++)
+      {
+        rewards[b][t] = databuffer[b].t[t].rewards.mean();
+      }
+    }
+
+    centralised_ai::collective_robot_behaviour::SaveRewardToFile(rewards.mean(), epochs, file_name);
 
     std::cout << "* Epochs: " << epochs << std::endl;
     epochs++;

@@ -191,8 +191,7 @@ std::vector<simulation_interface::SimulationInterface> simulation_interfaces) {
       state = GetGlobalState(referee, vision_client, own_team, opponent_team);
 
       /* Get rewards from the actions. */
-      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0),
-        {-0.001, 500, 10, 0.1});
+      exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 10, 0.1});
 
       //assert(exp.rewards.size(0) == amount_of_players_in_team);
       trajectory.push_back(exp); /*Store into trajectories*/
