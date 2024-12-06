@@ -15,7 +15,7 @@
 #include "string"
 
 /* Project .h files */
-#include "ssl_vision_client.h"
+#include "../ssl-interface/ssl_vision_client.h"
 #include "../common_types.h"
 
 namespace centralised_ai

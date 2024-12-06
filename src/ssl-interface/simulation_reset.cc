@@ -21,8 +21,8 @@
 #include "string"
 
 /* Project .h files */
-#include "generated/grsim_commands.pb.h"
-#include "generated/grsim_packet.pb.h"
+#include "../ssl-interface/generated/grsim_commands.pb.h"
+#include "../ssl-interface/generated/grsim_packet.pb.h"
 
 namespace centralised_ai
 {
