@@ -157,32 +157,32 @@ class VisionClient
   /*!
    * @brief Array containing the x coordinates of the blue team robots.
    */
-  float blue_robot_positions_x_[team_size];
+  float blue_robot_positions_x_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the y coordinates of the blue team robots.
    */
-  float blue_robot_positions_y_[team_size];
+  float blue_robot_positions_y_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the theta coordinates of the blue team robots.
    */
-  float blue_robot_orientations_[team_size];
+  float blue_robot_orientations_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the x coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_x_[team_size];
+  float yellow_robot_positions_x_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the y coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_y_[team_size];
+  float yellow_robot_positions_y_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the theta coordinates of the yellow team robots.
    */
-  float yellow_robot_orientations_[team_size];
+  float yellow_robot_orientations_[amount_of_players_in_team];
 
   /*!
    * @brief X coordinate of the ball.
@@ -198,13 +198,13 @@ class VisionClient
    * @brief Array indicating whether the position data of each blue
    * team robot has been read.
    */
-  float blue_robot_positions_read_[team_size];
+  float blue_robot_positions_read_[amount_of_players_in_team];
 
   /*!
    * @brief Array indicating whether the position data of each yellow
    * team robot has been read.
    */
-  float yellow_robot_positions_read_[team_size];
+  float yellow_robot_positions_read_[amount_of_players_in_team];
 
   /*!
    *@brief Flag indicating whether the ball position data has been read.

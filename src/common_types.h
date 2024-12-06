@@ -84,11 +84,6 @@ constexpr float robot_radius = 85;
 constexpr float ball_radius = 21.5;
 
 /*! 
- * @brief The number of robots in each team.
- */
-constexpr int team_size = amount_of_players_in_team;
-
-/*! 
  * @brief Enum representing player team selection.
  */
 enum class Team

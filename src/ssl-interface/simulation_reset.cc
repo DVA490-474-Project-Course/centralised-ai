@@ -80,7 +80,7 @@ void ResetRobotsAndBall(std::string ip, uint16_t port,
 
   /* Loop through each robot index to reset the positions and other attributes
   of blue and yellow team*/
-  for (int k = 0; k < team_size; k++)
+  for (int k = 0; k < amount_of_players_in_team; k++)
   {
     /* Reset blue team robots (yellowteam = false) */
     command = packet.mutable_commands()->add_robot_commands();

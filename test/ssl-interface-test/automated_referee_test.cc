@@ -41,7 +41,7 @@ public:
 /* Sets all robot and ball posiitons to zero */
 void SetAllPositionsToZero(VisionClientDerived& vision_client)
 {
-  for (int id = 0; id < centralised_ai::team_size; id++)
+  for (int id = 0; id < centralised_ai::amount_of_players_in_team; id++)
   {
     vision_client.SetBlueRobotPositionX(id, 0.0F);
     vision_client.SetBlueRobotPositionY(id, 0.0F);

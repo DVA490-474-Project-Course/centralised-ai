@@ -74,7 +74,7 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
 
   /* Set flags indicating that ball and robot positions have not been read yet */
   ball_data_read_ = false;
-  for (int id = 0; id < team_size; id++)
+  for (int id = 0; id < amount_of_players_in_team; id++)
   {
     blue_robot_positions_read_[id] = false;
     yellow_robot_positions_read_[id] = false;
@@ -85,7 +85,7 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
     ReceivePacket();
     all_data_has_been_read = true;
 
-    for (int id = 0; id < team_size; id++)
+    for (int id = 0; id < amount_of_players_in_team; id++)
     {
       if (blue_robot_positions_read_[id] == false ||
           yellow_robot_positions_read_[id] == false ||
@@ -116,7 +116,7 @@ void VisionClient::ReadVisionData(SslWrapperPacket packet)
       robot = detection.robots_blue(i);
       id = robot.robot_id();
 
-      if (id < team_size)
+      if (id < amount_of_players_in_team)
       {
         blue_robot_positions_x_[id] = robot.x();
         blue_robot_positions_y_[id] = robot.y();
@@ -134,7 +134,7 @@ void VisionClient::ReadVisionData(SslWrapperPacket packet)
       robot = detection.robots_yellow(i);
       id = robot.robot_id();
 
-      if (id < team_size)
+      if (id < amount_of_players_in_team)
       {
         yellow_robot_positions_x_[id] = robot.x();
         yellow_robot_positions_y_[id] = robot.y();
@@ -163,7 +163,7 @@ void VisionClient::ReadVisionData(SslWrapperPacket packet)
 /* Method to print position data, used for debugging/demo */
 void VisionClient::Print()
 {
-  for (int id = 0; id < team_size; id++)
+  for (int id = 0; id < amount_of_players_in_team; id++)
   {
     printf("BLUE ROBOT ID=<%d> POS=<%9.2f,%9.2f> ROT=<%9.2f>  ", id,
         blue_robot_positions_x_[id],
