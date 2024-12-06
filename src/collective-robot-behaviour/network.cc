@@ -281,28 +281,30 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
 
   // Set up Adam options
   torch::optim::AdamOptions adam_options;
-  adam_options.lr(7e-4);  // Learning rate
+  adam_options.lr(1e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 
   torch::optim::Adam opts({agents[0].policy_network->parameters()},
                             adam_options);
 
-  // Zero the gradients before the backward pass
-  opts.zero_grad();
-
-  pol_loss.backward({},true);
-
-  torch::nn::utils::clip_grad_norm_(agents[0].policy_network->parameters(), 0.5);
-  // Update the policy network for the current agent
-  opts.step();
-
   /*Update critic network*/
   torch::optim::Adam critnet(critic.parameters(), adam_options);
 
+
+  // Zero the gradients before the backward pass
+  opts.zero_grad();
   critnet.zero_grad();
-  cri_loss.backward({},true);
+
+  auto loss = pol_loss + cri_loss;
+  //pol_loss.backward({},true);
+  loss.backward();
+
+  torch::nn::utils::clip_grad_norm_(agents[0].policy_network->parameters(), 0.5);
   torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
+
+  // Update the policy network for the current agent
+  opts.step();
   critnet.step();
 
 

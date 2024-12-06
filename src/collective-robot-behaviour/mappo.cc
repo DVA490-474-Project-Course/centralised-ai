@@ -417,7 +417,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   assert(old_predicts_c.requires_grad() == true);
 
   // Compute policy entropy
-  torch::Tensor policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.9);
+  torch::Tensor policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.5);
 
   // Compute probability ratios
   torch::Tensor probability_ratios = ComputeProbabilityRatio(new_predicts_p, old_predicts_p);

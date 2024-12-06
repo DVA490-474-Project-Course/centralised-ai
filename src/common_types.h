@@ -51,7 +51,7 @@ const int input_size = 42;
 /*!
  * @brief Number of possible actions each agent can take.
  */
-const int num_actions = 5;
+const int num_actions = 4;
 
 /*!
  * @brief Size of the hidden layer in LSTM or RNN-based neural networks.
