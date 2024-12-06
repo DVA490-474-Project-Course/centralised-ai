@@ -88,8 +88,17 @@ constexpr float ball_radius = 21.5;
  */
 enum class Team
 {
+  /*! 
+   * @brief Blue team.
+   */
   kBlue = 0,
+  /*! 
+   * @brief Yellow team.
+   */
   kYellow = 1,
+  /*! 
+   * @brief Team unknown or not set.
+   */
   kUnknown = -1
 };
 
