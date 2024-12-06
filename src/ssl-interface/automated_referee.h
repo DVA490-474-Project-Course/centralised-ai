@@ -283,12 +283,12 @@ protected:
   /*!
     * @brief Indicates positive half X-coordinate for goal.
     */
-  float goal_x_positive_half = 4500;
+  static constexpr float goal_x_positive_half = 4500;
 
   /*!
     * @brief Indicates negative half X-coordinate for goal.
     */
-  float goal_x_negative_half = -4500;
+  static constexpr float goal_x_negative_half = -4500;
 
   /*!
     * @brief Indicates minimum Y-coordinate for goal width.
