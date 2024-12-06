@@ -218,7 +218,7 @@ bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y)
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
 {
   return (ball_x > goal_x_positive_half || ball_x < goal_x_negative_half
-      || ball_y > ball_out_of_field_max_y || ball_y < ball_out_of_field_min_y);
+      || ball_y > ball_out_of_field_min_y || ball_y < ball_out_of_field_min_y);
 }
 
 /* Returns true if the specified robot is currently touching the ball */
@@ -299,30 +299,33 @@ struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition()
   float ball_x = vision_client_.GetBallPositionX();
   float ball_y = vision_client_.GetBallPositionY();
 
-  if ((ball_x > 4500 && ball_y > 500) || (ball_x >= 4300 && ball_y > 3000))
+  if ((ball_x > goal_x_positive_half && ball_y > goal_width_max_y) ||
+      (ball_x >= 4300 && ball_y > ball_out_of_field_min_y))
   {
     local_designated_position.x = 4300;
     local_designated_position.y = 2800;
-  } else if ((ball_x > 4500 && ball_y < -0500) ||
-             (ball_x >= 4300 && ball_y < -3000))
+  } else if ((ball_x > goal_x_positive_half && ball_y < -goal_width_max_y) ||
+        (ball_x >= 4300 && ball_y < -ball_out_of_field_min_y))
   {
     local_designated_position.x = 4300;
     local_designated_position.y = -2800;
-  } else if ((ball_x < -4500 && ball_y > 0500) ||
-             (ball_x <= -4300 && ball_y > 3000))
+  } else if ((ball_x < goal_x_negative_half && ball_y > goal_width_max_y) ||
+        (ball_x <= -4300 && ball_y > ball_out_of_field_min_y))
   {
     local_designated_position.x = -4300;
     local_designated_position.y = 2800;
-  } else if ((ball_x < -4500 && ball_y < -0500) ||
-             (ball_x <= -4300 && ball_y < -3000))
+  } else if ((ball_x < goal_x_negative_half && ball_y < -goal_width_max_y) ||
+        (ball_x <= -4300 && ball_y < -ball_out_of_field_min_y))
   {
     local_designated_position.x = -4300;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 && ball_y < -3000)
+  } else if (ball_x > -4300 && ball_x < 4300 &&
+        ball_y < -ball_out_of_field_min_y)
   {
     local_designated_position.x = ball_x;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 && ball_y > 3000)
+  } else if (ball_x > -4300 && ball_x < 4300 &&
+        ball_y > ball_out_of_field_min_y)
   {
     local_designated_position.x = ball_x;
     local_designated_position.y = 2800;
