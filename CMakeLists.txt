@@ -19,6 +19,13 @@ set(CMAKE_PREFIX_PATH "/home/vicore/Documents/libtorch/share/cmake/Torch")
 find_package(Protobuf REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Torch REQUIRED)
+find_package(PythonLibs 3.10)
+find_package(Python3 COMPONENTS Development Interpreter REQUIRED)
+
+#target_include_directories(centralized_ai PRIVATE ${PYTHON_INCLUDE_DIRS})
+#target_link_libraries(centralized_ai ${PYTHON_LIBRARIES})
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+include_directories(${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
 
 #===============================================================================
 # add_subdirectories must be last

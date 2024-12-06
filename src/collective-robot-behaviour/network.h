@@ -57,14 +57,14 @@ namespace collective_robot_behaviour
     torch::Tensor new_state;
     std::vector<HiddenStates> hidden_p;
     HiddenStates hidden_v;
-    torch::Tensor criticvalues;
+    torch::Tensor critic_value;
 
 
     Trajectory()
     : /*robotID(-1),*/
       state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
       actions_prob(torch::zeros({num_actions})),
-      rewards(torch::zeros({1,amount_of_players_in_team})),
+      rewards(torch::zeros(amount_of_players_in_team)),
       actions(torch::zeros({amount_of_players_in_team})),
       new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
 
@@ -99,8 +99,10 @@ struct DataBuffer {
 struct PolicyNetwork : torch::nn::Module {
   const int num_layers;
   const int output_size;
-
-  torch::nn::LSTM lstm{nullptr};
+  
+  torch::nn::Linear layer1{nullptr};
+  torch::nn::Linear layer2{nullptr};
+  torch::nn::GRU rnn{nullptr};
   torch::nn::Linear output_layer{nullptr};
 
   PolicyNetwork();
@@ -113,10 +115,9 @@ struct PolicyNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
-  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> Forward(
+  std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
-    torch::Tensor hx,
-    torch::Tensor cx
+    torch::Tensor hx
   );
 };
 
@@ -129,11 +130,10 @@ struct PolicyNetwork : torch::nn::Module {
  *Contains robotid, x_pos, y_pos and poliycnetwork
  */
 struct CriticNetwork : torch::nn::Module {
-  const int num_layers;
-  const int output_size;
-
-  torch::nn::LSTM lstm{nullptr};
-  torch::nn::Linear value_layer{nullptr};
+  torch::nn::Linear layer1{nullptr};
+  torch::nn::Linear layer2{nullptr};
+  torch::nn::GRU rnn{nullptr};
+  torch::nn::Linear output_layer{nullptr};
 
   CriticNetwork();
 
@@ -146,10 +146,9 @@ struct CriticNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
-  std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> Forward(
+  std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
-    torch::Tensor hx,
-    torch::Tensor cx
+    torch::Tensor hx
   );
 };
 
@@ -164,10 +163,10 @@ struct Agents {
   torch::Tensor random_floats; // Declaration only
   float x_pos;
   float y_pos;
-  PolicyNetwork policy_network;
+  std::shared_ptr<PolicyNetwork> policy_network;
 
   // Constructor
-  Agents(int id, PolicyNetwork network);
+  Agents(int id, std::shared_ptr<PolicyNetwork> model);
 };
 
 /*!
@@ -204,13 +203,37 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic);
 std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
 
 /*!
+ * @brief Load old network models via the /models/old_agents folder.
+ *
+ * @param[in]  player_count amount of players to load in
+ * @param[in] critic A reference to the CriticNetwork
+ * @param[out] Returns Agent vector of all policy networks for each robot.
+ */
+std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic);
+
+  /*!
+ * @brief Save the old agents models and the critic network in models/old_agents folder.
+ *
+ * This function serializes the parameters of the given agents' policy networks
+ * and the critic network into a file. This allows for the preservation of the
+ * trained models' weights, enabling later recovery or continuation of training.
+ *
+ * @param[in] models A constant reference to a vector of old Agents containing the
+ *               individual agent models to be saved.
+ * @param[in] critic A reference to the old CriticNetwork instance that will also
+ *               be saved along with the agents' models.
+ */
+void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic);
+
+
+/*!
  * @brief Update all network weights
  *
  * @param[in]  agents policy networks of all agents/robots.
  * @param[in] critic A reference to the CriticNetwork
  * @param[in] exper_buff experience buffer vector.
  */
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork& critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
+void UpdateNets(std::vector<Agents>& agents, CriticNetwork &critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //NETWORK_H

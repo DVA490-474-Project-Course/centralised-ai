@@ -12,31 +12,16 @@
 
 #include <torch/torch.h>
 #include "../ssl-interface/automated_referee.h"
+#include "../simulation-interface/simulation_interface.h"
 #include "../common_types.h"
-#include "world.h"
-
-/*Extern values*/
-extern int input_size;
-extern int num_actions;
-extern int amount_of_players_in_team;
-extern int hidden_size;
+#include "reward.h"
+#include <vector>
+#include "../common_types.h"
 
 namespace centralised_ai
 {
 namespace collective_robot_behaviour
 {
-
-/*!
-*@brief Struct representing the observation of the state of the world.
-*/
-struct Observation
-{
-  /* Tensor representing the rewards for each agent, with the shape [num_agents].*/
-  torch::Tensor rewards;
-  /* Tensor representing the state of the world, with the shape [num_states]*/
-  torch::Tensor state;
-};
-
 /*!
 *@brief Struct representing the configuration of the rewards.
 */
@@ -49,33 +34,24 @@ typedef struct RewardConfiguration
 
     /* The reward that will be given to the robot when it has the ball. */
     float have_ball_reward;
+
+    /* The reward that will be multiplied with the distance.*/
+    float distance_to_ball_reward;
 } RewardConfiguration;
 
 /*!
 * @brief Calculates the opponent team from the own team.
 * @returns The opponent team.
+* @param[In] own_team: The team that the robots are on.
 */
 Team ComputeOpponentTeam(Team own_team);
 
 /*!
- *@brief Get the current state from grSim
- *
- *@pre The following preconditions must be met before using this class:
- * - A connection to grSim.
- *
- *@param[In] referee: The automated referee, which is the source of the current state of the world.
- *@param[In] vision_client: The vision client, which is the source of the current state of the world.
- *@param[In] Team: The team that the agents are on.
- *@param[Out] Tensor array of the current state that includes ....
- */
-Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interface::VisionClient vision_client, struct RewardConfiguration reward_configuration, Team team);
-
-/*!
-*@brief Get the current state from grSim
+*@brief Get the current global state of the world from grSim
 *
 *@returns A tensor representing the states of the world, with the shape [1, 1, num_states].
 * The states are as follows:
-* [0] - Reserved for the robot id as input to each policy network.
+* [0] - Reserved for the robot id as input to the policy network.
 * [1] - The x-coordinate of the ball.
 * [2] - The y-coordinate of the ball.
 * [3] - The x-coordinate of the teammate robot 0.
@@ -117,7 +93,6 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 * [39] - The opponent robot 5 have ball boolean.
 * [40] - The remaining time in the current stage.
 * [41] - The referee command.
-* [42] - The remaining time until the next referee command (if applicable, i.e. from kickoff to start).
 *
 *@pre The following preconditions must be met before using this class:
 * - A connection to grSim.
@@ -128,17 +103,15 @@ Observation GetObservations(ssl_interface::AutomatedReferee referee, ssl_interfa
 *@param[In] own_team: The team that the robots are on.
 *@param[In] opponent_team: The team that the robots are playing against.
 */
-torch::Tensor GetStates(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
+torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
 
 /*!
-*@brief Computes the rewards for each agent.
+*@brief Send actions to the robots.
 *
-*@returns A tensor representing the rewards for each agent, with the shape [num_agents].
-*@param[In] states: The states of the world, with the shape [num_states].
-*@param[In] reward_configuration: The configuration of the rewards.
-*@param[In] own_team: The team that the agents are on.
+*@param[In] robot_interfaces: Array of robot interfaces of all robots.
+*@param[In] action_ids: The ids of the actions which will be sent to all robots.
 */
-torch::Tensor ComputeRewards(torch::Tensor & states, struct RewardConfiguration reward_configuration, Team own_team);
+void SendActions(std::vector<simulation_interface::SimulationInterface> robot_interfaces, torch::Tensor action_ids);
 
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
