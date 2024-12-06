@@ -51,7 +51,7 @@ const int buffer_length = 2;
 /*!
  * @brief Number of players per team in the simulation or game.
  */
-const int amount_of_players_in_team = 2;
+const int amount_of_players_in_team = 6;
 
 /*!
  * @brief Batch size for training, calculated as buffer length multiplied by the number of players in the team.
