@@ -39,7 +39,7 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     vision_client.ReceivePacket();
     referee.AnalyzeGameState();
     
-    torch::Tensor states = torch::zeros(9);
+    torch::Tensor states = torch::zeros(21);
 
     /* Reserved for the robot id */
     states[0] = 0;
@@ -53,14 +53,14 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     states[4] = vision_client.GetRobotPositionY(0, own_team);
     states[5] = vision_client.GetRobotPositionX(1, own_team);
     states[6] = vision_client.GetRobotPositionY(1, own_team);
-    //states[7] = vision_client.GetRobotPositionX(2, own_team);
-    //states[8] = vision_client.GetRobotPositionY(2, own_team);
-    //states[9] = vision_client.GetRobotPositionX(3, own_team);
-    //states[10] = vision_client.GetRobotPositionY(3, own_team);
-    //states[11] = vision_client.GetRobotPositionX(4, own_team);
-    //states[12] = vision_client.GetRobotPositionY(4, own_team);
-    //states[13] = vision_client.GetRobotPositionX(5, own_team);
-    //states[14] = vision_client.GetRobotPositionY(5, own_team);
+    states[7] = vision_client.GetRobotPositionX(2, own_team);
+    states[8] = vision_client.GetRobotPositionY(2, own_team);
+    states[9] = vision_client.GetRobotPositionX(3, own_team);
+    states[10] = vision_client.GetRobotPositionY(3, own_team);
+    states[11] = vision_client.GetRobotPositionX(4, own_team);
+    states[12] = vision_client.GetRobotPositionY(4, own_team);
+    states[13] = vision_client.GetRobotPositionX(5, own_team);
+    states[14] = vision_client.GetRobotPositionY(5, own_team);
 //
     /* Opponent team positions */
     //states[15] = vision_client.GetRobotPositionX(0, opponent_team);
@@ -77,8 +77,12 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     //states[26] = vision_client.GetRobotPositionY(5, opponent_team);
 
     /* Own team orientations */
-    states[7] = vision_client.GetRobotOrientation(0, own_team);
-    states[8] = vision_client.GetRobotOrientation(1, own_team);
+    states[15] = vision_client.GetRobotOrientation(0, own_team);
+    states[16] = vision_client.GetRobotOrientation(1, own_team);
+    states[17] = vision_client.GetRobotOrientation(2, own_team);
+    states[18] = vision_client.GetRobotOrientation(3, own_team);
+    states[19] = vision_client.GetRobotOrientation(4, own_team);
+    states[20] = vision_client.GetRobotOrientation(5, own_team);
 
     /* Goal difference */
     //states[27] = ComputeGoalDifference(referee, own_team);
