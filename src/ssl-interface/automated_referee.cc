@@ -101,7 +101,7 @@ void AutomatedReferee::RefereeStateHandler()
     case RefereeCommand::kDirectFreeBlue:
     case RefereeCommand::kDirectFreeYellow:
     case RefereeCommand::kNormalStart:
-    /* Handle goals and ball out-of-field events. */
+      /* Handle goals and ball out-of-field events. */
       if (IsBallInGoal(Team::kBlue))
       {
         yellow_team_score_++;
@@ -218,7 +218,7 @@ bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y)
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
 {
   return (ball_x > goal_x_positive_half || ball_x < goal_x_negative_half
-      || ball_y > ball_out_of_field_min_y || ball_y < ball_out_of_field_min_y);
+      || ball_y > ball_out_of_field_max_y || ball_y < ball_out_of_field_min_y);
 }
 
 /* Returns true if the specified robot is currently touching the ball */
