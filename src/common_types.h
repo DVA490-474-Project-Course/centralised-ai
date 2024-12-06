@@ -34,19 +34,9 @@ constexpr int max_udp_packet_size = 65536;
 const int max_timesteps = 201;
 
 /*!
- * @brief Initial step count, starting from zero.
- */
-const int steps = 0;
-
-/*!
- * @brief Maximum steps per episode or iteration.
- */
-const int step_max = 0;
-
-/*!
  * @brief Length of the experience replay buffer.
  */
-const int buffer_length = 2;
+const int buffer_length = 5;
 
 /*!
  * @brief Number of players per team in the simulation or game.
