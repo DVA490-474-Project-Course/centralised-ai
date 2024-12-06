@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef CENTRALISEDAI_SSLVISIONCLIENT_H_
-#define CENTRALISEDAI_SSLVISIONCLIENT_H_
+#ifndef CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_
+#define CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_
 
 /* C system headers */
 #include "arpa/inet.h"
@@ -225,4 +225,4 @@ class VisionClient
 } /* namespace ssl_interface */
 } /* namesapce centralised_ai */
 
-#endif /* CENTRALISEDAI_SSLVISIONCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_ */

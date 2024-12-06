@@ -8,8 +8,8 @@
  *=============================================================================
  */
 
-#ifndef CENTRALISEDAI_SSLGMAECONTROLLERCLIENT_H_
-#define CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_
+#ifndef CENTRALISEDAI_SSLINTERFACE_SSLGMAECONTROLLERCLIENT_H_
+#define CENTRALISEDAI_SSLINTERFACE_SSLGMAECONTROLLERCLIENT_H_
 
 /* C system headers */
 #include "arpa/inet.h"
@@ -223,4 +223,4 @@ protected:
 } /* namespace ssl_interface */
 } /* namesapce centralised_ai */
 
-#endif /* CENTRALISEDAI_SSLGAMECONTROLLERCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLINTERFACE_SSLGMAECONTROLLERCLIENT_H_ */

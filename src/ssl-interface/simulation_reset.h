@@ -7,8 +7,8 @@
  * License: See LICENSE file for license details.
  *==============================================================================
  */
-#ifndef CENTRALISEDAI_SIMULATIONRESET_H_
-#define CENTRALISEDAI_SIMULATIONRESET_H_
+#ifndef CENTRALISEDAI_SSLINTERFACE_SIMULATIONRESET_H_
+#define CENTRALISEDAI_SSLINTERFACE_SIMULATIONRESET_H_
 
 /* C++ standard library headers */
 #include <string>
@@ -40,9 +40,9 @@ namespace ssl_interface
  * half of the field. Used for resetting the robots' team positions.
  */
 void ResetRobotsAndBall(std::string ip, uint16_t port,
-  enum Team team_on_positive_half);
+    enum Team team_on_positive_half);
 
 } /* namespace ssl_interface */
 } /* namespace centralised_ai */
 
-#endif /* CENTRALISEDAI_SIMULATIONRESET_H_ */
+#endif /* CENTRALISEDAI_SSLINTERFACE_SIMULATIONRESET_H_ */

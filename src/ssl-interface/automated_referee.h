@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef AUTOMATED_REFEREE_H
-#define AUTOMATED_REFEREE_H
+#ifndef CENTRALISEDAI_SSLINTERFACE_AUTOMATEDREFEREE_H_
+#define CENTRALISEDAI_SSLINTERFACE_AUTOMATEDREFEREE_H_
 
 /* C++ standard library headers */
 #include "string"
@@ -49,7 +49,7 @@ public:
     * be set to the same value as that which is set in the grSim configuration.
     */
   AutomatedReferee(VisionClient& vision_client, std::string grsim_ip_,
-    uint16_t grsim_port_);
+      uint16_t grsim_port_);
 
   /*!
     * @brief Analyze the game state, needs to be called continously.
@@ -68,7 +68,7 @@ public:
     * @param[in] stage_time The stage time duration.
     */
   void StartGame(enum Team starting_team, enum Team team_on_positive_half_,
-    double prepare_kickoff_duration_, int64_t stage_time_);
+      double prepare_kickoff_duration_, int64_t stage_time_);
 
   /*!
     * @brief Stop the automated referee, outputs will no longer be updated.
@@ -399,4 +399,4 @@ protected:
 } /* namespace ssl_interface */
 } /* namespace centralised_ai   */
 
-#endif /* automated_referee_H */
+#endif /* CENTRALISEDAI_SSLINTERFACE_AUTOMATEDREFEREE_H_ */
