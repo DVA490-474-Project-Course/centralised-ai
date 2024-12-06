@@ -25,6 +25,13 @@ namespace collective_robot_behaviour
     * NOTE: Num batches is the total number of batches that are in the file, i.e. batches from all episodes.
     */
     torch::Tensor LoadRewardFromFile(const std::string & filename);
+
+    /*!
+    * @brief Plots the mean reward for each episode, with reward on the y-axis and episode index on the x-axis.
+    * @param reward: The reward tensor, with the shape [num_episodes, 1].
+    * @pre You must call matplotlibcpp::figure(); once before calling this function in order show the plot.
+    */
+    void PlotReward(const torch::Tensor & reward);
 }
 }
 

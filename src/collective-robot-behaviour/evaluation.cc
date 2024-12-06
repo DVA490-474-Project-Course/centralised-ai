@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <matplotlibcpp.h>
 
 namespace centralised_ai
 {
@@ -75,6 +76,20 @@ namespace collective_robot_behaviour
         }
 
         return reward;
+    }
+
+    void PlotReward(const torch::Tensor & reward)
+    {
+        /* Plot the data. */
+        matplotlibcpp::plot(reward, "-k");
+
+        matplotlibcpp::grid(true);
+
+        matplotlibcpp::title("Mean Reward per Episode");
+        matplotlibcpp::xlabel("Episode");
+        matplotlibcpp::ylabel("Mean Reward");
+
+        matplotlibcpp::pause(0.1);
     }
 }
 }
