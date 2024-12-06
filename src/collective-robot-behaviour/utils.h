@@ -46,21 +46,14 @@ namespace collective_robot_behaviour
     torch::Tensor  ComputeGeneralAdvantageEstimation(const torch::Tensor & temporal_differences, double discount, double gae_parameter);
 
     /*!
-    @returns the probability ratio for all agents for each time step with the shape [num_time_steps, num_agents].
-    @param[In] current_probabilities: Probability of choosing the action for each agent for each time step with current policy, with shape [num_time_steps, num_agents].
-    @param[In] previous_probabilities: Probability of choosing the same action for each agent for each time step with previous policy, with shape [num_time_steps, num_agents].
+    @returns the probability ratio for all agents for each time step with the shape [mini_batch_size, num_agents, num_time_steps].
+    @param[In] current_probabilities: Probability of choosing the action for each agent for each time step with current policy, with shape [mini_batch_size, num_agents, num_time_steps].
+    @param[In] previous_probabilities: Probability of choosing the same action for each agent for each time step with previous policy, with shape [mini_batch_size, num_agents, num_time_steps].
     */
     torch::Tensor  ComputeProbabilityRatio(const torch::Tensor & current_probabilities, const torch::Tensor & previous_probabilities);
 
     /*!
-    @returns the probability ratio clipped depending on the clip_value with the shape [num_time_steps, num_agents].
-    @param[In] probability_ratio: Probability ratio for each agent for each time step of shape [num_time_steps, num_agents].
-    @param[In] clip_value: The parameter used to clip the probability ratio.
-    */
-    torch::Tensor  ClipProbabilityRatio(const torch::Tensor & probability_ratio, float clip_value);
-
-    /*!
-    @returns the policy loss over a number of time steps.
+    @returns the policy loss over a number of time steps as a single tensor value.
     @param[In] general_advantage_estimation for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] probability_ratio: Probability ratio for each agent for each chunk in the mini batch with the shape [mini_batch_size, num_agents, num_time_steps].
     @param[In] clip_value: The parameter used to clip the probability ratio.
