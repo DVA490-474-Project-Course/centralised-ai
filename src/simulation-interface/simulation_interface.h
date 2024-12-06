@@ -9,8 +9,8 @@
  *==============================================================================
  */
 
-#ifndef CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H
-#define CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H
+#ifndef CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H_
+#define CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H_
 
 /* C system headers */
 #include "arpa/inet.h"
@@ -245,4 +245,4 @@ protected:
 } /* namespace simulation_interface */
 } /* namesapce centralised_ai */
 
-#endif /* CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H */
+#endif /* CENTRALISEDAI_SIMULATIONINTERFACE_SIMULATIONINTERFACE_H_ */

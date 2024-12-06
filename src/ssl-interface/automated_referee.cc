@@ -79,7 +79,7 @@ void AutomatedReferee::RefereeStateHandler()
     case RefereeCommand::kPrepareKickoffYellow:
     case RefereeCommand::kPrepareKickoffBlue:
     /* Transition to normal start after kickoff preparation time. */
-      if (current_time - prepare_kickoff_start_time_ >= prepare_kickoff_duration_)
+      if (current_time - prepare_kickoff_start_time_>= prepare_kickoff_duration_)
       {
         referee_command_ = RefereeCommand::kNormalStart;
       }
@@ -233,7 +233,7 @@ enum Team AutomatedReferee::CheckForCollision()
 {
   for (auto team : {Team::kYellow, Team::kBlue})
   {
-    for (int id = 0; id < team_size; id++)
+    for (int id = 0; id < amount_of_players_in_team; id++)
     {
       if (IsTouchingBall(id, team))
       {
@@ -271,7 +271,7 @@ bool AutomatedReferee::BallSuccessfullyPlaced()
   /* there is no robot within 0.05 meters distance to the ball */
   for (auto team : {Team::kYellow, Team::kBlue})
   {
-    for (int id = 0; id < team_size; id++)
+    for (int id = 0; id < amount_of_players_in_team; id++)
     {
       if (DistanceToBall(id, team) <= 50)
       {

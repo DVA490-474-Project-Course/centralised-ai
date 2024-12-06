@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef CENTRALISEDAI_REFEREECOMMANDFUNCTIONS_H_
-#define CENTRALISEDAI_REFEREECOMMANDFUNCTIONS_H_
+#ifndef CENTRALISEDAI_SSLINTERFACE_REFEREECOMMANDFUNCTIONS_H_
+#define CENTRALISEDAI_SSLINTERFACE_REFEREECOMMANDFUNCTIONS_H_
 
 /* C++ standard library headers */
 #include "string"
@@ -54,4 +54,4 @@ std::string RefereeCommandToString(enum RefereeCommand referee_command);
 } /* namespace ssl_interface */
 } /* namespace centralised_ai */
 
-#endif /* CENTRALISEDAI_REFEREECOMMANDFUNCTIONS_H_ */
+#endif /* CENTRALISEDAI_SSLINTERFACE_REFEREECOMMANDFUNCTIONS_H_ */

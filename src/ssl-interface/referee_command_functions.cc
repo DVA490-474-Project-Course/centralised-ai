@@ -27,21 +27,36 @@ enum RefereeCommand ConvertRefereeCommand(enum Referee_Command command)
 {
   switch (command)
   {
-    case Referee::HALT: return RefereeCommand::kHalt;
-    case Referee::STOP: return RefereeCommand::kStop;
-    case Referee::NORMAL_START: return RefereeCommand::kNormalStart;
-    case Referee::FORCE_START: return RefereeCommand::kForceStart;
-    case Referee::PREPARE_KICKOFF_YELLOW: return RefereeCommand::kPrepareKickoffYellow;
-    case Referee::PREPARE_KICKOFF_BLUE: return RefereeCommand::kPrepareKickoffBlue;
-    case Referee::PREPARE_PENALTY_YELLOW: return RefereeCommand::kPreparePenaltyYellow;
-    case Referee::PREPARE_PENALTY_BLUE: return RefereeCommand::kPreparePenaltyBlue;
-    case Referee::DIRECT_FREE_YELLOW: return RefereeCommand::kDirectFreeYellow;
-    case Referee::DIRECT_FREE_BLUE: return RefereeCommand::kDirectFreeBlue;
-    case Referee::TIMEOUT_YELLOW: return RefereeCommand::kTimeoutYellow;
-    case Referee::TIMEOUT_BLUE: return RefereeCommand::kTimeoutBlue;
-    case Referee::BALL_PLACEMENT_YELLOW: return RefereeCommand::kBallPlacementYellow;
-    case Referee::BALL_PLACEMENT_BLUE: return RefereeCommand::kBallPlacementBlue;
-    default: return RefereeCommand::kUnknownCommand;
+    case Referee::HALT:
+      return RefereeCommand::kHalt;
+    case Referee::STOP:
+      return RefereeCommand::kStop;
+    case Referee::NORMAL_START:
+      return RefereeCommand::kNormalStart;
+    case Referee::FORCE_START:
+      return RefereeCommand::kForceStart;
+    case Referee::PREPARE_KICKOFF_YELLOW:
+      return RefereeCommand::kPrepareKickoffYellow;
+    case Referee::PREPARE_KICKOFF_BLUE:
+      return RefereeCommand::kPrepareKickoffBlue;
+    case Referee::PREPARE_PENALTY_YELLOW:
+      return RefereeCommand::kPreparePenaltyYellow;
+    case Referee::PREPARE_PENALTY_BLUE:
+      return RefereeCommand::kPreparePenaltyBlue;
+    case Referee::DIRECT_FREE_YELLOW:
+      return RefereeCommand::kDirectFreeYellow;
+    case Referee::DIRECT_FREE_BLUE:
+      return RefereeCommand::kDirectFreeBlue;
+    case Referee::TIMEOUT_YELLOW:
+      return RefereeCommand::kTimeoutYellow;
+    case Referee::TIMEOUT_BLUE:
+      return RefereeCommand::kTimeoutBlue;
+    case Referee::BALL_PLACEMENT_YELLOW:
+      return RefereeCommand::kBallPlacementYellow;
+    case Referee::BALL_PLACEMENT_BLUE:
+      return RefereeCommand::kBallPlacementBlue;
+    default:
+      return RefereeCommand::kUnknownCommand;
   }
 }
 
