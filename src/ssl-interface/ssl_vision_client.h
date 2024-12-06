@@ -8,8 +8,8 @@
  *==============================================================================
  */
 
-#ifndef CENTRALISEDAI_SSLVISIONCLIENT_H_
-#define CENTRALISEDAI_SSLVISIONCLIENT_H_
+#ifndef CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_
+#define CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_
 
 /* C system headers */
 #include "arpa/inet.h"
@@ -44,12 +44,12 @@ class VisionClient
     * Constructor that sets up connection to ssl Vision. When running simulation,
     * the vision packets are sent by grSim.
     *
-    * @param[in] ip Vision multicast address as is configured in ssl Vision or grSim.
-    * If running on the same computer as this client, it is recommended that it is set
-    * to localhost i.e. "127.0.0.1"
+    * @param[in] ip Vision multicast address as is configured in ssl Vision or
+    * grSim. If running on the same computer as this client, it is recommended
+    * that it is set to localhost i.e. "127.0.0.1"
     *
-    * @param[in] port The vision multicast port as is configured in ssl Vision or
-    * grSim.
+    * @param[in] port The vision multicast port as is configured in ssl Vision
+    * or grSim.
     */
   VisionClient(std::string ip, int port);
 
@@ -77,7 +77,8 @@ class VisionClient
   void Print();
 
   /*!
-    * @brief Returns the Unix timestamp of the latest packet that has been received.
+    * @brief Returns the Unix timestamp of the latest packet that has been
+    * received.
     */
   double GetTimestamp();
 
@@ -100,8 +101,8 @@ class VisionClient
   float GetRobotPositionY(int id, enum Team team);
 
   /*!
-    * @brief Returns the orientation in radians mm of robot with specified ID and
-    * team.
+    * @brief Returns the orientation in radians mm of robot with specified ID
+    * and team.
     * 
     * @param[in] id ID of robot.
     * 
@@ -156,32 +157,32 @@ class VisionClient
   /*!
    * @brief Array containing the x coordinates of the blue team robots.
    */
-  float blue_robot_positions_x_[team_size];
+  float blue_robot_positions_x_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the y coordinates of the blue team robots.
    */
-  float blue_robot_positions_y_[team_size];
+  float blue_robot_positions_y_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the theta coordinates of the blue team robots.
    */
-  float blue_robot_orientations_[team_size];
+  float blue_robot_orientations_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the x coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_x_[team_size];
+  float yellow_robot_positions_x_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the y coordinates of the yellow team robots.
    */
-  float yellow_robot_positions_y_[team_size];
+  float yellow_robot_positions_y_[amount_of_players_in_team];
 
   /*!
    * @brief Array containing the theta coordinates of the yellow team robots.
    */
-  float yellow_robot_orientations_[team_size];
+  float yellow_robot_orientations_[amount_of_players_in_team];
 
   /*!
    * @brief X coordinate of the ball.
@@ -197,13 +198,13 @@ class VisionClient
    * @brief Array indicating whether the position data of each blue
    * team robot has been read.
    */
-  float blue_robot_positions_read_[team_size];
+  float blue_robot_positions_read_[amount_of_players_in_team];
 
   /*!
    * @brief Array indicating whether the position data of each yellow
    * team robot has been read.
    */
-  float yellow_robot_positions_read_[team_size];
+  float yellow_robot_positions_read_[amount_of_players_in_team];
 
   /*!
    *@brief Flag indicating whether the ball position data has been read.
@@ -215,8 +216,8 @@ class VisionClient
   /**************************/
 
   /*!
-   * @brief Read the data from the protobuf data in the argument and store it locally
-   * in the class instance.
+   * @brief Read the data from the protobuf data in the argument and store it
+   * locally in the class instance.
    */
   void ReadVisionData(SslWrapperPacket packet);
 };
@@ -224,4 +225,4 @@ class VisionClient
 } /* namespace ssl_interface */
 } /* namesapce centralised_ai */
 
-#endif /* CENTRALISEDAI_SSLVISIONCLIENT_H_ */
+#endif /* CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_ */
