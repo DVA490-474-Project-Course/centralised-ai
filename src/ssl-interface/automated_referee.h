@@ -28,7 +28,8 @@ namespace ssl_interface
  * 
  * Class representing an automated referee, which @return referee commands for
  * kickoff, freekicks/cornerkicks and keeps track of the score. Mainly intended
- * to be used during AI training so that it can be done without human supervision.
+ * to be used during AI training so that it can be done without human
+ * supervision.
  * 
  * @note Copyable, moveable.
  */
@@ -41,8 +42,8 @@ public:
     * @param[in] vision_client A reference to the vision client.
     *
     * @param[in] ip address of the computer that is running grSim. When running
-    * grSim on the same computer that the simulation interface is running on this
-    * value should be localhost i.e. "127.0.0.1".
+    * grSim on the same computer that the simulation interface is running on
+    * this value should be localhost i.e. "127.0.0.1".
     *
     * @param[in] port The command listen port of grSim. This should
     * be set to the same value as that which is set in the grSim configuration.
@@ -87,8 +88,8 @@ public:
   /*!
     * @brief Returns the referee command.
     * 
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     *
     * @return the referee command.
     */
@@ -97,8 +98,8 @@ public:
   /*!
     * @brief Returns the blue team score.
     *
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     *
     * @return The score of the blue team.
     */
@@ -107,8 +108,8 @@ public:
   /*!
     * @brief Returns the yellow team score.
     *
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * beforehand.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called beforehand.
     *
     * @return The score of the yellow team.
     */
@@ -117,13 +118,13 @@ public:
   /*!
     * @brief Returns the X coordinate of the ball designated position.
     * 
-    * Return the X coordinate in mm of the ball designated position. This value is
-    * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
-    * issued by the referee, which means that a robot has to bring the ball to the
-    * designated position.
+    * Return the X coordinate in mm of the ball designated position. This value
+    * is relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command
+    * is issued by the referee, which means that a robot has to bring the ball
+    * to the designated position.
     *
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     *
     * @return The X coordinate in mm of the ball designated position.
     */
@@ -132,37 +133,38 @@ public:
   /*!
     * @brief Returns the Y coordinate of the ball designated position.
     * 
-    * Return the Y coordinate in mm of the ball designated position. This value is
-    * relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command is
-    * issued by the referee, which means that a robot has to bring the ball to the
-    * designated position.
+    * Return the Y coordinate in mm of the ball designated position. This value
+    * is relevant when the BALL_PLACEMENT_YELLOW or BALL_PLACEMENT_BlUE command
+    * is issued by the referee, which means that a robot has to bring the ball
+    * to the designated position.
     * 
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     *
     * @return The Y coordinate in mm of the ball designated position.
     */
   float GetBallDesignatedPositionY();
 
   /*!
-    * @brief Returns the team that has been assigned to the positive half of the field.
+    * @brief Returns the team that has been assigned to the positive half of the
+    * field.
     *
-    * @return The team assigned to the positive half of the field. Returns `kUnknown`
-    * if no team is assigned to the positive half.
+    * @return The team assigned to the positive half of the field. Returns
+    * `kUnknown' if no team is assigned to the positive half.
     *
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     */
   enum Team TeamOnPositiveHalf();
 
   /*!
     * @brief Returns the remaining stage time left.
     * 
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     *
-    * @return the remaining stage time left in seconds. If the stage time is passed
-    * this value become negative.
+    * @return the remaining stage time left in seconds. If the stage time is
+    * passed this value become negative.
     */
   int64_t GetStageTimeLeft();
 
@@ -176,8 +178,8 @@ public:
     * 
     * @param[in] Team color of the robot.
     * 
-    * @pre In order to have the data available AnalyzeGameState() needs to be called
-    * continously.
+    * @pre In order to have the data available AnalyzeGameState() needs to be
+    * called continously.
     */
   bool IsTouchingBall(int id, enum Team team);
 
@@ -211,14 +213,14 @@ protected:
   uint16_t grsim_port_;
 
   /*!
-    * @brief distance in mm between robot and ball within which they are considered
-    * to be touching each other.
+    * @brief distance in mm between robot and ball within which they are
+    * considered to be touching each other.
     */
   static constexpr float collision_margin = 12;
 
   /*!
-    * @brief Time in seconds that the commands PREPARE_KICKOFF_BLUE/YELLOW should
-    * stay at.
+    * @brief Time in seconds that the commands PREPARE_KICKOFF_BLUE/YELLOW
+    * should stay at.
     */
   double prepare_kickoff_duration_;
 
@@ -325,14 +327,16 @@ protected:
   /*!
     * @brief Returns which team is currently touching the ball.
     *
-    * @return The team currently touching the ball, or `kUnknown` if no team is in contact.
+    * @return The team currently touching the ball, or `kUnknown` if no team is
+    * in contact.
     */
   enum Team CheckForCollision();
 
   /*!
     * @brief Returns the distance between the specified robot and ball.
     *
-    * @param[in] id The ID of the robot for which the distance is to be calculated.
+    * @param[in] id The ID of the robot for which the distance is to be
+    * calculated.
     * @param[in] team The team to which the robot belongs.
     *
     * @return The distance between the specified robot and the ball.
@@ -369,10 +373,11 @@ protected:
   bool IsBallInYellowGoal(float ball_x, float ball_y);
 
   /*!
-    * @brief Assuming the ball is out of field, calculates the point where the ball
-    * should be placed for a free kick or corner kick.
+    * @brief Assuming the ball is out of field, calculates the point where the
+    * ball should be placed for a free kick or corner kick.
     *
-    * @return The point where the ball should be placed for the free kick or corner kick.
+    * @return The point where the ball should be placed for the free kick or
+    * corner kick.
     */
   struct Point CalcBallDesignatedPosition();
 

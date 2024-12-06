@@ -116,12 +116,11 @@ void GameControllerClient::ReadGameStateData(Referee packet)
 /* Method to print the game state, used for debugging/demo */
 void GameControllerClient::Print()
 {
-  printf("referee command: <%s> next command: <%s> score: <%i, %i> designated position <%f, "
-      "%f> stage time left: <%li>\n",
-    RefereeCommandToString(referee_command_).c_str(),
-    RefereeCommandToString(next_referee_command_).c_str(),
-    blue_team_score_, yellow_team_score_, ball_designated_position_x_, ball_designated_position_y_,
-    stage_time_left_);
+  printf("referee command: <%s> next command: <%s> score: <%i, %i> designated position <%f, %f> stage time left: <%li>\n",
+      RefereeCommandToString(referee_command_).c_str(),
+      RefereeCommandToString(next_referee_command_).c_str(),
+      blue_team_score_, yellow_team_score_, ball_designated_position_x_,
+      ball_designated_position_y_, stage_time_left_);
 }
 
 /* Public getters */

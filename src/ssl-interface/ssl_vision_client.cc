@@ -42,7 +42,6 @@ VisionClient::VisionClient(std::string ip, int port)
   socket_ = ::socket(AF_INET, SOCK_DGRAM, 0);
      
   /* Bind the socket with the client address */
-  //bind(socket_, (const struct sockaddr *)&client_address_, sizeof(client_address_));
   bind(socket_, reinterpret_cast<const struct sockaddr*>(&client_address_),
       sizeof(client_address_));
 }
@@ -55,7 +54,8 @@ void VisionClient::ReceivePacket()
   char buffer[max_udp_packet_size];
 
   /* Receive raw packet */
-  message_length = recv(socket_, (char *)buffer, max_udp_packet_size, MSG_WAITALL);
+  message_length = recv(socket_, (char *)buffer, max_udp_packet_size,
+      MSG_WAITALL);
 
   if (message_length > 0)
   {

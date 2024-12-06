@@ -79,7 +79,7 @@ void AutomatedReferee::RefereeStateHandler()
     case RefereeCommand::kPrepareKickoffYellow:
     case RefereeCommand::kPrepareKickoffBlue:
     /* Transition to normal start after kickoff preparation time. */
-      if (current_time - prepare_kickoff_start_time_ >= prepare_kickoff_duration_)
+      if (current_time - prepare_kickoff_start_time_>= prepare_kickoff_duration_)
       {
         referee_command_ = RefereeCommand::kNormalStart;
       }

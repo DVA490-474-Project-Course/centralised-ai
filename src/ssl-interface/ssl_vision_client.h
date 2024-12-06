@@ -44,12 +44,12 @@ class VisionClient
     * Constructor that sets up connection to ssl Vision. When running simulation,
     * the vision packets are sent by grSim.
     *
-    * @param[in] ip Vision multicast address as is configured in ssl Vision or grSim.
-    * If running on the same computer as this client, it is recommended that it is set
-    * to localhost i.e. "127.0.0.1"
+    * @param[in] ip Vision multicast address as is configured in ssl Vision or
+    * grSim. If running on the same computer as this client, it is recommended
+    * that it is set to localhost i.e. "127.0.0.1"
     *
-    * @param[in] port The vision multicast port as is configured in ssl Vision or
-    * grSim.
+    * @param[in] port The vision multicast port as is configured in ssl Vision
+    * or grSim.
     */
   VisionClient(std::string ip, int port);
 
@@ -77,7 +77,8 @@ class VisionClient
   void Print();
 
   /*!
-    * @brief Returns the Unix timestamp of the latest packet that has been received.
+    * @brief Returns the Unix timestamp of the latest packet that has been
+    * received.
     */
   double GetTimestamp();
 
@@ -100,8 +101,8 @@ class VisionClient
   float GetRobotPositionY(int id, enum Team team);
 
   /*!
-    * @brief Returns the orientation in radians mm of robot with specified ID and
-    * team.
+    * @brief Returns the orientation in radians mm of robot with specified ID
+    * and team.
     * 
     * @param[in] id ID of robot.
     * 
@@ -215,8 +216,8 @@ class VisionClient
   /**************************/
 
   /*!
-   * @brief Read the data from the protobuf data in the argument and store it locally
-   * in the class instance.
+   * @brief Read the data from the protobuf data in the argument and store it
+   * locally in the class instance.
    */
   void ReadVisionData(SslWrapperPacket packet);
 };

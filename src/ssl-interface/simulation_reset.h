@@ -1,6 +1,6 @@
 /* simulation_reset.h
  *==============================================================================
- * Author: Emil Åberg
+ * Author: Shruthi P. Kunnon
  * Creation date: 2024-10-21
  * Last modified: 2024-10-30 by Emil Åberg
  * Description: Provides function to reset robots and ball in grSim
