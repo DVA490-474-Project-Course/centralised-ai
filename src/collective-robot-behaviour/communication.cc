@@ -135,7 +135,7 @@ void SendActions(std::vector<simulation_interface::SimulationInterface> robot_in
     switch (action_ids[i].item<int>())
     {
       case 0: /* Idle */
-        robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
+        //robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
       break;
       case 1: /* Forward */
         robot_interfaces[i].SetVelocity(0.5F, 0.0F, 0.0F);
@@ -150,13 +150,11 @@ void SendActions(std::vector<simulation_interface::SimulationInterface> robot_in
       case 4: /* Right */
         robot_interfaces[i].SetVelocity(0.0F, -0.5F, 0.0F);
         break;
-      case 5: /* Diagonal forward-left */
-        //robot_interfaces[i].SetVelocity(0.5F, 0.5F, 0.0F);
-        robot_interfaces[i].SetVelocity(0, 0, 0.15F);
+      case 5: /* Rotate anti-clockwise */
+        robot_interfaces[i].SetVelocity(0.0F, 0.0F, 1.0F);
         break;
-      case 6: /* Diagonal forward-right */
-        //robot_interfaces[i].SetVelocity(0.5F, -0.5F, 0.0F);
-        robot_interfaces[i].SetVelocity(0, 0, -0.15F);
+      case 6: /* Rotate clockwise */
+        robot_interfaces[i].SetVelocity(0.0F, 0.0F, -1.0F);
         break;
       //case 7: /* Diagonal backward-left*/
       //  robot_interfaces[i].SetVelocity(-0.5F, 0.5F, 0.0F);
