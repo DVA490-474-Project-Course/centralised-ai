@@ -105,6 +105,9 @@ Team ComputeOpponentTeam(Team own_team);
 */
 torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
 
+
+torch::Tensor GetLocalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team, int robot_id);
+
 /*!
 *@brief Send actions to the robots.
 *

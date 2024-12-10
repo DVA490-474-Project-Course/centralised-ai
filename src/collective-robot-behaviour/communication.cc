@@ -34,6 +34,17 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     }
 }
 
+torch::Tensor GetLocalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team, int robot_id)
+{
+  torch::Tensor states = torch::zeros(3);
+
+  states[0] = vision_client.GetRobotPositionX(robot_id, own_team);
+  states[1] = vision_client.GetRobotPositionY(robot_id, own_team);
+  states[2] = vision_client.GetRobotOrientation(robot_id, own_team);
+
+  return states.view({1, 1, states.size(0)});
+}
+
 torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
 {
     vision_client.ReceivePacket();
@@ -140,7 +151,7 @@ void SendActions(std::vector<simulation_interface::SimulationInterface> robot_in
       break;
       case 1:
         /* Backward */
-        robot_interfaces[i].SetVelocity(-5.0F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
       break;
       case 2: /* Left */
         robot_interfaces[i].SetVelocity(0.0F, 0.5F, 0.0F);

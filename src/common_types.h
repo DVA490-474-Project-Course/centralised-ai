@@ -36,7 +36,7 @@ const int max_timesteps = 201;
 /*!
  * @brief Length of the experience replay buffer.
  */
-const int buffer_length = 5;
+const int buffer_length = 2;
 
 /*!
  * @brief Number of players per team in the simulation or game.
@@ -47,6 +47,16 @@ const int amount_of_players_in_team = 6;
  * @brief Batch size for training, calculated as buffer length multiplied by the number of players in the team.
  */
 const int batch_size = buffer_length * amount_of_players_in_team;
+
+/*!
+  * @brief The coefficient representing how much the entropy should be considered in the loss function.
+*/
+const float entropy_coefficient = 0.3;
+
+/*!
+  * @brief The clip value representing how much the policy should be clipped in the loss function.
+*/
+const float clip_value = 0.2;
 
 /*!
  * @brief Input size for neural networks, typically representing the number of features in the state or observation.

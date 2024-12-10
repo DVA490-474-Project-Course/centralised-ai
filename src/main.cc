@@ -31,13 +31,13 @@
 
 int main()
 {
-  /* Create models class for all robots, and the centralised critic network */
-  std::vector<centralised_ai::collective_robot_behaviour::Agents> models;
+  /* Create the centralised critic network class */
   centralised_ai::collective_robot_behaviour::CriticNetwork critic;
+  centralised_ai::collective_robot_behaviour::PolicyNetwork policy;
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  //models = centralised_ai::collective_robot_behaviour::CreateAgents(1);
-  models = LoadAgents(centralised_ai::amount_of_players_in_team, critic); //Load in the trained model
+  //centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();
+  LoadNetworks(policy, critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -77,18 +77,18 @@ int main()
   std::string file_name = "../rewards/reward_" + oss.str() + ".csv";
   std::cout << "File name to save rewards: " << file_name << std::endl;
 
-  SaveOldModels(models,critic);
+  centralised_ai::collective_robot_behaviour::SaveOldNetworks(policy, critic);
 
   int epochs = 0;
   std::cout << "Running" << std::endl;
   while (true)
   {
-    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
+    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow, 3.0F, 300);
     /*run actions and save  to buffer*/
-    auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue,simulation_interfaces);
+    auto databuffer = centralised_ai::collective_robot_behaviour::MappoRun(policy, critic, referee, vision_client, centralised_ai::Team::kBlue, simulation_interfaces);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
+    centralised_ai::collective_robot_behaviour::Mappo_Update(policy, critic, databuffer);
 
     /*Save the reward to go to a file*/
     int32_t num_batches = databuffer.size();

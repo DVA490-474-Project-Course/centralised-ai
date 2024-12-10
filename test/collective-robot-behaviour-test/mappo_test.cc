@@ -22,14 +22,14 @@ namespace collective_robot_behaviour
   */
 
   TEST(ParametersNewTest, NewParameters) {
-    auto models = CreateAgents(amount_of_players_in_team);
-    auto old_models = CreateAgents(amount_of_players_in_team);
+    auto policy = CreatePolicy();
+    auto old_policy = CreatePolicy();
     CriticNetwork critic_network;
     CriticNetwork old_critic_network;
-    bool check1 = CheckModelParametersMatch(models, models,critic_network, critic_network);
+    bool check1 = CheckModelParametersMatch(policy, policy, critic_network, critic_network);
     EXPECT_TRUE(check1);
 
-    bool check2 = CheckModelParametersMatch(models, old_models, critic_network, old_critic_network);
+    bool check2 = CheckModelParametersMatch(policy, old_policy, critic_network, old_critic_network);
     EXPECT_FALSE(check2);
   }
 

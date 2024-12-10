@@ -19,16 +19,8 @@ namespace collective_robot_behaviour{
 
 DataBuffer::DataBuffer()
     : A(torch::zeros({1, amount_of_players_in_team})),
-      R(torch::zeros({1, amount_of_players_in_team})) {
-}
-
-Agents::Agents(int id, std::shared_ptr<PolicyNetwork> network)
-    : robotId(id), policy_network(std::move(network)),
-      random_floats(torch::rand({2})), // Initialize random_floats here
-      x_pos(random_floats[0].item<float>()), // Initialize x_pos
-      y_pos(random_floats[1].item<float>()){
-
-}
+      R(torch::zeros({1, amount_of_players_in_team})) 
+{}
 
 HiddenStates::HiddenStates()
     : ht_p(torch::zeros({1, 1, hidden_size})),  /* Hidden state tensor initialized to zeros*/
@@ -38,7 +30,7 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork() : 
   num_layers(1),
   output_size(num_actions),
-  layer1(torch::nn::Linear(input_size, hidden_size)),
+  layer1(torch::nn::Linear(3, hidden_size)),
   layer2(torch::nn::Linear(hidden_size, hidden_size)),
   rnn(torch::nn::GRUOptions(hidden_size, hidden_size).num_layers(num_layers).batch_first(false)),
   output_layer(torch::nn::Linear(hidden_size, output_size))
@@ -125,23 +117,21 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
   return std::make_tuple(output, h);  // Return value and hidden state
 }
 
-std::vector<Agents> CreateAgents(int amount_of_players_in_team) {
-  std::vector<Agents> robots;
-  for (int i = 0; i < amount_of_players_in_team; i++) {
-    auto model = std::make_shared<PolicyNetwork>();
-    model->rnn->reset_parameters();
-    robots.emplace_back(i, model);
-  }
-  return robots;
+PolicyNetwork CreatePolicy()
+{
+  PolicyNetwork policy;
+  policy.rnn->reset_parameters();
+
+  return policy;
 }
 
-void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
-
+void SaveNetworks(PolicyNetwork & policy, CriticNetwork & critic)
+{
     std::string model_path = "../models/agent_network0.pt";
 
     try {
       torch::serialize::OutputArchive output_archive;
-      models[0].policy_network->save(output_archive);
+      policy.save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
@@ -163,28 +153,20 @@ void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic) {
   }
 }
 
-std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
-  std::vector<Agents> agents;
+void LoadNetworks(PolicyNetwork& policy, CriticNetwork& critic)
+{
+  /* Load the policy network */
+  try {
+    std::string policy_path = "../models/agent_network0.pt";
+    torch::serialize::InputArchive input_archive;
+    input_archive.load_from(policy_path);
 
-  /* Load all policy networks and assign to each agent */
-  for (int i = 0; i < 1; ++i) {
-    try {
-      std::string model_path = "../models/agent_network0.pt";
-      torch::serialize::InputArchive input_archive;
-
-      input_archive.load_from(model_path);
-
-      // Create a new PolicyNetwork for each agent and load its parameters
-      std::shared_ptr<PolicyNetwork> model = std::make_shared<PolicyNetwork>();;
-      model->load(input_archive);
-
-      std::cout << "Loading agent " << i << " from " << model_path << std::endl;
-      agents.emplace_back(i, model);
-    }
-    catch (const std::exception& e) {
-      std::cerr << "Error loading model for agent " << i << ": " << e.what() << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    policy.load(input_archive);
+    std::cout << "Loading policy network from " << policy_path << std::endl;
+  }
+  catch (const std::exception& e) {
+    std::cerr << "Error loading model policy network: " << e.what() << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   /* Load the critic network */
@@ -200,17 +182,15 @@ std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic) {
     std::cerr << "Error loading model for critic network: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
-
-  return agents;
 }
 
-void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic) {
+void SaveOldNetworks(PolicyNetwork & policy, CriticNetwork & critic) {
 
     std::string model_path = "../models/old_agents/agent_network0.pt";
 
     try {
       torch::serialize::OutputArchive output_archive;
-      models[0].policy_network->save(output_archive);
+      policy.save(output_archive);
       output_archive.save_to(model_path);
     }
     catch (const std::exception& e) {
@@ -232,29 +212,21 @@ void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic) {
   }
 }
 
-std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
-  std::vector<Agents> agents;
+void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic) {
 
-  /* Load all policy networks and assign to each agent */
-
-  for (int i = 0; i < 1; ++i) {
-    try {
-      std::string model_path = "../models/old_agents/agent_network" + std::to_string(i) + ".pt";
+  /* Load the policy network */
+  try {
+      std::string policy_path = "../models/old_agents/agent_network" + std::to_string(0) + ".pt";
       torch::serialize::InputArchive input_archive;
+      input_archive.load_from(policy_path);
 
-      input_archive.load_from(model_path);
+      policy.load(input_archive);
 
-      // Create a new PolicyNetwork for each agent and load its parameters
-      std::shared_ptr<PolicyNetwork> model = std::make_shared<PolicyNetwork>();
-      model->load(input_archive);
-
-      std::cout << "Loading agent " << i << " from " << model_path << std::endl;
-      agents.emplace_back(i, model);
+      std::cout << "Loading policy network from " << policy_path << std::endl;
     }
     catch (const std::exception& e) {
-      std::cerr << "Error loading model for agent " << i << ": " << e.what() << std::endl;
+      std::cerr << "Error loading model for policy network: " << e.what() << std::endl;
     }
-  }
 
   /* Load the critic network */
   try {
@@ -268,11 +240,9 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
   catch (const std::exception& e) {
     std::cerr << "Error loading model for critic network: " << e.what() << std::endl;
   }
-
-  return agents;
 }
 
-  void UpdateNets(std::vector<Agents>& agents,
+  void UpdateNets(PolicyNetwork& policy,
     CriticNetwork& critic,
     torch::Tensor pol_loss,
     torch::Tensor cri_loss) {
@@ -285,7 +255,7 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 
-  torch::optim::Adam opts({agents[0].policy_network->parameters()},
+  torch::optim::Adam opts({policy.parameters()},
                             adam_options);
 
   /*Update critic network*/
@@ -300,14 +270,12 @@ std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic) {
   //pol_loss.backward({},true);
   loss.backward();
 
-  torch::nn::utils::clip_grad_norm_(agents[0].policy_network->parameters(), 0.5);
+  torch::nn::utils::clip_grad_norm_(policy.parameters(), 0.5);
   torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
 
   // Update the policy network for the current agent
   opts.step();
   critnet.step();
-
-
 }
 
 }/*namespace centralised_ai*/

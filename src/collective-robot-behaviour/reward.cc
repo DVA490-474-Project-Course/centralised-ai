@@ -17,7 +17,6 @@ namespace collective_robot_behaviour
 torch::Tensor ComputeAngleToBallReward(const torch::Tensor & orientations, const torch::Tensor & positions, const torch::Tensor & ball_position)
 {
 	torch::Tensor angles_to_ball = torch::empty(orientations.size(0));
-
 	torch::Tensor robots_to_ball = ball_position - positions;
 
 	for (int32_t i = 0; i < orientations.size(0); i++)
@@ -31,7 +30,6 @@ torch::Tensor ComputeAngleToBallReward(const torch::Tensor & orientations, const
 		robot_to_ball[1] = robots_to_ball[1][i];
 
 		torch::Tensor robot_to_ball_normalized = robot_to_ball.div(robot_to_ball.norm());
-
 		torch::Tensor ball_product = robot_to_ball_normalized.dot(world_forward);
 
 		angles_to_ball[i] = ball_product;
