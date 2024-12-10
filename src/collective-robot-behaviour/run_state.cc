@@ -56,11 +56,7 @@ namespace collective_robot_behaviour
         torch::Tensor angle_to_ball_reward = ComputeAngleToBallReward(orientations, positions, ball_position);
         //torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
 
-        //std::cout << "Total reward: " << angle_to_ball_reward + distance_to_ball_reward << std::endl;
-        //std::cout << "Distance to ball reward: " << distance_to_ball_reward << std::endl;
-        //std::cout << "Angle to ball reward: " << angle_to_ball_reward << std::endl;
-        //std::cout << "states: " << states << std::endl;
-        return angle_to_ball_reward + distance_to_ball_reward;
+        return distance_to_ball_reward;
     }
 }
 }

@@ -140,7 +140,7 @@ void SendActions(std::vector<simulation_interface::SimulationInterface> robot_in
       break;
       case 1:
         /* Backward */
-        robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
+        robot_interfaces[i].SetVelocity(-5.0F, 0.0F, 0.0F);
       break;
       case 2: /* Left */
         robot_interfaces[i].SetVelocity(0.0F, 0.5F, 0.0F);

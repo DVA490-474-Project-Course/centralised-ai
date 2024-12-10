@@ -29,12 +29,67 @@
 #include "common_types.h"
 #include <ctime>
 
-int main()
+std::vector<double> critic_loss;
+
+void PlotLoss()
 {
+  /* Set plot labels and title. */
+  matplotlibcpp::figure();
+
+  /* Plot the data in real-time. */
+  while (true) {
+  
+      /* Plot the data. */
+      matplotlibcpp::plot(critic_loss, "-k");
+
+      matplotlibcpp::grid(true);
+
+      matplotlibcpp::title("Critic Loss");
+      matplotlibcpp::xlabel("Time Step");
+      matplotlibcpp::ylabel("Critic Loss");
+    
+      //matplotlibcpp::xlim(0, static_cast<int32_t>(time_steps.size()));
+
+      /* Pause for more efficient plotting. */
+      matplotlibcpp::pause(0.1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }  
+}
+
+std::vector<double> critic_loss;
+
+void PlotLoss()
+{
+  /* Set plot labels and title. */
+  matplotlibcpp::figure();
+
+  /* Plot the data in real-time. */
+  while (true) {
+  
+      /* Plot the data. */
+      matplotlibcpp::plot(critic_loss, "-k");
+
+      matplotlibcpp::grid(true);
+
+      matplotlibcpp::title("Critic Loss");
+      matplotlibcpp::xlabel("Time Step");
+      matplotlibcpp::ylabel("Critic Loss");
+    
+      //matplotlibcpp::xlim(0, static_cast<int32_t>(time_steps.size()));
+
+      /* Pause for more efficient plotting. */
+      matplotlibcpp::pause(0.1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }  
+}
+
+int main() {
   std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
+  models = centralised_ai::collective_robot_behaviour::CreateAgents(1);
+  //models = LoadAgents(centralised_ai::amount_of_players_in_team,critic); //Load in the trained model
   //models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
   models = LoadAgents(centralised_ai::amount_of_players_in_team, critic); //Load in the trained model
 
@@ -51,7 +106,8 @@ int main()
   vision_client.ReceivePacketsUntilAllDataRead();
 
   /* Create the AutomatedReferee instance with the VisionClient */
-  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip, grsim_port);
+  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip,
+    grsim_port);
 
   /* Start the automated referee */
   referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
@@ -60,7 +116,14 @@ int main()
   for (int32_t id = 0; id < centralised_ai::amount_of_players_in_team; id++)
   {
     simulation_interfaces.push_back(centralised_ai::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, centralised_ai::Team::kBlue));
+    //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
+
+  //torch::Tensor states = centralised_ai::collective_robot_behaviour::GetStates(referee,vision_client,centralised_ai::Team::kBlue,centralised_ai::Team::kYellow);
+  //std::cout << "States: " << states << std::endl;
+
+  // Launch the plotting in a separate thread
+  //std::thread plot_thread(PlotLoss);
 
   /* Generate the file name from date. */
   /* Get current time */
@@ -76,21 +139,13 @@ int main()
   std::string file_name = "../rewards/reward_" + oss.str() + ".csv";
   std::cout << "File name to save rewards: " << file_name << std::endl;
 
-  /* Save the initial models */
   SaveOldModels(models,critic);
 
-  /* Set the networks to training mode */
-  critic.train();
-  for (auto &model : models)
-  {
-    model.policy_network->train();
-  }
 
-  /* Run the training loop */
+
   int epochs = 0;
   std::cout << "Running" << std::endl;
-  while (true)
-  {
+  while (true) {
     referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
     /*run actions and save  to buffer*/
     auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue,simulation_interfaces);
@@ -116,6 +171,9 @@ int main()
     std::cout << "* Epochs: " << epochs << std::endl;
     epochs++;
   }
+
+  //plot_thread.join();
+
 
   return 0;
 }
