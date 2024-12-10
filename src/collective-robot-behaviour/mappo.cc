@@ -162,10 +162,12 @@ std::vector<DataBuffer> MappoRun(std::vector<Agents> Models, CriticNetwork criti
       auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored, 1);
       exp.actions = prob_actions_stored_softmax.argmax(1);
 
+      for (int i = 0; i < 10; i++) {
+        /* Let agents run for 20 ms until next timestep */
+        SendActions(simulation_interfaces, exp.actions);
+      }
       std::cout << prob_actions_stored_softmax << std::endl;
 
-      /* Let agents run for 20 ms until next timestep */
-      SendActions(simulation_interfaces, exp.actions);
 
       /* Convert critic value from shape [1, 1] to a value. */
       auto critic_value = valNetOutput.squeeze();
@@ -419,7 +421,7 @@ void Mappo_Update(std::vector<Agents> &Models, CriticNetwork &critic, std::vecto
   assert(old_predicts_c.requires_grad() == true);
 
   // Compute policy entropy
-  torch::Tensor policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.5);
+  torch::Tensor policy_entropy = ComputePolicyEntropy(all_actions_probs, 0.9);
 
   // Compute probability ratios
   torch::Tensor probability_ratios = ComputeProbabilityRatio(new_predicts_p, old_predicts_p);
