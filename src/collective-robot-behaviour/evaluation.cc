@@ -4,7 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <pybind11/embed.h>
+#include <pybind11/stl.h>
 #include <matplotlibcpp.h>
+#include <torch/torch.h>
 
 namespace centralised_ai
 {
@@ -80,8 +83,17 @@ namespace collective_robot_behaviour
 
     void PlotReward(const torch::Tensor & reward)
     {
+        /* Convert the tensor to a x- and y vector */
+        std::vector<float> x;
+        std::vector<float> y;
+        for (int32_t i = 0; i < reward.size(0); i++)
+        {
+            x.push_back(i);
+            y.push_back(reward[i].item<float>());
+        }
+
         /* Plot the data. */
-        matplotlibcpp::plot(reward, "-k");
+        matplotlibcpp::plot(x, y, "-k");
 
         matplotlibcpp::grid(true);
 

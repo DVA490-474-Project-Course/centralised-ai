@@ -42,7 +42,7 @@ namespace collective_robot_behaviour {
 
     bool check = true;
 
-    // Check agent models
+    /* Check agent models */
     for (size_t i = 0; i < saved_models.size(); ++i) {
         auto saved_params = saved_models[i].policy_network->rnn->parameters();
         auto loaded_params = loaded_models[i].policy_network->rnn->parameters();
@@ -60,7 +60,7 @@ namespace collective_robot_behaviour {
         }
     }
 
-    // Check critic model parameters
+    /* Check critic model parameters */
     auto saved_critic_params = saved_critic.rnn->parameters();
     auto loaded_critic_params = loaded_critic.rnn->parameters();
 
@@ -78,7 +78,7 @@ namespace collective_robot_behaviour {
         }
     }
 
-    // Output result
+    /* Output result */
     if (check == true) {
         std::cout << "All parameters match successfully!" << std::endl;
         return true;
@@ -164,7 +164,7 @@ std::vector<simulation_interface::SimulationInterface> simulation_interfaces) {
       } /*end for agent*/
 
       
-      auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored,1);
+      auto prob_actions_stored_softmax = torch::softmax(prob_actions_stored, 1);
 
       /*Get the actions with the highest probabilities for each agent*/
       exp.actions = prob_actions_stored_softmax.argmax(1);
@@ -176,25 +176,26 @@ std::vector<simulation_interface::SimulationInterface> simulation_interfaces) {
 
       /*Let agents run for 20 ms until next timestep*/
       SendActions(simulation_interfaces,exp.actions);
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
       /* Convert critic value from shape [1, 1] to a value. */
       auto critic_value = valNetOutput.squeeze();
 
-      /*Update all values*/
+      /* Update all values*/
       exp.actions_prob = prob_actions_stored_softmax;
       exp.state = state.clone();
       exp.critic_value = valNetOutput.squeeze().expand({amount_of_players_in_team});
       exp.hidden_v.ht_p = V_hx;
 
-      /*Update state and use it for next itteration*/
+      /* Update state and use it for next iteration */
       state = GetGlobalState(referee, vision_client, own_team, opponent_team);
 
-      /* Get rewards from the actions. */
+      /* Get rewards from the actions */
       exp.rewards = run_state.ComputeRewards(state.squeeze(0).squeeze(0), {-0.001, 500, 10, 0.1});
+      assert(exp.rewards.size(0) == amount_of_players_in_team);
 
-      //assert(exp.rewards.size(0) == amount_of_players_in_team);
-      trajectory.push_back(exp); /*Store into trajectories*/
+      /* Store the experience into the trajectory */
+      trajectory.push_back(exp);
+
     } /*end for timestep*/
 
     /* Erase initial trajectory (First index in trajectories) */

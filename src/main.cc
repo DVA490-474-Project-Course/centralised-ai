@@ -35,8 +35,8 @@ int main()
   centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
-  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  //models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
+  models = LoadAgents(centralised_ai::amount_of_players_in_team, critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -73,8 +73,8 @@ int main()
   oss << std::put_time(&local_time, "%Y-%m-%d_%H-%M-%S");  // e.g., "2024-09-12_14-30-00"
 
   /* Create the file name */
-  std::string file_name = "../reward_to_go_" + oss.str() + ".csv";
-  std::cout << "File name to save reward to go: " << file_name << std::endl;
+  std::string file_name = "../rewards/reward_" + oss.str() + ".csv";
+  std::cout << "File name to save rewards: " << file_name << std::endl;
 
   /* Save the initial models */
   SaveOldModels(models,critic);
