@@ -28,7 +28,7 @@ TEST(UpdateNetwork, Update) {
   }
 
   // Define dummy input for forward pass
-  auto input = torch::randn({1, 1, input_size});
+  auto input = torch::randn({1, 1, num_global_states});
   auto hx = torch::randn({1, 1, hidden_size});
 
   // Forward pass through the critic network

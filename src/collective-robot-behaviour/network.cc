@@ -30,7 +30,7 @@ HiddenStates::HiddenStates()
 PolicyNetwork::PolicyNetwork() : 
   num_layers(1),
   output_size(num_actions),
-  layer1(torch::nn::Linear(3, hidden_size)),
+  layer1(torch::nn::Linear(num_local_states, hidden_size)),
   layer2(torch::nn::Linear(hidden_size, hidden_size)),
   rnn(torch::nn::GRUOptions(hidden_size, hidden_size).num_layers(num_layers).batch_first(false)),
   output_layer(torch::nn::Linear(hidden_size, output_size))
@@ -72,7 +72,7 @@ std::tuple<torch::Tensor, torch::Tensor> PolicyNetwork::Forward(torch::Tensor in
 
   CriticNetwork::CriticNetwork()
       : 
-        layer1(torch::nn::Linear(input_size, hidden_size)),
+        layer1(torch::nn::Linear(num_global_states, hidden_size)),
         layer2(torch::nn::Linear(hidden_size, hidden_size)),
         rnn(torch::nn::GRUOptions(hidden_size, hidden_size).num_layers(1).batch_first(false)),
         output_layer(torch::nn::Linear(hidden_size, 1)) {   // Single output for value function
@@ -255,11 +255,10 @@ void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic) {
   adam_options.eps(1e-5);  // Epsilon
   adam_options.weight_decay(0);  // Weight decay
 
-  torch::optim::Adam opts({policy.parameters()},
-                            adam_options);
+  torch::optim::Adam opts({policy.parameters()}, adam_options);
 
   /*Update critic network*/
-  torch::optim::Adam critnet(critic.parameters(), adam_options);
+  torch::optim::Adam critnet({critic.parameters()}, adam_options);
 
 
   // Zero the gradients before the backward pass

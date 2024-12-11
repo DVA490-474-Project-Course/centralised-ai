@@ -34,7 +34,7 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     }
 }
 
-torch::Tensor GetLocalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team, int robot_id)
+torch::Tensor GetLocalState(ssl_interface::VisionClient & vision_client, Team own_team, int robot_id)
 {
   torch::Tensor states = torch::zeros(3);
 

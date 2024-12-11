@@ -59,9 +59,14 @@ const float entropy_coefficient = 0.3;
 const float clip_value = 0.2;
 
 /*!
- * @brief Input size for neural networks, typically representing the number of features in the state or observation.
+ * @brief Represents the number of global states or observation.
  */
-const int input_size = 21;
+const int num_global_states = 21;
+
+/*!
+* @brief Represents the number of local states for each robot.
+*/
+const int num_local_states = 3;
 
 /*!
  * @brief Number of possible actions each agent can take.

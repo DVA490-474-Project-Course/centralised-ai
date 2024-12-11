@@ -153,7 +153,7 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
         agent_state.index({0, 0, 0}) = agent; /* Update the first index value to robot ID */
         agent_state = agent_state;
 
-        auto local_state = GetLocalState(referee, vision_client, own_team, opponent_team, agent);
+        auto local_state = GetLocalState(vision_client, own_team, agent);
 
         /* Get action probabilities and hidden states */
         auto [act_prob, hx_new] = policy.Forward(local_state, trajectory[timestep - 1].hidden_p[agent].ht_p);
@@ -288,7 +288,7 @@ void Mappo_Update(PolicyNetwork& policy, CriticNetwork& critic, std::vector<Data
     int num_chunks = chunks.size();
     int num_time_steps = chunks[0].t.size();
     int num_layers = 1;
-    torch::Tensor input = torch::zeros({num_chunks, 10, input_size}); /* [batch_size, sequence_len, input_size] */
+    torch::Tensor input = torch::zeros({num_chunks, 10, num_global_states}); /* [batch_size, sequence_len, input_size] */
     /* Create hidden state and cell state tensors for all agents. */
     torch::Tensor h0_critic = torch::zeros({num_chunks,1, 1, hidden_size}); /* [num_layers, batch_size, hidden_size]*/
     torch::Tensor h0_policy = torch::zeros({num_chunks,1,amount_of_players_in_team, hidden_size}); /* [num_players, num_layers, batch_size, hidden_size] */
