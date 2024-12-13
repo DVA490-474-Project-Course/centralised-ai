@@ -151,7 +151,6 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
       {
         auto agent_state = state.clone();
         agent_state.index({0, 0, 0}) = agent; /* Update the first index value to robot ID */
-        agent_state = agent_state;
 
         auto local_state = GetLocalState(vision_client, own_team, agent);
 
@@ -172,8 +171,6 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
         /* Let agents run for 20 ms until next timestep */
         SendActions(simulation_interfaces, exp.actions);
       }
-      std::cout << prob_actions_stored_softmax << std::endl;
-
 
       /* Convert critic value from shape [1, 1] to a value. */
       auto critic_value = valNetOutput.squeeze();
@@ -201,8 +198,6 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
 
     int32_t trajectory_length = trajectory.size();
 
-    //torch::AutoGradMode enable_grad(true); //////////////////////////////////////////////////////////
-
     /* Calculate Reward to go */
     torch::Tensor reward_to_go = torch::zeros({amount_of_players_in_team, trajectory_length});
     torch::Tensor rewards = torch::zeros({amount_of_players_in_team, trajectory_length});
@@ -224,12 +219,12 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
     torch::Tensor gae = ComputeGeneralAdvantageEstimation(temporal_difference, 0.99, 0.95);
 
     /* Split amount of timesteps in trajectories to length L */
-    int32_t L = 10;
-    int32_t num_chunks = trajectory_length / L;
+    int32_t l_batch_size = 10;
+    int32_t num_chunks = trajectory_length / l_batch_size ;
 
     for (int32_t l = 0; l < num_chunks; l++) {
-      int32_t start_index = l * L;
-      int32_t end_index = std::min(start_index + L, trajectory_length);
+      int32_t start_index = l * l_batch_size ;
+      int32_t end_index = std::min(start_index + l_batch_size , trajectory_length);
 
       /* Add each Trajectory into dat.t value for all timesteps in chunk */
       DataBuffer chunk;
@@ -255,7 +250,7 @@ std::vector<DataBuffer> MappoRun(PolicyNetwork & policy, CriticNetwork & critic,
 * Follows the algorithm from the paper: "The Surprising Effectiveness of PPO in Cooperative
 * Multi-Agent Games" by Yu et al., available at: https://arxiv.org/pdf/2103.01955
 */
-void Mappo_Update(PolicyNetwork& policy, CriticNetwork& critic, std::vector<DataBuffer> data_buffer)
+void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic, std::vector<DataBuffer> data_buffer)
 {
   /* Total number of chunks in D. */
   int data_buffer_size = data_buffer.size();

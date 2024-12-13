@@ -138,7 +138,6 @@ void SaveNetworks(PolicyNetwork & policy, CriticNetwork & critic)
       std::cerr << "Error saving model for agent " <<0 << ": " << e.what() << std::endl;
     }
 
-
   /*Save Crtitc network in models folder*/
   try {
     std::string model_path = "../models/critic_network.pt";
@@ -247,9 +246,7 @@ void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic) {
     torch::Tensor pol_loss,
     torch::Tensor cri_loss) {
 
-  // Backpropagate for each agent
-
-  // Set up Adam options
+  /* Set up Adam options*/
   torch::optim::AdamOptions adam_options;
   adam_options.lr(1e-4);  // Learning rate
   adam_options.eps(1e-5);  // Epsilon
@@ -266,13 +263,11 @@ void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic) {
   critnet.zero_grad();
 
   auto loss = pol_loss + cri_loss;
-  //pol_loss.backward({},true);
   loss.backward();
 
   torch::nn::utils::clip_grad_norm_(policy.parameters(), 0.5);
   torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
 
-  // Update the policy network for the current agent
   opts.step();
   critnet.step();
 }

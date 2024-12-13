@@ -105,7 +105,6 @@ struct PolicyNetwork : torch::nn::Module {
   torch::nn::GRU rnn{nullptr};
   torch::nn::Linear output_layer{nullptr};
 
-  PolicyNetwork();
   /*!
   * @brief Forward function for the LSTM Policy Network
   *
@@ -115,6 +114,7 @@ struct PolicyNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
+  PolicyNetwork();
   std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
     torch::Tensor hx
@@ -131,8 +131,6 @@ struct CriticNetwork : torch::nn::Module {
   torch::nn::GRU rnn{nullptr};
   torch::nn::Linear output_layer{nullptr};
 
-  CriticNetwork();
-
   /*!
   * @brief Forward function for the LSTM Critic Network
   *
@@ -142,6 +140,7 @@ struct CriticNetwork : torch::nn::Module {
   *
   *@param[out] (Predicted actions, hx new, cx new)
   */
+  CriticNetwork();
   std::tuple<torch::Tensor, torch::Tensor> Forward(
     torch::Tensor input,
     torch::Tensor hx
@@ -195,7 +194,7 @@ void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic);
 void SaveOldNetworks(PolicyNetwork & policy, CriticNetwork & critic);
 
 /*!
- * @brief Update all network weights
+ * @brief Update all network weights from loss functions
  *
  * @param[in] policy A reference to the policy network.
  * @param[in] critic A reference to the critic network.

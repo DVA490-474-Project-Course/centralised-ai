@@ -39,6 +39,7 @@ std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden();
  /*!
   *@brief Algorithm for training the networks.
   *
+  *@details Global constant values is declared in common_types.h!
   *@pre The following preconditions must be met before using this class:
   * - Saved or created models of policy and critic network is needed.
   *
@@ -46,10 +47,14 @@ std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden();
   *@param[in] critic is the created/loaded ctritic network that the MAPPO will be validating from.
   *@param[in] data_buffer is the buffer that stores all the chunks of time steps for updating the networks.
   */
-void Mappo_Update(PolicyNetwork& policy, CriticNetwork& critic, std::vector<DataBuffer> data_buffer);
+void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic, std::vector<DataBuffer> data_buffer);
 
 /*!
   *@brief Algorithm for stepping in the grSim environment and collecting the data needed for training.
+  *
+  *@details Global constant values is declared in common_types.h!
+  * @pre The following preconditions must be met before using this class:
+  * - Saved or created models of policy and critic network is needed.
   *
   *@param[in] policy is the created/loaded policy network which will be used by all agents.
   *@param[in] critic is the created/loaded ctritic network that the MAPPO will be validating from.

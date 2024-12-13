@@ -88,7 +88,7 @@ int main()
     auto databuffer = centralised_ai::collective_robot_behaviour::MappoRun(policy, critic, referee, vision_client, centralised_ai::Team::kBlue, simulation_interfaces);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(policy, critic, databuffer);
+    centralised_ai::collective_robot_behaviour::MappoUpdate(policy, critic, databuffer);
 
     /*Save the reward to go to a file*/
     int32_t num_batches = databuffer.size();
