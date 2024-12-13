@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-11-61
-// Last modified: 2024-11-06 by Jacob Johansson
+// Last modified: 2024-12-12 by Jacob Johansson
 // Description: Header for run_state.cc.
 // License: See LICENSE file for license details.
 //==============================================================================

@@ -30,7 +30,6 @@ namespace collective_robot_behaviour
         /* Write the mean reward. */
         file << mean_reward.item<float>() << std::endl;
 
-
         file.close();
     }
 

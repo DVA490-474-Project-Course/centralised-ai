@@ -2,7 +2,7 @@
 *==============================================================================
  * Author: Viktor Eriksson
  * Creation date: 2024-10-23.
- * Last modified: 2024-11-06 by Jacob Johansson
+ * Last modified: 2024-12-12 by Jacob Johansson
  * Description: Communication header file.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -42,14 +42,15 @@ typedef struct RewardConfiguration
 /*!
 * @brief Calculates the opponent team from the own team.
 * @returns The opponent team.
-* @param[In] own_team: The team that the robots are on.
+* @param[in] own_team: The team that the robots are on.
 */
 Team ComputeOpponentTeam(Team own_team);
 
 /*!
 *@brief Get the current global state of the world from grSim
+*@note The num_global_states doesn't match the number of states in the description due to the fact that not every state was used to train the current model, but is recommended to use in the final version.
 *
-*@returns A tensor representing the states of the world, with the shape [1, 1, num_states].
+*@returns A tensor representing the states of the world, with the shape [1, 1, num_global_states].
 * The states are as follows:
 * [0] - Reserved for the robot id as input to the policy network.
 * [1] - The x-coordinate of the ball.

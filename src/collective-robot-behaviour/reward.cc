@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-11-01 by Jacob Johansson
+// Last modified: 2024-12-12 by Jacob Johansson
 // Description: Source file for all code related to the reward functions.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -44,7 +44,7 @@ torch::Tensor ComputeAverageDistanceReward(torch::Tensor & positions, float max_
 	torch::Tensor average_position = positions.mean(1, true);
 	torch::Tensor distances = (positions - average_position).pow(2).sum(0); /* [num_agents]. */
 
-	torch::Tensor rewards = (-1/pow(max_distance, 2)) * distances + 1; /* Linear function for calculating the reward. */
+	torch::Tensor rewards = (-1/pow(max_distance, 2)) * distances + 1;
 
 	return torch::clamp(rewards, 0, 1) * max_reward;
 }
