@@ -34,16 +34,6 @@ constexpr int max_udp_packet_size = 65536;
 const int max_timesteps = 201;
 
 /*!
- * @brief Initial step count, starting from zero.
- */
-const int steps = 0;
-
-/*!
- * @brief Maximum steps per episode or iteration.
- */
-const int step_max = 0;
-
-/*!
  * @brief Length of the experience replay buffer.
  */
 const int buffer_length = 2;
@@ -59,14 +49,29 @@ const int amount_of_players_in_team = 6;
 const int batch_size = buffer_length * amount_of_players_in_team;
 
 /*!
- * @brief Input size for neural networks, typically representing the number of features in the state or observation.
+  * @brief The coefficient representing how much the entropy should be considered in the loss function.
+*/
+const float entropy_coefficient = 0.3;
+
+/*!
+  * @brief The clip value representing how much the policy should be clipped in the loss function.
+*/
+const float clip_value = 0.2;
+
+/*!
+ * @brief Represents the number of global states or observation.
  */
-const int input_size = 9;
+const int num_global_states = 21;
+
+/*!
+* @brief Represents the number of local states for each robot.
+*/
+const int num_local_states = 3;
 
 /*!
  * @brief Number of possible actions each agent can take.
  */
-const int num_actions = 7;
+const int num_actions = 6;
 
 /*!
  * @brief Size of the hidden layer in LSTM or RNN-based neural networks.

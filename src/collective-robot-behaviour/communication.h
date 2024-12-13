@@ -98,12 +98,21 @@ Team ComputeOpponentTeam(Team own_team);
 * - A connection to grSim.
 * - AutomatedReferee::AnalyzeGameState() and VisionClient::ReceivePacket() must be called on a separate thread.
 *
-*@param[In] referee: The automated referee, which is the source of the current state of the world.
-*@param[In] vision_client: The vision client, which is the source of the current state of the world.
-*@param[In] own_team: The team that the robots are on.
-*@param[In] opponent_team: The team that the robots are playing against.
+*@param[in] referee: The automated referee, which is the source of the current state of the world.
+*@param[in] vision_client: The vision client, which is the source of the current state of the world.
+*@param[in] own_team: The team that the robots are on.
+*@param[in] opponent_team: The team that the robots are playing against.
 */
 torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team);
+
+/*!
+*@brief Get the local state of the robot with the specified robot id.
+*@returns A tensor representing the local state of the robot, with the shape [1, 1, num_local_states].
+*@param[in] vision_client: The vision client, which is the source of the current state of the world.
+*@param[in] own_team: The team that the robots are on.
+*@param[in] robot_id: The id of the robot.
+*/
+torch::Tensor GetLocalState(ssl_interface::VisionClient & vision_client, Team own_team, int robot_id);
 
 /*!
 *@brief Send actions to the robots.

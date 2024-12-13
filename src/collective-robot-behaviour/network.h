@@ -62,11 +62,11 @@ namespace collective_robot_behaviour
 
     Trajectory()
     : /*robotID(-1),*/
-      state(torch::zeros({1, 1,input_size})), //Previous error wrong array size
+      state(torch::zeros({1, 1,num_global_states})), //Previous error wrong array size
       actions_prob(torch::zeros({num_actions})),
       rewards(torch::zeros(amount_of_players_in_team)),
       actions(torch::zeros({amount_of_players_in_team})),
-      new_state(torch::zeros({1, 1, input_size})) // New state, wrote to same as state dimension
+      new_state(torch::zeros({1, 1, num_global_states})) // New state, wrote to same as state dimension
 
     {}
   };
@@ -90,7 +90,7 @@ struct DataBuffer {
 };
 
 /*!
- * @brief PolicyNetwork struct creates a LSTM network along with a forward function.
+ * @brief Struct of the policy network based on the paper "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games" - https://arxiv.org/pdf/2103.01955".
  *
  *Contains num_layers, output_size, input_size, hidden_size.
  *Batch first = true, linear output_layer.
@@ -123,11 +123,7 @@ struct PolicyNetwork : torch::nn::Module {
 
 
 /*!
- * @brief Struct of the LSTM Critic Network
- *
- * @info  ,Linear output.
- *
- *Contains robotid, x_pos, y_pos and poliycnetwork
+ * @brief Struct of the Critic Network based on the paper "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games" - https://arxiv.org/pdf/2103.01955".
  */
 struct CriticNetwork : torch::nn::Module {
   torch::nn::Linear layer1{nullptr};
@@ -152,32 +148,11 @@ struct CriticNetwork : torch::nn::Module {
   );
 };
 
-
 /*!
- * @brief Agents struct creates a struct of a policy network and robot id to define the robots configuration.
- *
- *Contains robotid, x_pos, y_pos and poliycnetwork
+ * @brief Create a new policy network with reset hidden states.
+ * @return Returns a new PolicyNetwork instance.
  */
-struct Agents {
-  int robotId;
-  torch::Tensor random_floats; // Declaration only
-  float x_pos;
-  float y_pos;
-  std::shared_ptr<PolicyNetwork> policy_network;
-
-  // Constructor
-  Agents(int id, std::shared_ptr<PolicyNetwork> model);
-};
-
-/*!
- * @brief short desciption
- *
- * long description
- *
- * @param[in] amount_of_players_in_team number of players in one team
- * @return Returns amount of policy networks as the amount of players into a vector.
- */
-std::vector<Agents> CreateAgents(int amount_of_players_in_team);
+PolicyNetwork CreatePolicy();
 
 /*!
  * @brief Save the agents models and the critic network in models folder.
@@ -186,54 +161,49 @@ std::vector<Agents> CreateAgents(int amount_of_players_in_team);
  * and the critic network into a file. This allows for the preservation of the
  * trained models' weights, enabling later recovery or continuation of training.
  *
- * @param[in] models A constant reference to a vector of Agents containing the
- *               individual agent models to be saved.
- * @param[in] critic A reference to the CriticNetwork instance that will also
- *               be saved along with the agents' models.
- */
-void SaveModels(const std::vector<Agents>& models, CriticNetwork& critic);
+ * @param[in] policy A reference to the policy network instance.
+ * @param[in] critic A reference to the critic network instance.
+*/
+void SaveNetworks(PolicyNetwork & policy, CriticNetwork & critic);
 
 /*!
  * @brief Load network models via the /models folder.
  *
- * @param[in]  player_count amount of players to load in
+ * @param[in] policy A reference to the PolicyNetwork
  * @param[in] critic A reference to the CriticNetwork
- * @param[out] Returns Agent vector of all policy networks for each robot.
  */
-std::vector<Agents> LoadAgents(int player_count, CriticNetwork& critic);
+void LoadNetworks(PolicyNetwork& policy, CriticNetwork& critic);
 
 /*!
  * @brief Load old network models via the /models/old_agents folder.
  *
- * @param[in]  player_count amount of players to load in
+ * @param[in] policy A reference to the PolicyNetwork
  * @param[in] critic A reference to the CriticNetwork
- * @param[out] Returns Agent vector of all policy networks for each robot.
  */
-std::vector<Agents> LoadOldAgents(int player_count, CriticNetwork& critic);
+void LoadOldNetworks(PolicyNetwork& policy, CriticNetwork& critic);
 
   /*!
- * @brief Save the old agents models and the critic network in models/old_agents folder.
+ * @brief Save the old policy and the critic network in models/old_agents folder.
  *
  * This function serializes the parameters of the given agents' policy networks
  * and the critic network into a file. This allows for the preservation of the
  * trained models' weights, enabling later recovery or continuation of training.
  *
- * @param[in] models A constant reference to a vector of old Agents containing the
- *               individual agent models to be saved.
- * @param[in] critic A reference to the old CriticNetwork instance that will also
- *               be saved along with the agents' models.
+ * @param[in] policy A reference to the old policy network instance.
+ * @param[in] critic A reference to the old critic network instance.
  */
-void SaveOldModels(const std::vector<Agents>& models, CriticNetwork& critic);
-
+void SaveOldNetworks(PolicyNetwork & policy, CriticNetwork & critic);
 
 /*!
  * @brief Update all network weights
  *
- * @param[in]  agents policy networks of all agents/robots.
- * @param[in] critic A reference to the CriticNetwork
- * @param[in] exper_buff experience buffer vector.
+ * @param[in] policy A reference to the policy network.
+ * @param[in] critic A reference to the critic network.
+ * @param[in] policy_loss A tensor value representing the policy loss.
+ * @param[in] critic_loss A tensor value representing the critic loss.
  */
-void UpdateNets(std::vector<Agents>& agents, CriticNetwork &critic,torch::Tensor policy_loss,torch::Tensor critic_loss);
+void UpdateNets(PolicyNetwork& policy, CriticNetwork& critic, torch::Tensor policy_loss, torch::Tensor critic_loss);
+
 }/*namespace centralised_ai*/
 }/*namespace collective_robot_behaviour*/
 #endif //NETWORK_H

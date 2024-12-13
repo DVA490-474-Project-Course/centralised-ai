@@ -34,12 +34,23 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee, Te
     }
 }
 
+torch::Tensor GetLocalState(ssl_interface::VisionClient & vision_client, Team own_team, int robot_id)
+{
+  torch::Tensor states = torch::zeros(3);
+
+  states[0] = vision_client.GetRobotPositionX(robot_id, own_team);
+  states[1] = vision_client.GetRobotPositionY(robot_id, own_team);
+  states[2] = vision_client.GetRobotOrientation(robot_id, own_team);
+
+  return states.view({1, 1, states.size(0)});
+}
+
 torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_interface::VisionClient & vision_client, Team own_team, Team opponent_team)
 {
     vision_client.ReceivePacket();
     referee.AnalyzeGameState();
     
-    torch::Tensor states = torch::zeros(9);
+    torch::Tensor states = torch::zeros(21);
 
     /* Reserved for the robot id */
     states[0] = 0;
@@ -53,14 +64,14 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     states[4] = vision_client.GetRobotPositionY(0, own_team);
     states[5] = vision_client.GetRobotPositionX(1, own_team);
     states[6] = vision_client.GetRobotPositionY(1, own_team);
-    //states[7] = vision_client.GetRobotPositionX(2, own_team);
-    //states[8] = vision_client.GetRobotPositionY(2, own_team);
-    //states[9] = vision_client.GetRobotPositionX(3, own_team);
-    //states[10] = vision_client.GetRobotPositionY(3, own_team);
-    //states[11] = vision_client.GetRobotPositionX(4, own_team);
-    //states[12] = vision_client.GetRobotPositionY(4, own_team);
-    //states[13] = vision_client.GetRobotPositionX(5, own_team);
-    //states[14] = vision_client.GetRobotPositionY(5, own_team);
+    states[7] = vision_client.GetRobotPositionX(2, own_team);
+    states[8] = vision_client.GetRobotPositionY(2, own_team);
+    states[9] = vision_client.GetRobotPositionX(3, own_team);
+    states[10] = vision_client.GetRobotPositionY(3, own_team);
+    states[11] = vision_client.GetRobotPositionX(4, own_team);
+    states[12] = vision_client.GetRobotPositionY(4, own_team);
+    states[13] = vision_client.GetRobotPositionX(5, own_team);
+    states[14] = vision_client.GetRobotPositionY(5, own_team);
 //
     /* Opponent team positions */
     //states[15] = vision_client.GetRobotPositionX(0, opponent_team);
@@ -77,8 +88,12 @@ torch::Tensor GetGlobalState(ssl_interface::AutomatedReferee & referee, ssl_inte
     //states[26] = vision_client.GetRobotPositionY(5, opponent_team);
 
     /* Own team orientations */
-    states[7] = vision_client.GetRobotOrientation(0, own_team);
-    states[8] = vision_client.GetRobotOrientation(1, own_team);
+    states[15] = vision_client.GetRobotOrientation(0, own_team);
+    states[16] = vision_client.GetRobotOrientation(1, own_team);
+    states[17] = vision_client.GetRobotOrientation(2, own_team);
+    states[18] = vision_client.GetRobotOrientation(3, own_team);
+    states[19] = vision_client.GetRobotOrientation(4, own_team);
+    states[20] = vision_client.GetRobotOrientation(5, own_team);
 
     /* Goal difference */
     //states[27] = ComputeGoalDifference(referee, own_team);
@@ -130,29 +145,25 @@ void SendActions(std::vector<simulation_interface::SimulationInterface> robot_in
   {
     switch (action_ids[i].item<int>())
     {
-      case 0: /* Idle */
-        robot_interfaces[i].SetVelocity(0.0F, 0.0F, 0.0F);
       break;
-      case 1: /* Forward */
+      case 0: /* Forward */
         robot_interfaces[i].SetVelocity(0.5F, 0.0F, 0.0F);
       break;
-      case 2:
+      case 1:
         /* Backward */
         robot_interfaces[i].SetVelocity(-0.5F, 0.0F, 0.0F);
       break;
-      case 3: /* Left */
+      case 2: /* Left */
         robot_interfaces[i].SetVelocity(0.0F, 0.5F, 0.0F);
         break;
-      case 4: /* Right */
+      case 3: /* Right */
         robot_interfaces[i].SetVelocity(0.0F, -0.5F, 0.0F);
         break;
-      case 5: /* Diagonal forward-left */
-        //robot_interfaces[i].SetVelocity(0.5F, 0.5F, 0.0F);
-        robot_interfaces[i].SetVelocity(0, 0, 0.15F);
+      case 4: /* Rotate anti-clockwise */
+        robot_interfaces[i].SetVelocity(0.0F, 0.0F, 1.0F);
         break;
-      case 6: /* Diagonal forward-right */
-        //robot_interfaces[i].SetVelocity(0.5F, -0.5F, 0.0F);
-        robot_interfaces[i].SetVelocity(0, 0, -0.15F);
+      case 5: /* Rotate clockwise */
+        robot_interfaces[i].SetVelocity(0.0F, 0.0F, -1.0F);
         break;
       //case 7: /* Diagonal backward-left*/
       //  robot_interfaces[i].SetVelocity(-0.5F, 0.5F, 0.0F);

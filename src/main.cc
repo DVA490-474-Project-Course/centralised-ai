@@ -29,40 +29,15 @@
 #include "common_types.h"
 #include <ctime>
 
-std::vector<double> critic_loss;
-
-void PlotLoss()
+int main()
 {
-  /* Set plot labels and title. */
-  matplotlibcpp::figure();
-
-  /* Plot the data in real-time. */
-  while (true) {
-  
-      /* Plot the data. */
-      matplotlibcpp::plot(critic_loss, "-k");
-
-      matplotlibcpp::grid(true);
-
-      matplotlibcpp::title("Critic Loss");
-      matplotlibcpp::xlabel("Time Step");
-      matplotlibcpp::ylabel("Critic Loss");
-    
-      //matplotlibcpp::xlim(0, static_cast<int32_t>(time_steps.size()));
-
-      /* Pause for more efficient plotting. */
-      matplotlibcpp::pause(0.1);
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }  
-}
-
-int main() {
-  std::vector<centralised_ai::collective_robot_behaviour::Agents> models; /*Create Models class for each robot.*/
-  centralised_ai::collective_robot_behaviour::CriticNetwork critic; /*Create global critic network*/
+  /* Create the centralised critic network class */
+  centralised_ai::collective_robot_behaviour::CriticNetwork critic;
+  centralised_ai::collective_robot_behaviour::PolicyNetwork policy;
 
   /*Comment out if want to create new agents, otherwise load in saved models*/
-  models = centralised_ai::collective_robot_behaviour::CreateAgents(centralised_ai::amount_of_players_in_team);
-  //models = LoadAgents(amount_of_players_in_team,critic); //Load in the trained model
+  //centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();
+  LoadNetworks(policy, critic); //Load in the trained model
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -77,24 +52,16 @@ int main() {
   vision_client.ReceivePacketsUntilAllDataRead();
 
   /* Create the AutomatedReferee instance with the VisionClient */
-  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip,
-    grsim_port);
+  centralised_ai::ssl_interface::AutomatedReferee referee(vision_client, grsim_ip, grsim_port);
 
   /* Start the automated referee */
-  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
+  referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow, 3.0F, 300);
 
   std::vector<centralised_ai::simulation_interface::SimulationInterface> simulation_interfaces;
   for (int32_t id = 0; id < centralised_ai::amount_of_players_in_team; id++)
   {
     simulation_interfaces.push_back(centralised_ai::simulation_interface::SimulationInterface(grsim_ip, grsim_port, id, centralised_ai::Team::kBlue));
-    //simulation_interfaces[id].SetVelocity(5.0F, 0.0F, 0.0F);
   }
-
-  //torch::Tensor states = centralised_ai::collective_robot_behaviour::GetStates(referee,vision_client,centralised_ai::Team::kBlue,centralised_ai::Team::kYellow);
-  //std::cout << "States: " << states << std::endl;
-
-  // Launch the plotting in a separate thread
-  //std::thread plot_thread(PlotLoss);
 
   /* Generate the file name from date. */
   /* Get current time */
@@ -107,52 +74,40 @@ int main() {
   oss << std::put_time(&local_time, "%Y-%m-%d_%H-%M-%S");  // e.g., "2024-09-12_14-30-00"
 
   /* Create the file name */
-  std::string file_name = "../reward_to_go_" + oss.str() + ".csv";
-  std::cout << "File name to save reward to go: " << file_name << std::endl;
+  std::string file_name = "../rewards/reward_" + oss.str() + ".csv";
+  std::cout << "File name to save rewards: " << file_name << std::endl;
 
-  SaveOldModels(models,critic);
-  critic.train();
-  for (auto &model : models) {
-    model.policy_network->train();
-  }
+  centralised_ai::collective_robot_behaviour::SaveOldNetworks(policy, critic);
+
   int epochs = 0;
   std::cout << "Running" << std::endl;
-  while (true) {
-    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow,3.0F, 300);
+  while (true)
+  {
+    referee.StartGame(centralised_ai::Team::kBlue, centralised_ai::Team::kYellow, 3.0F, 300);
     /*run actions and save  to buffer*/
-    auto databuffer = MappoRun(models,critic,referee,vision_client,centralised_ai::Team::kBlue,simulation_interfaces);
-
-      /* Calcuate the mean episode reward */
-      float mean_reward = 0.0;
-      for (int32_t i = 0; i < databuffer.size(); i++)
-      {
-        for (int32_t j = 0; j < databuffer[i].t.size(); j++)
-        {
-          mean_reward += databuffer[i].t[j].rewards.sum().div(centralised_ai::amount_of_players_in_team).item<float>();
-        }
-      }
-
-      mean_reward /= static_cast<float>(centralised_ai::max_timesteps);
-
-      critic_loss.push_back(mean_reward);
-      /* Push the mean reward for each time step in the returned epoch. */
-      //for (int32_t t = 0; t < databuffer[0].t.size(); t++)
-      //{
-      //  /* Todo: Push critic loss to the list. */
-      //}
+    auto databuffer = centralised_ai::collective_robot_behaviour::MappoRun(policy, critic, referee, vision_client, centralised_ai::Team::kBlue, simulation_interfaces);
 
     /*Run Mappo Agent algorithm by Policy Models and critic network*/
-    centralised_ai::collective_robot_behaviour::Mappo_Update(models,critic,databuffer);
+    centralised_ai::collective_robot_behaviour::Mappo_Update(policy, critic, databuffer);
 
-    torch::Tensor reward_to_go = torch::ones({4, 10});
-    centralised_ai::collective_robot_behaviour::SaveRewardToGoToFile(reward_to_go, file_name);
+    /*Save the reward to go to a file*/
+    int32_t num_batches = databuffer.size();
+    int32_t num_time_steps = databuffer[0].t.size();
+    torch::Tensor rewards = torch::zeros({num_batches, num_time_steps});
+    
+    for (int32_t b = 0; b < databuffer.size(); b++)
+    {
+      for (int32_t t = 0; t < databuffer[b].t.size(); t++)
+      {
+        rewards[b][t] = databuffer[b].t[t].rewards.mean();
+      }
+    }
+
+    centralised_ai::collective_robot_behaviour::SaveRewardToFile(rewards.mean(), epochs, file_name);
 
     std::cout << "* Epochs: " << epochs << std::endl;
     epochs++;
   }
-
-  //plot_thread.join();
-
 
   return 0;
 }
