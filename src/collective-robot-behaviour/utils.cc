@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-07
-// Last modified: 2024-11-01 by Jacob Johansson
+// Last modified: 2024-12-12 by Jacob Johansson
 // Description: Headers for utils.h.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -21,16 +21,15 @@ namespace collective_robot_behaviour
 
 torch::Tensor ComputeRewardToGo(const torch::Tensor & rewards, double discount)
 {
-
   int32_t num_time_steps = rewards.size(0);
 
   /* Calculate the finite-horizon undiscounted reward-to-go.*/
   torch::Tensor output = torch::zeros(num_time_steps);
         
   output[num_time_steps - 1] = pow(discount, num_time_steps-1) * rewards[num_time_steps - 1];
-  for (int32_t t = num_time_steps - 2; t >= 0; t--)
-	{
-    output[t] = pow(discount, t) * rewards[t] + output[t + 1];
+	for (int32_t t = num_time_steps - 2; t >= 0; t--)	
+	{	
+	  output[t] = pow(discount, t) * rewards[t] + output[t + 1];
 	}
 
 	return output;

@@ -2,7 +2,7 @@
  *==============================================================================
  * Author: Jacob Johansson, Emil Åberg, Viktor Eriksson
  * Creation date: 2024-09-16
- * Last modified: 2024-10-01 by Jacob Johansson
+ * Last modified: 2024-12-12 by Jacob Johansson & Viktor Eriksson
  * Description: Main function.
  * License: See LICENSE file for license details.
  *==============================================================================
@@ -35,9 +35,9 @@ int main()
   centralised_ai::collective_robot_behaviour::CriticNetwork critic;
   centralised_ai::collective_robot_behaviour::PolicyNetwork policy;
 
-  /*Comment out if want to create new agents, otherwise load in saved models*/
-  //centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();
-  LoadNetworks(policy, critic); //Load in the trained model
+  /* Comment out if want to create new agents, otherwise load in saved models*/
+  /*centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();*/
+  LoadNetworks(policy, critic);
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";
@@ -77,6 +77,7 @@ int main()
   std::string file_name = "../rewards/reward_" + oss.str() + ".csv";
   std::cout << "File name to save rewards: " << file_name << std::endl;
 
+  /* Save the initial state of the networks. */
   centralised_ai::collective_robot_behaviour::SaveOldNetworks(policy, critic);
 
   int epochs = 0;
@@ -105,6 +106,7 @@ int main()
 
     centralised_ai::collective_robot_behaviour::SaveRewardToFile(rewards.mean(), epochs, file_name);
 
+    /* Update the epoch index */
     std::cout << "* Epochs: " << epochs << std::endl;
     epochs++;
   }

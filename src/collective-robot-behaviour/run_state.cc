@@ -1,7 +1,7 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-11-61
-// Last modified: 2024-11-06 by Jacob Johansson
+// Last modified: 2024-12-12 by Jacob Johansson
 // Description: Source file for run_state.cc.
 // License: See LICENSE file for license details.
 //==============================================================================
@@ -44,19 +44,15 @@ namespace collective_robot_behaviour
         orientations[4] = states[19];
         orientations[5] = states[20];
 
-        //torch::Tensor average_distance_reward = ComputeAverageDistanceReward(positions, reward_configuration.max_distance_from_center, reward_configuration.average_distance_reward);
-        //torch::Tensor have_ball = states.slice(0, 12, 14);
-        //torch::Tensor have_ball_reward = ComputeHaveBallReward(have_ball, reward_configuration.have_ball_reward);
-
         /* Distance to ball */
         torch::Tensor ball_position = torch::empty({2, 1});
         ball_position[0] = states[1];
         ball_position[1] = states[2];
         torch::Tensor distance_to_ball_reward = ComputeDistanceToBallReward(positions, ball_position, reward_configuration.distance_to_ball_reward);
         torch::Tensor angle_to_ball_reward = ComputeAngleToBallReward(orientations, positions, ball_position);
-        //torch::Tensor total_reward = average_distance_reward + have_ball_reward + distance_to_ball_reward;
+        torch::Tensor total_reward = distance_to_ball_reward + angle_to_ball_reward;
 
-        return distance_to_ball_reward;
+        return total_reward;
     }
 }
 }

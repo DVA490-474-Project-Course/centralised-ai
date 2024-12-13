@@ -1,8 +1,8 @@
 //==============================================================================
 // Author: Jacob Johansson
 // Creation date: 2024-10-01
-// Last modified: 2024-11-06 by Jacob Johansson
-// Description: Headers for world.cc.
+// Last modified: 2024-12-12 by Jacob Johansson
+// Description: Header for the base of the game states.
 // License: See LICENSE file for license details.
 //==============================================================================
 
@@ -34,14 +34,11 @@ class GameStateBase
     /*!
     * @brief Calculates the rewards for the given state.
     * @returns A tensor representing the reward for the given state, with the shape [num_agents].
-    * @param[In] states: The states of the world, with the shape [num_states].
-    * @param[In] reward_configuration: The configuration of the rewards.
+    * @param[in] states: The states of the world, with the shape [num_states].
+    * @param[in] reward_configuration: The configuration of the rewards.
     */
     virtual torch::Tensor ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration) = 0;
 };
-
-
-
 
 }
 }
