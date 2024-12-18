@@ -9,7 +9,7 @@
  */
 
 /* C++ standard library */
-#include <vector>
+#include "vector"
 
 /* Project .h files */
 #include "collective-robot-behaviour/utils.h"
@@ -22,12 +22,12 @@
 #include "collective-robot-behaviour/evaluation.h"
 #include "common_types.h"
 
-#include <pybind11/embed.h>
-#include <pybind11/stl.h>
-#include <matplotlibcpp.h>
-#include <iostream>
+#include "pybind11/embed.h"
+#include "pybind11/stl.h"
+#include "matplotlibcpp.h"
+#include "iostream"
 #include "common_types.h"
-#include <ctime>
+#include "ctime"
 
 int main()
 {
