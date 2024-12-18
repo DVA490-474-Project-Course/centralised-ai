@@ -11,3 +11,4 @@
 *.gitmodules*
 *.vscode*
 matplotlibcpp.h
+.clang-format
