@@ -134,7 +134,7 @@ void SendActions(
     std::vector<simulation_interface::SimulationInterface> robot_interfaces,
     torch::Tensor action_ids);
 
-} // namespace collective_robot_behaviour
-} // namespace centralised_ai
+} /* namespace collective_robot_behaviour */
+} /* namespace centralised_ai */
 
 #endif
