@@ -10,12 +10,12 @@
 #ifndef COMMUNICATION_H_H
 #define COMMUNICATION_H_H
 
-#include <torch/torch.h>
+#include "torch/torch.h"
 #include "../ssl-interface/automated_referee.h"
 #include "../simulation-interface/simulation_interface.h"
 #include "../common_types.h"
 #include "reward.h"
-#include <vector>
+#include "vector"
 #include "../common_types.h"
 
 namespace centralised_ai

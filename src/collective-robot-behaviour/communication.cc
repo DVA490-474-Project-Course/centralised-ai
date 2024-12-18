@@ -8,12 +8,12 @@
  *==============================================================================
  */
 
-#include <torch/torch.h>
+#include "torch/torch.h"
 #include "network.h"
 #include "../ssl-interface/automated_referee.h"
 #include "../simulation-interface/simulation_interface.h"
 #include "reward.h"
-#include <vector>
+#include "vector"
 
 namespace centralised_ai
 {
