@@ -10,8 +10,9 @@
 
 #ifndef NETWORK_H
 #define NETWORK_H
+
 /* PyTorch C++ API library  */
-#include <torch/torch.h>
+#include "torch/torch.h"
 /* Projects .h files for communication functions. */
 #include "communication.h"
 
