@@ -6,7 +6,7 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#include <torch/torch.h>
+#include "torch/torch.h"
 #include "reward.h"
 
 namespace centralised_ai

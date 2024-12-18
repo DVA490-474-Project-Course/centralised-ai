@@ -9,7 +9,7 @@
 #ifndef REWARD_H
 #define REWARD_H
 
-#include <torch/torch.h>
+#include "torch/torch.h"
 
 namespace centralised_ai
 {
