@@ -8,6 +8,7 @@
  * ==============================================================================
  */
 
+#include "communication.h"
 #include "../common_types.h"
 #include "../simulation-interface/simulation_interface.h"
 #include "../ssl-interface/automated_referee.h"
@@ -15,7 +16,6 @@
 #include "reward.h"
 #include "torch/torch.h"
 #include "vector"
-#include "communication.h"
 
 namespace centralised_ai {
 namespace collective_robot_behaviour {
@@ -35,11 +35,19 @@ static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee,
 
 torch::Tensor GetLocalState(ssl_interface::VisionClient& vision_client,
                             Team own_team, int robot_id) {
-  torch::Tensor states = torch::zeros(3);
+  torch::Tensor states = torch::zeros(4);
 
-  states[0] = vision_client.GetRobotPositionX(robot_id, own_team);
-  states[1] = vision_client.GetRobotPositionY(robot_id, own_team);
-  states[2] = vision_client.GetRobotOrientation(robot_id, own_team);
+  float position_x = vision_client.GetRobotPositionX(robot_id, own_team);
+  float position_y = vision_client.GetRobotPositionY(robot_id, own_team);
+  float orientation = vision_client.GetRobotOrientation(robot_id, own_team);
+  float ball_position_x = vision_client.GetBallPositionX();
+  float ball_position_y = vision_client.GetBallPositionY();
+
+  states[0] = position_x;
+  states[1] = position_y;
+  states[2] = orientation;
+  states[3] = std::sqrt(std::pow(position_x - ball_position_x, 2) +
+                        std::pow(position_y - ball_position_y, 2));
 
   return states.view({1, 1, states.size(0)});
 }
