@@ -6,13 +6,13 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#include <torch/torch.h>
-#include <torch/nn.h>
-#include <torch/nn/modules/utils.h>
-#include <stdint.h>
+#include "torch/torch.h"
+#include "torch/nn.h"
+#include "torch/nn/modules/utils.h"
+#include "stdint.h"
 #include "utils.h"
-#include <cmath>
-#include <iostream>
+#include "cmath"
+#include "iostream"
 
 namespace centralised_ai
 {
