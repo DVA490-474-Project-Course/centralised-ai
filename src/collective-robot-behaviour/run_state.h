@@ -10,7 +10,7 @@
 #define RUN_STATE_H
 
 #include "reward.h"
-#include <torch/torch.h>
+#include "torch/torch.h"
 #include "communication.h"
 #include "state.h"
 

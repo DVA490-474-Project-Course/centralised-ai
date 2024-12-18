@@ -8,7 +8,7 @@
 
 #include "reward.h"
 #include "run_state.h"
-#include <torch/torch.h>
+#include "torch/torch.h"
 #include "communication.h"
 
 namespace centralised_ai
