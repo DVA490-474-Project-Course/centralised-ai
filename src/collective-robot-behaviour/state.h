@@ -9,8 +9,8 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include <vector>
-#include <torch/torch.h>
+#include "vector"
+#include "torch/torch.h"
 #include "communication.h"
 
 namespace centralised_ai
