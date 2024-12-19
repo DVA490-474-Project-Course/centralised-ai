@@ -6,25 +6,24 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#ifndef RUN_STATE_H
-#define RUN_STATE_H
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_RUNSTATE_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_RUNSTATE_H_
 
-#include "reward.h"
-#include "torch/torch.h"
 #include "communication.h"
+#include "reward.h"
 #include "state.h"
+#include "torch/torch.h"
 
-namespace centralised_ai
-{
-namespace collective_robot_behaviour
-{
-    class RunState : public GameStateBase
-    {
-        public:
-            torch::Tensor ComputeActionMasks(const torch::Tensor & states) override;
-            torch::Tensor ComputeRewards(const torch::Tensor & states, struct RewardConfiguration reward_configuration) override;
-    };
-}
-}
+namespace centralised_ai {
+namespace collective_robot_behaviour {
+class RunState : public GameStateBase {
+public:
+  torch::Tensor ComputeActionMasks(const torch::Tensor& states) override;
+  torch::Tensor
+  ComputeRewards(const torch::Tensor& states,
+                 struct RewardConfiguration reward_configuration) override;
+};
+} // namespace collective_robot_behaviour
+} // namespace centralised_ai
 
 #endif

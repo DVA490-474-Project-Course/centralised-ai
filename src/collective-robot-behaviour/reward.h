@@ -6,8 +6,8 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#ifndef REWARD_H
-#define REWARD_H
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_REWARD_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_REWARD_H_
 
 #include "torch/torch.h"
 

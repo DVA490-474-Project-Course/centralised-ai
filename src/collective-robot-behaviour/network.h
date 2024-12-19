@@ -8,8 +8,8 @@
 *==============================================================================
 */
 
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_NETWORK_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_NETWORK_H_
 
 /* PyTorch C++ API library  */
 #include "torch/torch.h"

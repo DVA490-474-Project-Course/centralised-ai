@@ -6,8 +6,8 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_UTILS_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_UTILS_H_
 
 #include <torch/torch.h>
 #include <stdint.h>

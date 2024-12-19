@@ -6,8 +6,8 @@
 // License: See LICENSE file for license details.
 //==============================================================================
 
-#ifndef STATE_H
-#define STATE_H
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_STATE_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_STATE_H_
 
 #include "vector"
 #include "torch/torch.h"

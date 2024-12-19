@@ -8,8 +8,8 @@
  * ==============================================================================
  */
 
-#ifndef EVALUATION_H_
-#define EVALUATION_H_
+#ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_EVALUATION_H_
+#define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_EVALUATION_H_
 
 #include "fstream"
 #include "iostream"
