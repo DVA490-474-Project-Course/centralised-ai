@@ -99,7 +99,7 @@ ResetHidden() {
 
   Trajectory initial_trajectory;
   for (int i = 0; i < amount_of_players_in_team; i++) {
-    initial_trajectory.hidden_p.push_back(reset_states);
+    initial_trajectory.hidden_states_policy.push_back(reset_states);
   }
 
   trajectories.push_back(initial_trajectory);
@@ -157,15 +157,15 @@ MappoRun(PolicyNetwork& policy, CriticNetwork& critic,
 
     /* Loop for amount of timestamps in each batch */
     for (int timestep = 1; timestep < max_timesteps; timestep++) {
-      exp.hidden_p.clear();
+      exp.hidden_states_policy.clear();
 
       torch::Tensor prob_actions_stored =
           torch::zeros({amount_of_players_in_team, num_actions});
 
       /* Get hidden states and output probabilities for critic network, input is
        * state and previous timestep */
-      std::tuple<torch::Tensor, torch::Tensor> critic_value =
-          critic.Forward(state, trajectory[timestep - 1].hidden_v.ht_p);
+      std::tuple<torch::Tensor, torch::Tensor> critic_value = critic.Forward(
+          state, trajectory[timestep - 1].hidden_states_critic.ht_p);
 
       torch::Tensor critic_output = std::get<0>(critic_value);
       torch::Tensor critic_hx = std::get<1>(critic_value);
@@ -182,7 +182,8 @@ MappoRun(PolicyNetwork& policy, CriticNetwork& critic,
 
         /* Get action probabilities and hidden states */
         std::tuple<torch::Tensor, torch::Tensor> policy_value = policy.Forward(
-            local_state, trajectory[timestep - 1].hidden_p[agent].ht_p);
+            local_state,
+            trajectory[timestep - 1].hidden_states_policy[agent].ht_p);
 
         prob_actions_stored[agent] = std::get<0>(policy_value)[0][0];
         new_states.ht_p = std::get<1>(policy_value);
@@ -190,7 +191,7 @@ MappoRun(PolicyNetwork& policy, CriticNetwork& critic,
         assert(action_probabilities.requires_grad() == 0);
 
         /* Store hidden states */
-        exp.hidden_p.push_back(new_states);
+        exp.hidden_states_policy.push_back(new_states);
       }
 
       /* Get the actions with the highest probabilities for each agent */
@@ -210,7 +211,7 @@ MappoRun(PolicyNetwork& policy, CriticNetwork& critic,
       exp.state = state.clone();
       exp.critic_value =
           critic_output.squeeze().expand({amount_of_players_in_team});
-      exp.hidden_v.ht_p = critic_hx;
+      exp.hidden_states_critic.ht_p = critic_hx;
 
       /* Update state and use it for next iteration */
       state = GetGlobalState(referee, vision_client, own_team, opponent_team);
@@ -341,7 +342,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
     for (int c = 0; c < num_chunks; c++) {
       DataBuffer chunk = chunks[c];
 
-      h0_critic[c] = chunk.t[0].hidden_v.ht_p.clone();
+      h0_critic[c] = chunk.t[0].hidden_states_critic.ht_p.clone();
 
       for (int t = 0; t < num_time_steps; t++) {
         input[c][t] = chunk.t[t].state.squeeze().clone();
@@ -349,7 +350,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
 
       for (int agent = 0; agent < amount_of_players_in_team; agent++) {
         h0_policy[c][0][agent] =
-            chunk.t[0].hidden_p[agent].ht_p.squeeze().clone();
+            chunk.t[0].hidden_states_policy[agent].ht_p.squeeze().clone();
       }
     }
 
@@ -363,10 +364,10 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   int num_chunks = mini_batch.size();
   int64_t num_time_steps =
       static_cast<int64_t>(mini_batch[0].t.size()); /* Timesteps in batch */
-  torch::Tensor old_predicts_p = torch::zeros(
+  torch::Tensor old_policy_probabilities = torch::zeros(
       {num_chunks, amount_of_players_in_team,
        num_time_steps}); /* old network predicts of action of policy network */
-  torch::Tensor new_predicts_p = torch::zeros(
+  torch::Tensor new_policy_probabilities = torch::zeros(
       {num_chunks, amount_of_players_in_team,
        num_time_steps}); /* new network predicts of action of policy network */
   torch::Tensor all_actions_probs =
@@ -402,10 +403,10 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   /* Configure arrays from min_batch to fit into later functions */
   for (int c = 0; c < num_chunks; c++) {
     DataBuffer batch = mini_batch[c];
-    torch::Tensor h0_c = batch.t[0].hidden_v.ht_p;
+    torch::Tensor h0_c = batch.t[0].hidden_states_critic.ht_p;
 
     for (int32_t j = 0; j < amount_of_players_in_team; j++) {
-      torch::Tensor h0_p = batch.t[0].hidden_p[j].ht_p;
+      torch::Tensor h0_p = batch.t[0].hidden_states_policy[j].ht_p;
 
       for (int32_t t = 0; t < num_time_steps; t++) {
         /* Update critic network from batch */
@@ -456,7 +457,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
         /* Save prediction of the old networks probability of agents done action
          * in the timestep
          */
-        old_predicts_p[c][j][t] = output_old_p[act];
+        old_policy_probabilities[c][j][t] = output_old_p[act];
 
         torch::Tensor agent_state2 = agent_state1.clone();
 
@@ -476,7 +477,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
         }
 
         /* Save stored prediction of the action */
-        new_predicts_p[c][j][t] = pred_p.squeeze()[act];
+        new_policy_probabilities[c][j][t] = pred_p.squeeze()[act];
 
         /* Store all predictions the agent did at the timestep */
         all_actions_probs[c][j][t] = pred_p.squeeze();
@@ -506,8 +507,8 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   torch::Tensor reward_to_go_tensor = reward_to_go;
 
   assert(all_actions_probs.requires_grad() == true);
-  assert(new_predicts_p.requires_grad() == true);
-  assert(old_predicts_p.requires_grad() == true);
+  assert(new_policy_probabilities.requires_grad() == true);
+  assert(old_policy_probabilities.requires_grad() == true);
   assert(old_predicts_c.requires_grad() == true);
 
   /* Compute policy entropy */
@@ -515,8 +516,8 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
       ComputePolicyEntropy(all_actions_probs, entropy_coefficient);
 
   /* Compute probability ratios */
-  torch::Tensor probability_ratios =
-      ComputeProbabilityRatio(new_predicts_p, old_predicts_p);
+  torch::Tensor probability_ratios = ComputeProbabilityRatio(
+      new_policy_probabilities, old_policy_probabilities);
 
   /* Compute policy loss */
   torch::Tensor policy_loss = -ComputePolicyLoss(gae_tensor, probability_ratios,
