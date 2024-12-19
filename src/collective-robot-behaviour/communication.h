@@ -27,6 +27,7 @@ namespace collective_robot_behaviour {
  * @brief Struct representing the configuration of the rewards.
  */
 struct RewardConfiguration {
+
   /*!
    * @brief The reward that will be given to the robot when within
    * max_distance_from_center.
