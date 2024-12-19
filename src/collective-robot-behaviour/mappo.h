@@ -11,8 +11,8 @@
 #ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_MAPPO_H_
 #define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_MAPPO_H_
 
-#include "../common_types.h"
-#include "../simulation-interface/simulation_interface.h"
+#include "../../src/common_types.h"
+#include "../../src/simulation-interface/simulation_interface.h"
 #include "chrono"
 #include "communication.h"
 #include "network.h"

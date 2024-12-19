@@ -12,9 +12,9 @@
 #ifndef CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_COMMUNICATION_H_
 #define CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_COMMUNICATION_H_
 
-#include "../common_types.h"
-#include "../simulation-interface/simulation_interface.h"
-#include "../ssl-interface/automated_referee.h"
+#include "../../src/common_types.h"
+#include "../../src/simulation-interface/simulation_interface.h"
+#include "../../src/ssl-interface/automated_referee.h"
 #include "network.h"
 #include "reward.h"
 #include "torch/torch.h"
