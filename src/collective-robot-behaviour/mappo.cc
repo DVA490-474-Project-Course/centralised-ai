@@ -302,6 +302,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   policy.train();
   critic.train();
   torch::AutoGradMode enable_grad_mode(true);
+  torch::autograd::DetectAnomalyGuard(true);
 
   std::vector<DataBuffer> chunks;
 
@@ -395,25 +396,26 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   assert(reward_to_go.size(1) == amount_of_players_in_team);
   assert(reward_to_go.size(2) == num_time_steps);
 
-  torch::Tensor local_state = torch::zeros({1, 1, 3});
+  torch::Tensor local_state = torch::zeros({1, 1, num_local_states});
   assert(local_state.size(0) == 1);
   assert(local_state.size(1) == 1);
-  assert(local_state.size(2) == 3);
+  assert(local_state.size(2) == num_local_states);
 
   /* Configure arrays from min_batch to fit into later functions */
   for (int c = 0; c < num_chunks; c++) {
     DataBuffer batch = mini_batch[c];
-    torch::Tensor h0_c = batch.t[0].hidden_states_critic.ht_p;
+    torch::Tensor h0_c = batch.t[0].hidden_states_critic.ht_p.clone();
 
     for (int32_t j = 0; j < amount_of_players_in_team; j++) {
-      torch::Tensor h0_p = batch.t[0].hidden_states_policy[j].ht_p;
+      torch::Tensor h0_p = batch.t[0].hidden_states_policy[j].ht_p.clone();
+      torch::Tensor h0_p_old = h0_p.clone();
 
       for (int32_t t = 0; t < num_time_steps; t++) {
         /* Update critic network from batch */
         /* Old network */
-        torch::Tensor state = batch.t[t].state; /* Get saved state for critic */
+        torch::Tensor state = batch.t[t].state.clone(); /* Get saved state for critic */
         torch::Tensor global_state = state.clone();
-        global_state.index({0, 0, 0}) = -1;
+        global_state[0][0][0] = -1;
 
         /* Old network */
         std::tuple<torch::Tensor, torch::Tensor> old_ci =
@@ -428,7 +430,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
         /* new(current) network */
 
         std::tuple<torch::Tensor, torch::Tensor> critic_new_value =
-            critic.Forward(global_state, h0_c);
+              critic.Forward(global_state, h0_c);
 
         new_predicts_c[c][t] = std::get<0>(critic_new_value).squeeze();
         h0_c = std::get<1>(critic_new_value);
@@ -438,33 +440,36 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
                       .actions[j]
                       .item<int>(); /* action did in the recorded timestep */
 
-        /* Update the first index value to robot ID */
-        torch::Tensor agent_state1 = state.clone();
-        agent_state1.index({0, 0, 0}) = j;
+        /* Create the Local state from the current Global state*/
+        local_state[0][0][0] = state[0][0][3 + 2 * j + 0];
+        local_state[0][0][1] = state[0][0][3 + 2 * j + 1];
+        local_state[0][0][2] = state[0][0][15 + j];
+        local_state[0][0][3] = state[0][0][1];
+        local_state[0][0][4] = state[0][0][2];
 
-        local_state.index({0, 0, 0}) = state.index({0, 0, 3 + 2 * j + 0});
-        local_state.index({0, 0, 1}) = state.index({0, 0, 3 + 2 * j + 1});
-        local_state.index({0, 0, 2}) = state.index({0, 0, 15 + j});
+        std::cout << local_state[0][0] << std::endl;
+        std::cout << state[0][0] << std::endl;
 
         /* Make prediction from the agents old network */
         std::tuple<torch::Tensor, torch::Tensor> old_pi =
-            old_net_policy.Forward(local_state, h0_p);
+            old_net_policy.Forward(local_state.clone(), h0_p_old);
 
         /* Output from old_net */
+        h0_p_old = std::get<1>(old_pi);
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze();
         output_old_p = torch::softmax(output_old_p, -1);
+
 
         /* Save prediction of the old networks probability of agents done action
          * in the timestep
          */
         old_policy_probabilities[c][j][t] = output_old_p[act];
 
-        torch::Tensor agent_state2 = agent_state1.clone();
-
         std::tuple<torch::Tensor, torch::Tensor> policy_new_value =
-            policy.Forward(local_state, h0_p);
-        torch::Tensor pred_p = std::get<0>(policy_new_value);
+            policy.Forward(local_state.clone(), h0_p);
 
+        h0_p = std::get<1>(policy_new_value);
+        torch::Tensor pred_p = std::get<0>(policy_new_value);
         pred_p = torch::softmax(pred_p, -1);
 
         /* Check if pred_p contains zeros */
@@ -499,9 +504,10 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   /* Save to old network */
   SaveOldNetworks(policy, critic);
 
-  /* Verify the old saved networks is the same as the current networks */
+  /* Verify the old saved networks is the same as the current networks
   bool matches =
       CheckModelParametersMatch(old_net_policy, policy, old_net_critic, critic);
+  */
 
   torch::Tensor gae_tensor = gae;
   torch::Tensor reward_to_go_tensor = reward_to_go;
@@ -543,8 +549,9 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
 
   /* This should be false after updateNets() if networks were updated correctly
    */
-  matches =
+  /*matches =
       CheckModelParametersMatch(old_net_policy, policy, old_net_critic, critic);
+  */
 
   std::cout << "Training of buffer done! " << std::endl;
   std::cout << "Policy loss: " << policy_loss << std::endl;

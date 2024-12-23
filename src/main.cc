@@ -33,11 +33,11 @@ int main()
 {
   /* Create the centralised critic network class */
   centralised_ai::collective_robot_behaviour::CriticNetwork critic;
-  centralised_ai::collective_robot_behaviour::PolicyNetwork policy;
+  //centralised_ai::collective_robot_behaviour::PolicyNetwork policy;
 
   /* Comment out if want to create new agents, otherwise load in saved models*/
-  /*centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();*/
-  LoadNetworks(policy, critic);
+  centralised_ai::collective_robot_behaviour::PolicyNetwork policy = centralised_ai::collective_robot_behaviour::CreatePolicy();
+  //LoadNetworks(policy, critic);
 
   /* Define the IP and port for the VisionClient */
   std::string vision_ip = "127.0.0.1";

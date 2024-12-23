@@ -270,11 +270,11 @@ void UpdateNets(PolicyNetwork& policy, CriticNetwork& critic,
   opts.zero_grad();
   critnet.zero_grad();
 
-  auto loss = pol_loss + cri_loss;
+  torch::Tensor loss = pol_loss + cri_loss;
   loss.backward();
 
-  torch::nn::utils::clip_grad_norm_(policy.parameters(), 0.5);
-  torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.5);
+  torch::nn::utils::clip_grad_norm_(policy.parameters(), 0.2);
+  torch::nn::utils::clip_grad_norm_(critic.parameters(), 0.2);
 
   opts.step();
   critnet.step();
