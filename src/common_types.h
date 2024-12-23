@@ -68,7 +68,7 @@ const int num_global_states = 21;
 /*!
  * @brief Represents the number of local states for each robot.
  */
-const int num_local_states = 4;
+const int num_local_states = 5;
 
 /*!
  * @brief Number of possible actions each agent can take.

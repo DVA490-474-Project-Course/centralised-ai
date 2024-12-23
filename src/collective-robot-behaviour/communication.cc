@@ -46,8 +46,8 @@ torch::Tensor GetLocalState(ssl_interface::VisionClient& vision_client,
   states[0] = position_x;
   states[1] = position_y;
   states[2] = orientation;
-  states[3] = std::sqrt(std::pow(position_x - ball_position_x, 2) +
-                        std::pow(position_y - ball_position_y, 2));
+  states[3] = ball_position_x;
+  states[4] = ball_position_y;
 
   return states.view({1, 1, states.size(0)});
 }
