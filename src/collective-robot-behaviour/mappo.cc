@@ -1,4 +1,4 @@
-/* Mappo.cc
+/* mappo.cc
  * ==============================================================================
  * Author: Viktor Eriksson, Jacob Johansson
  * Creation date: 2024-10-23
