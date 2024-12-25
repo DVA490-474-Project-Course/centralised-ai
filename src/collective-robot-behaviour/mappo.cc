@@ -290,8 +290,8 @@ MappoRun(PolicyNetwork& policy, CriticNetwork& critic,
  * Cooperative Multi-Agent Games" by Yu et al., available at:
  * https://arxiv.org/pdf/2103.01955
  */
-void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
-                 std::vector<DataBuffer> data_buffer) {
+torch::Tensor MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
+                          std::vector<DataBuffer> data_buffer) {
   /* Total number of chunks in D. */
   int data_buffer_size = data_buffer.size();
 
@@ -413,7 +413,8 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
       for (int32_t t = 0; t < num_time_steps; t++) {
         /* Update critic network from batch */
         /* Old network */
-        torch::Tensor state = batch.t[t].state.clone(); /* Get saved state for critic */
+        torch::Tensor state =
+            batch.t[t].state.clone(); /* Get saved state for critic */
         torch::Tensor global_state = state.clone();
         global_state[0][0][0] = -1;
 
@@ -430,7 +431,7 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
         /* new(current) network */
 
         std::tuple<torch::Tensor, torch::Tensor> critic_new_value =
-              critic.Forward(global_state, h0_c);
+            critic.Forward(global_state, h0_c);
 
         new_predicts_c[c][t] = std::get<0>(critic_new_value).squeeze();
         h0_c = std::get<1>(critic_new_value);
@@ -458,7 +459,6 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
         h0_p_old = std::get<1>(old_pi);
         torch::Tensor output_old_p = std::get<0>(old_pi).squeeze();
         output_old_p = torch::softmax(output_old_p, -1);
-
 
         /* Save prediction of the old networks probability of agents done action
          * in the timestep
@@ -504,10 +504,9 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
   /* Save to old network */
   SaveOldNetworks(policy, critic);
 
-  /* Verify the old saved networks is the same as the current networks
+  /* Verify the old saved networks is the same as the current networks */
   bool matches =
       CheckModelParametersMatch(old_net_policy, policy, old_net_critic, critic);
-  */
 
   torch::Tensor gae_tensor = gae;
   torch::Tensor reward_to_go_tensor = reward_to_go;
@@ -549,14 +548,15 @@ void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
 
   /* This should be false after updateNets() if networks were updated correctly
    */
-  /*matches =
+  matches =
       CheckModelParametersMatch(old_net_policy, policy, old_net_critic, critic);
-  */
 
   std::cout << "Training of buffer done! " << std::endl;
   std::cout << "Policy loss: " << policy_loss << std::endl;
   std::cout << "Critic loss: " << critic_loss << std::endl;
   std::cout << "==============================================" << std::endl;
+
+  return torch::cat({policy_loss, critic_loss});
 }
 
 } /* namespace collective_robot_behaviour */

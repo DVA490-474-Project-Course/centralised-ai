@@ -48,6 +48,9 @@ std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden();
  * @pre The following preconditions must be met before using this class:
  * - Saved or created models of policy and critic network is needed.
  *
+ * @returns A tensor representing the loss of the networks, with the shape
+ * [policy_loss, critic_loss].
+ *
  * @param[in] policy is the created/loaded policy network which will be used by
  * all agents.
  *
@@ -57,8 +60,8 @@ std::tuple<std::vector<Trajectory>, torch::Tensor, torch::Tensor> ResetHidden();
  * @param[in] data_buffer is the buffer that stores all the chunks of time steps
  * for updating the networks.
  */
-void MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
-                 std::vector<DataBuffer> data_buffer);
+torch::Tensor MappoUpdate(PolicyNetwork& policy, CriticNetwork& critic,
+                          std::vector<DataBuffer> data_buffer);
 
 /*!
  * @brief Algorithm for stepping in the grSim environment and collecting the

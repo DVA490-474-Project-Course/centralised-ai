@@ -24,13 +24,22 @@ namespace centralised_ai {
 namespace collective_robot_behaviour {
 
 /*!
- * @brief Saves the reward to a file.
+ * @brief Saves the reward to a file with the specified file name.
  * @param[in] mean_reward: The mean reward tensor, with the shape [1].
  * @param[in] episode: The episode number.
  * @param[in] file_name: The filename to save the reward to go to.
  */
 void SaveRewardToFile(const torch::Tensor& mean_reward, int32_t episode,
                       const std::string& filename);
+
+/*!
+ * @brief Saves the losses to a file with the specified file name.
+ * @param[in] kLosses: The losses tensor, with the shape [policy_loss,
+ * critic_loss].
+ * @param[in] kFileName: The filename to save the losses to.
+ */
+void SaveLossesToFile(const torch::Tensor& kLosses,
+                      const std::string& kFileName);
 
 /*!
  * @brief Loads the reward from a file.

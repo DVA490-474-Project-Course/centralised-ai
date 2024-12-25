@@ -21,6 +21,20 @@
 namespace centralised_ai {
 namespace collective_robot_behaviour {
 
+void SaveLossesToFile(const torch::Tensor& kLosses,
+                      const std::string& kFileName) {
+  std::ofstream file(kFileName, std::ios::app);
+
+  if (!file.is_open()) {
+    std::cerr << "Could not open file: " << kFileName << std::endl;
+    return;
+  }
+
+  file << kLosses[0].item<float>() << "," << kLosses[1].item<float>()
+       << std::endl;
+  file.close();
+}
+
 void SaveRewardToFile(const torch::Tensor& mean_reward, int32_t episode,
                       const std::string& file_name) {
   /* Save the reward tensor to a file. */
