@@ -22,8 +22,10 @@
 #include "utils.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
  * @brief Resets hidden states and initializes trajectories for agents in a
@@ -112,4 +114,4 @@ bool CheckModelParametersMatch(const PolicyNetwork& kSavedPolicy,
 } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */
 
-#endif
+#endif /* CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_MAPPO_H_ */

@@ -11,8 +11,10 @@
 #include "reward.h"
 #include "torch/torch.h"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 torch::Tensor ComputeAngleToBallReward(const torch::Tensor& kOrientations,
                                        const torch::Tensor& kPositions,
@@ -80,5 +82,5 @@ torch::Tensor ComputeHaveBallReward(torch::Tensor& have_ball_flags,
   return rewards;
 }
 
-} // namespace collective_robot_behaviour
-} // namespace centralised_ai
+} /* namespace collective_robot_behaviour */
+} /* namespace centralised_ai */

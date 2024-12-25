@@ -17,8 +17,10 @@
 #include "torch/torch.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /* Utility function for calculating the goal difference. */
 static int32_t ComputeGoalDifference(ssl_interface::AutomatedReferee referee,

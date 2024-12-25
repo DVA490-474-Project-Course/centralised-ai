@@ -20,8 +20,10 @@
 #include "torch/torch.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
  * @brief Struct representing the configuration of the rewards.
@@ -137,4 +139,4 @@ void SendActions(
 } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */
 
-#endif
+#endif /* CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_COMMUNICATION_H_ */

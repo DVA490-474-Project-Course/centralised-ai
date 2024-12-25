@@ -17,8 +17,10 @@
 #include "torch/script.h"
 #include "torch/torch.h"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
  * @brief Struct is the hidden states used for the networks
@@ -205,4 +207,4 @@ void UpdateNets(PolicyNetwork& policy, CriticNetwork& critic,
 } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */
 
-#endif
+#endif /* CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_NETWORK_H_ */

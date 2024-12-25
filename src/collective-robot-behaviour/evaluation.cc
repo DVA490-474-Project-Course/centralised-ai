@@ -18,8 +18,10 @@
 #include "torch/torch.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 void SaveLossesToFile(const torch::Tensor& kLosses,
                       const std::string& kFileName) {
@@ -120,5 +122,5 @@ void PlotReward(const torch::Tensor& reward) {
   matplotlibcpp::pause(0.1);
 }
 
-} // namespace collective_robot_behaviour
-} // namespace centralised_ai
+} /* namespace collective_robot_behaviour */
+} /* namespace centralised_ai */

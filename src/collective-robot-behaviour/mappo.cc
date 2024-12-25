@@ -21,8 +21,10 @@
 #include "utils.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*
  * Check if the old network have the same as the new network, which is used to

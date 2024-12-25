@@ -20,8 +20,10 @@
 #include "torch/torch.h"
 #include "vector"
 
-namespace centralised_ai {
-namespace collective_robot_behaviour {
+namespace centralised_ai
+{
+namespace collective_robot_behaviour
+{
 
 /*!
  * @brief Saves the reward to a file with the specified file name.
@@ -62,4 +64,4 @@ void PlotReward(const torch::Tensor& reward);
 } /* namespace collective_robot_behaviour */
 } /* namespace centralised_ai */
 
-#endif
+#endif /* CENTRALISEDAI_COLLECTIVEROBOTBEHAVIOUR_EVALUATION_H_ */
