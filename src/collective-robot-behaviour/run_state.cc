@@ -1,14 +1,16 @@
-//==============================================================================
-// Author: Jacob Johansson, Viktor Eriksson
-// Creation date: 2024-11-6
-// Last modified: 2024-12-12 by Jacob Johansson
-// Description: Source file for run_state.cc.
-// License: See LICENSE file for license details.
-//==============================================================================
+/* ==============================================================================
+ * Author: Jacob Johansson, Viktor Eriksson
+ * Creation date: 2024-11-6
+ * Last modified: 2024-12-12 by Jacob Johansson
+ * Description: Source file for run_state.cc.
+ * License: See LICENSE file for license details.
+ * ==============================================================================
+ */
 
 #include "run_state.h"
-#include "communication.h"
-#include "reward.h"
+#include "../../src/collective-robot-behaviour/communication.h"
+#include "../../src/collective-robot-behaviour/game_state_base.h"
+#include "../../src/collective-robot-behaviour/reward.h"
 #include "torch/torch.h"
 
 namespace centralised_ai
