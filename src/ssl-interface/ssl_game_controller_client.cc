@@ -61,7 +61,7 @@ void GameControllerClient::ReceivePacket()
   char buffer[max_udp_packet_size];
 
   /* Receive raw packet */
-  message_length = recv(socket_, buffer,max_udp_packet_size, MSG_WAITALL);
+  message_length = recv(socket_, buffer, max_udp_packet_size, MSG_WAITALL);
 
   if (message_length > 0)
   {
@@ -80,12 +80,14 @@ void GameControllerClient::ReadGameStateData(Referee packet)
   blue_team_score_ = packet.blue().score();
   yellow_team_score_ = packet.yellow().score();
 
+  /* Read designated position */
   if (packet.has_designated_position())
   {
     ball_designated_position_x_ = packet.designated_position().x();
     ball_designated_position_y_ = packet.designated_position().y();
   }
 
+  /* Read team side assignement */
   if (packet.has_blue_team_on_positive_half())
   {
     if (packet.blue_team_on_positive_half())
@@ -98,6 +100,7 @@ void GameControllerClient::ReadGameStateData(Referee packet)
     }
   }
 
+  /* Read next referee command */
   if (packet.has_next_command())
   {
     next_referee_command_ = ConvertRefereeCommand(packet.next_command());
@@ -107,6 +110,7 @@ void GameControllerClient::ReadGameStateData(Referee packet)
     next_referee_command_ = RefereeCommand::kUnknownCommand;
   }
 
+  /* Read remaining stage time */
   if (packet.has_stage_time_left())
   {
     stage_time_left_ = packet.stage_time_left();
@@ -123,25 +127,37 @@ void GameControllerClient::Print()
       ball_designated_position_y_, stage_time_left_);
 }
 
-/* Public getters */
+/* Return the current referee command */
 enum RefereeCommand GameControllerClient::GetRefereeCommand() {
   return referee_command_;
 }
+
+/* Return blue team's score */
 int GameControllerClient::GetBlueTeamScore() {
   return blue_team_score_;
 }
+
+/* Return yellow team's score */
 int GameControllerClient::GetYellowTeamScore() {
   return yellow_team_score_;
 }
+
+/* Return x coordinate of designated position */
 float GameControllerClient::GetBallDesignatedPositionX() {
   return ball_designated_position_x_;
 }
+
+/* Return y coordinate of designated position */
 float GameControllerClient::GetBallDesignatedPositionY() {
   return ball_designated_position_y_;
 }
+
+/* Return remaining stage time */
 int64_t GameControllerClient::GetStageTimeLeft() {
   return stage_time_left_;
 }
+
+/* Returns which team is assigned to the positive half of the field */
 enum Team GameControllerClient::GetTeamOnPositiveHalf() {
   return team_on_positive_half_;
 }
