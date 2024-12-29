@@ -54,7 +54,7 @@ void VisionClient::ReceivePacket()
   char buffer[max_udp_packet_size];
 
   /* Receive raw packet */
-  message_length = recv(socket_, (char *)buffer, max_udp_packet_size,
+  message_length = recv(socket_, buffer, max_udp_packet_size,
       MSG_WAITALL);
 
   if (message_length > 0)
@@ -99,6 +99,8 @@ void VisionClient::ReceivePacketsUntilAllDataRead()
   while (all_data_has_been_read == false);
 }
 
+/* Read data from a protobuf defined packet from SSL-Vision and write it to this
+ * object */
 void VisionClient::ReadVisionData(SslWrapperPacket packet)
 {
   SslDetectionFrame detection;
@@ -181,11 +183,13 @@ void VisionClient::Print()
       timestamp_);
 }
 
+/* Returns the Unix timestamp of the latest packet that has been received */
 double VisionClient::GetTimestamp()
 {
   return timestamp_;
 }
 
+/* Return the x coordinate in mm of robot with specified ID and team */
 float VisionClient::GetRobotPositionX(int id, enum Team team)
 {
   if (team == Team::kBlue)
@@ -198,11 +202,12 @@ float VisionClient::GetRobotPositionX(int id, enum Team team)
   }
   else
   {
-    std::perror("GetRobotPositionX called with unknown team.");
+    throw std::invalid_argument("GetRobotPositionX called with unknown team.");
     return 0.0F;
   }
 }
 
+/* Return the y coordinate in mm of robot with specified ID and team */
 float VisionClient::GetRobotPositionY(int id, enum Team team)
 {
   if (team == Team::kBlue)
@@ -215,11 +220,12 @@ float VisionClient::GetRobotPositionY(int id, enum Team team)
   }
   else
   {
-    std::perror("GetRobotPositionY called with unknown team.");
+    throw std::invalid_argument("GetRobotPositionY called with unknown team.");
     return 0.0F;
   }
 }
 
+/* Return the orientation in radians of the robot with specified ID and team */
 float VisionClient::GetRobotOrientation(int id, enum Team team)
 {
   if (team == Team::kBlue)
@@ -232,16 +238,18 @@ float VisionClient::GetRobotOrientation(int id, enum Team team)
   }
   else
   {
-    std::perror("GetRobotOrientation called with unknown team.");
+    throw std::invalid_argument("GetRobotOrientation called with unknown team.");
     return 0.0F;
   }
 }
 
+/* Return the x coordinate in mm of the ball */
 float VisionClient::GetBallPositionX()
 {
   return ball_position_x_;
 }
 
+/* Return the y coordinate in mm of the ball */
 float VisionClient::GetBallPositionY()
 {
   return ball_position_y_;

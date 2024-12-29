@@ -12,7 +12,10 @@
 #define CENTRALISEDAI_SSLINTERFACE_SSLVISIONCLIENT_H_
 
 /* C system headers */
-#include "arpa/inet.h"
+#include "arpa/inet.h" 
+#include "netinet/in.h"
+#include "stdio.h"
+#include "sys/socket.h" 
 
 /* C++ standard library headers */
 #include "string" 
@@ -33,101 +36,129 @@ namespace ssl_interface
  * Class for communicating with ssl vision and provides methods to read ball and
  * robot positions and orientation.
  * 
- * @note Copyable, moveable.
+ * @note Not copyable, not moveable.
  */
 class VisionClient
 {
  public:
   /*!
-    * @brief Constructor that sets up connection to ssl Vision
-    *
-    * Constructor that sets up connection to ssl Vision. When running simulation,
-    * the vision packets are sent by grSim.
-    *
-    * @param[in] ip Vision multicast address as is configured in ssl Vision or
-    * grSim. If running on the same computer as this client, it is recommended
-    * that it is set to localhost i.e. "127.0.0.1"
-    *
-    * @param[in] port The vision multicast port as is configured in ssl Vision
-    * or grSim.
-    */
+   * @brief Constructor that sets up connection to ssl Vision
+   *
+   * Constructor that sets up connection to ssl Vision. When running simulation,
+   * the vision packets are sent by grSim.
+   *
+   * @param[in] ip Vision multicast address as is configured in ssl Vision or
+   * grSim. If running on the same computer as this client, it is recommended
+   * that it is set to localhost i.e. "127.0.0.1"
+   *
+   * @param[in] port The vision multicast port as is configured in ssl Vision
+   * or grSim.
+   */
   VisionClient(std::string ip, int port);
 
   /*!
     * @brief Reads a UDP packet from ssl Vision.
     * 
-    * Reads a UDP packet from ssl Vision, and updates all
-    * game state values that are available in the client.
-    * 
-    * @warning This method is blocking until a UDP packet has been received,
-    * potentially introducing a delay in whatever other task the calling thread
-    * is doing. It is recommended to continously run this method in a thread
-    * separate from where the Get* functions are called.
-    */
+   * Reads a UDP packet from ssl Vision, and updates all
+   * game state values that are available in the client.
+   * 
+   * @warning This method is blocking until a UDP packet has been received,
+   * potentially introducing a delay in whatever other task the calling thread
+   * is doing. It is recommended to continously run this method in a thread
+   * separate from where the Get* functions are called.
+   */
   virtual void ReceivePacket(); /* Set to virtual in order to mock 
                                  * receiving of packets when testing */
 
   /*!
-    * @brief Prints the vision data that has been read by this client.
-    * 
-    * Prints the vision data that has been read by this client including
-    * robot and ball positions, orientation and timestamp. Used for debugging
-    * purpuses.
-    */
+   * @brief Prints the vision data that has been read by this client.
+   * 
+   * Prints the vision data that has been read by this client including
+   * robot and ball positions, orientation and timestamp. Used for debugging
+   * purpuses.
+   */
   void Print();
 
   /*!
-    * @brief Returns the Unix timestamp of the latest packet that has been
-    * received.
-    */
+   * @brief Returns the Unix timestamp of the latest packet that has been
+   * received.
+   *
+   * @return Unix timestamp of last package received
+   */
   double GetTimestamp();
 
   /*!
-    * @brief Returns the x coordinate in mm of robot with specified ID and team.
-    * 
-    * @param[in] id ID of the specified robot.
-    * 
-    * @param[in] id Team of the specified robot.
-    */
+   * @brief Returns the x coordinate in mm of robot with specified ID and team.
+   * 
+   * @param[in] id ID of the specified robot.
+   * 
+   * @param[in] id Team of the specified robot.
+   * 
+   * @throws std::invalid_argument if called with argument Team::kUnknown;
+   * 
+   * @return X coordinate of specified robot
+   */
   float GetRobotPositionX(int id, enum Team team);
 
   /*!
-    * @brief Returns the y coordinate in mm of robot with specified ID and team.
-    * 
-    * @param[in] id ID of robot.
-    * 
-    * @param[in] id Team of robot.
-    */
+   * @brief Returns the y coordinate in mm of robot with specified ID and team.
+   * 
+   * @param[in] id ID of robot.
+   * 
+   * @param[in] id Team of robot.
+   * 
+   * @throws std::invalid_argument if called with argument Team::kUnknown;
+   *
+   * @return Y coordinate of specified robot
+   */
   float GetRobotPositionY(int id, enum Team team);
 
   /*!
-    * @brief Returns the orientation in radians mm of robot with specified ID
-    * and team.
-    * 
-    * @param[in] id ID of robot.
-    * 
-    * @param[in] id Team of robot.
-    */
+   * @brief Returns the orientation in radians of robot with specified ID
+   * and team.
+   * 
+   * @param[in] id ID of robot.
+   * 
+   * @param[in] id Team of robot.
+   * 
+   * @throws std::invalid_argument if called with argument Team::kUnknown;
+   *
+   * @return Orientation of specified robot
+   */
   float GetRobotOrientation(int id, enum Team team);
 
   /*!
-    * @brief Returns the x coordinate of the ball in mm.
-    */
+   * @brief Returns the x coordinate of the ball in mm.
+   * 
+   * Returns the x coordinate of the ball in mm. Origin is located in the center
+   * of the field. The y-axis follows the half-way line. The x-axis lies between
+   * the goals. Which team has its goal on the positive side of the x-axis is
+   * given by SSL-Game-Controller.
+   * 
+   * @return X coordinate of the ball
+   */
   float GetBallPositionX();
 
   /*!
-    * @brief Returns the y coordinate of the ball in mm.
-    */
+   * @brief Returns the y coordinate of the ball in mm.
+   *
+   * Returns the y coordinate of the ball in mm. Origin is located in the center
+   * of the field. The y-axis follows the half-way line. The x-axis lies between
+   * the goals. Which team has its goal on the positive side of the y-axis is
+   * given by SSL-Game-Controller.
+   * 
+   * @return Y coordinate of the ball
+   */
   float GetBallPositionY();
 
   /*!
-    * @brief Reads a UDP packet from ssl Vision.
-    * 
-    * Reads a UDP packets from ssl Vision, and updates all
-    * game state values that are available in the client
-    * until positions of ball and each robot have been read
-    * at least once.
-    */
+   * @brief Reads a UDP packet from ssl Vision.
+   * 
+   * Reads a UDP packets from ssl Vision, and updates all
+   * game state values that are available in the client
+   * until positions of ball and each robot have been read
+   * at least once.
+   */
   void ReceivePacketsUntilAllDataRead();
  
  protected:
@@ -212,7 +243,7 @@ class VisionClient
   bool ball_data_read_;
 
   /**************************/
-  /* Private methods */
+  /* Protected methods      */
   /**************************/
 
   /*!
