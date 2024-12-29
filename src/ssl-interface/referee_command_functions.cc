@@ -8,12 +8,14 @@
  *==============================================================================
  */
 
+/* Related .h files */
+#include "../ssl-interface/referee_command_functions.h"
+
 /* C++ standard library headers */
 #include "string"
 
 /* Project .h files */
 #include "../common_types.h"
-#include "../ssl-interface/referee_command_functions.h"
 #include "../ssl-interface/generated/ssl_gc_referee_message.pb.h"
 
 namespace centralised_ai

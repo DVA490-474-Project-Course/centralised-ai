@@ -24,7 +24,7 @@ namespace ssl_interface
 {
 
 /*!
- * @brief Convert RefereeCommand enum to string.
+ * @brief Convert from Referee_Command enum to RefereeCommand enum.
  * 
  * Converts Protobuf defined enumerator Referee_Command to RefereeCommand
  * enumerator defined by this project in common_types.h. This is done for
