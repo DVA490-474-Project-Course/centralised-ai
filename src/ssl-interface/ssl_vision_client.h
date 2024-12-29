@@ -92,7 +92,7 @@ class VisionClient
    * 
    * @param[in] id ID of the specified robot.
    * 
-   * @param[in] id Team of the specified robot.
+   * @param[in] team Team of the specified robot.
    * 
    * @throws std::invalid_argument if called with argument Team::kUnknown;
    * 
@@ -105,7 +105,7 @@ class VisionClient
    * 
    * @param[in] id ID of robot.
    * 
-   * @param[in] id Team of robot.
+   * @param[in] team Team of robot.
    * 
    * @throws std::invalid_argument if called with argument Team::kUnknown;
    *
@@ -119,7 +119,7 @@ class VisionClient
    * 
    * @param[in] id ID of robot.
    * 
-   * @param[in] id Team of robot.
+   * @param[in] team Team of robot.
    * 
    * @throws std::invalid_argument if called with argument Team::kUnknown;
    *
