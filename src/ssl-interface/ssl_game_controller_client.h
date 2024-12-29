@@ -147,10 +147,9 @@ class GameControllerClient
    *
    * @pre In order to have the data available ReceivePacket() needs to be called
    * beforehand.
+   * 
    * @return The remaining stage time in seconds. A negative value indicates that
    * the stage time has passed.
-   * 
-   * @return Remaining stage time
    */
   int64_t GetStageTimeLeft();
 
