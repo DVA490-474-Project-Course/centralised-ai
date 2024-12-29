@@ -1,6 +1,6 @@
 /* simulation_reset.cc
  *==============================================================================
- * Author: Shruthi P. Kunnon
+ * Author: Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-21
  * Last modified: 2024-10-30 by Emil Åberg
  * Description: Provides function to reset robots and ball in grSim
@@ -9,7 +9,7 @@
  */
 
 /* Related .h files */
-#include "simulation_reset.h"
+#include "../ssl-interface/simulation_reset.h"
 
 /* C system headers */
 #include "arpa/inet.h"
@@ -23,6 +23,7 @@
 /* Project .h files */
 #include "../ssl-interface/generated/grsim_commands.pb.h"
 #include "../ssl-interface/generated/grsim_packet.pb.h"
+#include "../common_types.h"
 
 namespace centralised_ai
 {
@@ -34,11 +35,13 @@ namespace ssl_interface
  * positions for both yellow and blue teams. For the blue team, the x-values
  * have opposite sign to place them on the opposite side of the field.
  */
-constexpr double initial_position_x[6] = {1.50, 1.50, 1.50, 0.55, 2.50, 3.60};
-constexpr double initial_position_y[6] = {1.12, 0.0, -1.12, 0.00, 0.00, 0.00};
+static constexpr double kInitialPositionX[6] =
+    {1.50, 1.50, 1.50, 0.55, 2.50, 3.60};
+static constexpr double kInitialPositionY[6] =
+    {1.12, 0.0, -1.12, 0.00, 0.00, 0.00};
 
 /* Send a grSim packet with UDP */
-void SendPacket(GrSimPacket packet, std::string ip, uint16_t port)
+static void SendPacket(GrSimPacket packet, std::string ip, uint16_t port)
 {
   size_t size;
   void *buffer;
@@ -55,12 +58,12 @@ void SendPacket(GrSimPacket packet, std::string ip, uint16_t port)
 
   /* Serialize the protobuf message before sending */
   size = packet.ByteSizeLong();
-  buffer = (char *)malloc(size);
+  buffer = malloc(size);
   packet.SerializeToArray(buffer, size);
 
   /* Send the UDP packet*/
   ::sendto(socket, buffer, size, 0, reinterpret_cast<sockaddr *>(&destination),
-           sizeof(destination));
+      sizeof(destination));
 
   free(buffer);
 }
@@ -99,17 +102,17 @@ void ResetRobotsAndBall(std::string ip, uint16_t port,
     if (team_on_positive_half == Team::kYellow)
     {
       /* Set new x position */
-      replacement->set_x(-initial_position_x[k]);
+      replacement->set_x(-kInitialPositionX[k]);
       replacement->set_dir(0.0F);
     }
     else
     {
       /* Set new x position */
-      replacement->set_x(initial_position_x[k]);
+      replacement->set_x(kInitialPositionX[k]);
       replacement->set_dir(180.0F);
     }
     /* Set new y position */
-    replacement->set_y(initial_position_y[k]);
+    replacement->set_y(kInitialPositionY[k]);
     /* Set to blue team (yellowteam = false) */
     replacement->set_yellow_team(false);
 
@@ -130,16 +133,16 @@ void ResetRobotsAndBall(std::string ip, uint16_t port,
     if (team_on_positive_half == Team::kYellow)
     {
       /* Set new x position */
-      replacement->set_x(initial_position_x[k]);
+      replacement->set_x(kInitialPositionX[k]);
       replacement->set_dir(180.0F);
     }
     else
     {
       /* Set new x position */
-      replacement->set_x(-initial_position_x[k]);
+      replacement->set_x(-kInitialPositionX[k]);
       replacement->set_dir(0.0F);
     }
-    replacement->set_y(initial_position_y[k]);
+    replacement->set_y(kInitialPositionY[k]);
     replacement->set_yellow_team(true);
   }
 

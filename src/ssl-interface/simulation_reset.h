@@ -1,19 +1,28 @@
 /* simulation_reset.h
  *==============================================================================
- * Author: Shruthi P. Kunnon
+ * Author: Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-21
  * Last modified: 2024-10-30 by Emil Åberg
  * Description: Provides function to reset robots and ball in grSim
  * License: See LICENSE file for license details.
  *==============================================================================
  */
+
 #ifndef CENTRALISEDAI_SSLINTERFACE_SIMULATIONRESET_H_
 #define CENTRALISEDAI_SSLINTERFACE_SIMULATIONRESET_H_
 
+/* C system headers */
+#include "arpa/inet.h"
+#include "netinet/in.h"
+#include "sys/socket.h"
+
 /* C++ standard library headers */
-#include <string>
+#include "memory"
+#include "string"
 
 /* Project .h files */
+#include "../ssl-interface/generated/grsim_commands.pb.h"
+#include "../ssl-interface/generated/grsim_packet.pb.h"
 #include "../common_types.h"
 
 namespace centralised_ai
