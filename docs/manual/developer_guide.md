@@ -3,11 +3,6 @@ Developer Guide
 
 @page developer_guide Developer Guide
 
-Developer Guide
-=======================
-
-@page developer_guide Developer Guide
-
 Code Style/Standard
 -----------------------
 The project strictly adheres to the 
