@@ -58,7 +58,7 @@ static void SetAllPositionsToZero(VisionClientDerived& vision_client)
 }
 
 
-/*TEST(GetGlobalStateTest, TestShape)
+TEST(GetGlobalStateTest, TestShape)
 {
   VisionClientDerived vision_client = VisionClientDerived("127.0.0.1", 20001);
   centralised_ai::ssl_interface::AutomatedReferee automated_referee(vision_client, "127.0.0.1", 10001);
@@ -69,7 +69,7 @@ static void SetAllPositionsToZero(VisionClientDerived& vision_client)
   EXPECT_EQ(state.size(0), 1);
   EXPECT_EQ(state.size(1), 1);
   EXPECT_EQ(state.size(2), 42);
-}*/
+}
 
 
 TEST(ComputeOpponentTeamTest, TestOpponentTeam_1)
