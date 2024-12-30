@@ -1,4 +1,4 @@
-/* automated_referee.h
+/* automated_referee.cc
  *==============================================================================
  * Author: Aaiza A. Khan, Shruthi P. Kunnon, Emil Åberg
  * Creation date: 2024-10-10
@@ -33,18 +33,17 @@ AutomatedReferee::AutomatedReferee(VisionClient &vision_client,
     std::string grsim_ip, uint16_t grsim_port)
     : vision_client_(vision_client),
       referee_command_(RefereeCommand::kStop),
-      blue_team_score_(0),
-      yellow_team_score_(0),
-      last_kicker_team_(Team::kUnknown),
-      designated_position_({0.0F, 0.0F}),
-      game_running_(false),
-      grsim_ip_(grsim_ip),
-      grsim_port_(grsim_port) {
-
+    blue_team_score_(0),
+    yellow_team_score_(0),
+    last_kicker_team_(Team::kUnknown),
+    designated_position_({0.0F, 0.0F}),
+    game_running_(false),
+    grsim_ip_(grsim_ip),
+    grsim_port_(grsim_port) {
 }
 
 /* Analyze the game state by using VisionClient to access robot and ball
-   positions */
+ * positions */
 void AutomatedReferee::AnalyzeGameState()
 {
   enum Team touching_ball;
@@ -71,15 +70,15 @@ void AutomatedReferee::AnalyzeGameState()
  * resets ball and robot position when a goal is scored. */
 void AutomatedReferee::RefereeStateHandler()
 {
-  float current_time;
-  current_time = vision_client_.GetTimestamp();
+  float current_time = vision_client_.GetTimestamp();
 
   switch (referee_command_)
   {
     case RefereeCommand::kPrepareKickoffYellow:
     case RefereeCommand::kPrepareKickoffBlue:
-    /* Transition to normal start after kickoff preparation time. */
-      if (current_time - prepare_kickoff_start_time_>= prepare_kickoff_duration_)
+      /* Transition to normal start after kickoff preparation time. */
+      if (current_time - prepare_kickoff_start_time_
+          >= prepare_kickoff_duration_)
       {
         referee_command_ = RefereeCommand::kNormalStart;
       }
@@ -117,7 +116,7 @@ void AutomatedReferee::RefereeStateHandler()
         ResetRobotsAndBall(grsim_ip_, grsim_port_, team_on_positive_half_);
       }
       else if (IsBallOutOfField(vision_client_.GetBallPositionX(),
-        vision_client_.GetBallPositionY()))
+          vision_client_.GetBallPositionY()))
       {
         designated_position_ = CalcBallDesignatedPosition();
         /* Assign free kicks to the appropriate team. */
@@ -135,30 +134,30 @@ void AutomatedReferee::RefereeStateHandler()
       break;
     default:
       /* Handle unexpected states by throwing a runtime error. */
-        throw std::runtime_error("unhandled state encountered: " +
-            std::to_string(static_cast<int>(referee_command_)) +
-            ". Runtime exception occurred.");
+      throw std::runtime_error("unhandled state encountered: " +
+          std::to_string(static_cast<int>(referee_command_)) +
+          ". Runtime exception occurred.");
   }
 }
 
 /* Starts the automated referee, reset score, referee command,
  * robot and ball positions. */
 void AutomatedReferee::StartGame(enum Team starting_team,
-  enum Team team_on_positive_half_, double prepare_kickoff_duration_,
-      int64_t stage_time_)
+  enum Team team_on_positive_half, double prepare_kickoff_duration,
+      int64_t stage_time)
 {
   yellow_team_score_ = 0;
   blue_team_score_ = 0;
-  designated_position_.x = 0.0;
-  designated_position_.y = 0.0;
+  designated_position_.x = 0.0F;
+  designated_position_.y = 0.0F;
   prepare_kickoff_start_time_ = vision_client_.GetTimestamp();
   time_at_game_start_ = vision_client_.GetTimestamp();
-  this->prepare_kickoff_duration_ = prepare_kickoff_duration_;
-  this->team_on_positive_half_ = team_on_positive_half_;
+  prepare_kickoff_duration_ = prepare_kickoff_duration;
+  team_on_positive_half_ = team_on_positive_half;
   last_kicker_team_ = starting_team;
   game_running_ = true;
-  this->stage_time_ = stage_time_;
-  stage_time_left_ = stage_time_;
+  stage_time_ = stage_time;
+  stage_time_left_ = stage_time;
 
   /* Set the initial referee command based on the starting team. */
   if (starting_team == Team::kBlue)
@@ -197,34 +196,27 @@ bool AutomatedReferee::IsBallInGoal(enum Team team)
 
   if (team_on_positive_half_ == team)
   {
-    return (ball_x > goal_x_positive_half && ball_y > goal_width_min_y
-        && ball_y < goal_width_max_y);
+    return (ball_x > kGoalXPositiveHalf_ && ball_y > kGoalWidthMinY_
+        && ball_y < kGoalWidthMaxY_);
   }
   else
   {
-    return (ball_x < goal_x_negative_half && ball_y > goal_width_min_y
-        && ball_y < goal_width_max_y);
+    return (ball_x < kGoalXNegativeHalf_ && ball_y > kGoalWidthMinY_
+        && ball_y < kGoalWidthMaxY_);
   }
-}
-
-/* Returns true if ball is in yellow teams goal */
-bool AutomatedReferee::IsBallInYellowGoal(float ball_x, float ball_y)
-{
-  return (ball_x < goal_x_negative_half && ball_y > goal_width_min_y &&
-      ball_y < goal_width_max_y);
 }
 
 /* Check if the ball has gone out of field */
 bool AutomatedReferee::IsBallOutOfField(float ball_x, float ball_y)
 {
-  return (ball_x > goal_x_positive_half || ball_x < goal_x_negative_half
-      || ball_y > ball_out_of_field_max_y || ball_y < ball_out_of_field_min_y);
+  return (ball_x > kGoalXPositiveHalf_ || ball_x < kGoalXNegativeHalf_
+      || ball_y > kBallOutOfFieldMaxY_ || ball_y < kBallOutOfFieldMinY_);
 }
 
 /* Returns true if the specified robot is currently touching the ball */
 bool AutomatedReferee::IsTouchingBall(int id, enum Team team)
 {
-  return (DistanceToBall(id, team) <= ball_radius + collision_margin);
+  return (DistanceToBall(id, team) <= kBallRadius + kCollisionMargin_);
 }
 
 /* Returns which team is currently touching the ball, returns KUnknown if no
@@ -245,23 +237,23 @@ enum Team AutomatedReferee::CheckForCollision()
   return Team::kUnknown;
 }
 
-/* Return distance to ball and specified robot */
+/* Return distance to center of the ball and specified robot */
 float AutomatedReferee::DistanceToBall(int id, enum Team team)
 {
   return std::sqrt(
     std::pow((vision_client_.GetBallPositionX() -
-      vision_client_.GetRobotPositionX(id, team)), 2) +
+        vision_client_.GetRobotPositionX(id, team)), 2) +
     std::pow((vision_client_.GetBallPositionY() -
-      vision_client_.GetRobotPositionY(id, team)), 2)) -
-    robot_radius;
+        vision_client_.GetRobotPositionY(id, team)), 2)) -
+    kRobotRadius;
 }
 
-/* Return distance to ball and specified point */
+/* Return distance to center of the ball and specified point */
 float AutomatedReferee::DistanceToBall(float x, float y)
 {
   return std::sqrt(
-    std::pow((vision_client_.GetBallPositionX() - x), 2) +
-    std::pow((vision_client_.GetBallPositionY() - y), 2));
+      std::pow((vision_client_.GetBallPositionX() - x), 2) +
+      std::pow((vision_client_.GetBallPositionY() - y), 2));
 }
 
 /* Returns true if ball is considered sucessfully placed according to SSL
@@ -283,7 +275,7 @@ bool AutomatedReferee::BallSuccessfullyPlaced()
   /* the ball is at a position within 0.15 meters radius from the requested
    * position */
   if (DistanceToBall(designated_position_.x, designated_position_.y)
-    > 150)
+      > 150)
   {
     return false;
   }
@@ -292,40 +284,45 @@ bool AutomatedReferee::BallSuccessfullyPlaced()
 }
 
 /* Assuming ball is out of field, returns the point of where ball should be
-   placed for freekick/cornerkick. */
+ * placed for freekick/cornerkick. */
 struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition()
 {
   struct Point local_designated_position;
   float ball_x = vision_client_.GetBallPositionX();
   float ball_y = vision_client_.GetBallPositionY();
 
-  if ((ball_x > goal_x_positive_half && ball_y > goal_width_max_y) ||
-      (ball_x >= 4300 && ball_y > ball_out_of_field_min_y))
+  if ((ball_x > kGoalXPositiveHalf_ && ball_y > kGoalWidthMaxY_) ||
+      (ball_x >= 4300 && ball_y > kBallOutOfFieldMinY_))
   {
     local_designated_position.x = 4300;
     local_designated_position.y = 2800;
-  } else if ((ball_x > goal_x_positive_half && ball_y < -goal_width_max_y) ||
-        (ball_x >= 4300 && ball_y < -ball_out_of_field_min_y))
+  }
+  else if ((ball_x > kGoalXPositiveHalf_ && ball_y < -kGoalWidthMaxY_) ||
+      (ball_x >= 4300 && ball_y < -kBallOutOfFieldMinY_))
   {
     local_designated_position.x = 4300;
     local_designated_position.y = -2800;
-  } else if ((ball_x < goal_x_negative_half && ball_y > goal_width_max_y) ||
-        (ball_x <= -4300 && ball_y > ball_out_of_field_min_y))
+  }
+  else if ((ball_x < kGoalXNegativeHalf_ && ball_y > kGoalWidthMaxY_) ||
+      (ball_x <= -4300 && ball_y > kBallOutOfFieldMinY_))
   {
     local_designated_position.x = -4300;
     local_designated_position.y = 2800;
-  } else if ((ball_x < goal_x_negative_half && ball_y < -goal_width_max_y) ||
-        (ball_x <= -4300 && ball_y < -ball_out_of_field_min_y))
+  }
+  else if ((ball_x < kGoalXNegativeHalf_ && ball_y < -kGoalWidthMaxY_) ||
+      (ball_x <= -4300 && ball_y < -kBallOutOfFieldMinY_))
   {
     local_designated_position.x = -4300;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 &&
-        ball_y < -ball_out_of_field_min_y)
+  }
+  else if (ball_x > -4300 && ball_x < 4300 &&
+      ball_y < -kBallOutOfFieldMinY_)
   {
     local_designated_position.x = ball_x;
     local_designated_position.y = -2800;
-  } else if (ball_x > -4300 && ball_x < 4300 &&
-        ball_y > ball_out_of_field_min_y)
+  }
+  else if (ball_x > -4300 && ball_x < 4300 &&
+      ball_y > kBallOutOfFieldMinY_)
   {
     local_designated_position.x = ball_x;
     local_designated_position.y = 2800;

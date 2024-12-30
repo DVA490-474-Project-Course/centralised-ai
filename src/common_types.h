@@ -25,7 +25,7 @@ namespace centralised_ai {
  * @brief Maximum size of UDP packets received from SSL Vision and
  * SSL Game Controller.
  */
-constexpr int max_udp_packet_size = 65536;
+static constexpr int kMaxUdpPacketSize = 65536;
 
 /*!
  * @brief The maximum number of timesteps for the simulation or training.
@@ -83,12 +83,12 @@ const int hidden_size = 64;
 /*!
  * @brief The robot radius in mm.
  */
-constexpr float robot_radius = 85;
+static constexpr float kRobotRadius = 85;
 
 /*!
  * @brief The ball radius in mm.
  */
-constexpr float ball_radius = 21.5;
+static constexpr float kBallRadius = 21.5;
 
 /*!
  * @brief Enum representing player team selection.
