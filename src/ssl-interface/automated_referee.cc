@@ -331,26 +331,45 @@ struct AutomatedReferee::Point AutomatedReferee::CalcBallDesignatedPosition()
   return local_designated_position;
 }
 
-/* Public getters */
-enum RefereeCommand AutomatedReferee::GetRefereeCommand() {
+/* Public getter for the referee command */
+enum RefereeCommand AutomatedReferee::GetRefereeCommand()
+{
   return referee_command_;
 }
-int AutomatedReferee::GetBlueTeamScore() {
+
+/* Public getter for blue team's score */
+int AutomatedReferee::GetBlueTeamScore()
+{
   return blue_team_score_;
 }
-int AutomatedReferee::GetYellowTeamScore() {
+
+/* Public getter for yellow team's score */
+int AutomatedReferee::GetYellowTeamScore()
+{
   return yellow_team_score_;
 }
-float AutomatedReferee::GetBallDesignatedPositionX() {
+
+/* Public getter for the x coordinate of ball designated position */
+float AutomatedReferee::GetBallDesignatedPositionX()
+{
   return designated_position_.x;
 }
-float AutomatedReferee::GetBallDesignatedPositionY() {
+
+/* Public getter for the y coordinate of ball designated position */
+float AutomatedReferee::GetBallDesignatedPositionY()
+{
   return designated_position_.y;
 }
-enum Team AutomatedReferee::TeamOnPositiveHalf() {
+
+/* Public getter for team side assignment */
+enum Team AutomatedReferee::TeamOnPositiveHalf()
+{
   return team_on_positive_half_;
 }
-int64_t AutomatedReferee::GetStageTimeLeft() {
+
+/* Public getter for remaining stage time */
+int64_t AutomatedReferee::GetStageTimeLeft()
+{
   return stage_time_left_;
 };
 
