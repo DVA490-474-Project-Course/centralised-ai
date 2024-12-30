@@ -16,13 +16,13 @@
 
 class TestableSimulationInterface 
     : public centralised_ai::simulation_interface::SimulationInterface {
-  public:
+   public:
     TestableSimulationInterface(std::string ip, uint16_t port, int id, 
         centralised_ai::Team team)
             : SimulationInterface(ip, port, id, team) {}
-      GrSimPacket CallCreateProtoPacket() {
+    GrSimPacket CallCreateProtoPacket() {
       return CreateProtoPacket();
-      }
+    }
 
 };
 

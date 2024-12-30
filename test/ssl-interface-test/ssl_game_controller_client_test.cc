@@ -35,44 +35,6 @@ class MockGameControllerClient : public centralised_ai::ssl_interface
   }
 };
 
-/* Helper function to convert protobuf command to
- * centralised_ai::RefereeCommand */
-centralised_ai::RefereeCommand
-    ConvertProtoRefereeCommand(Referee_Command command) {
-  switch (command) {
-    case Referee_Command_HALT:
-      return centralised_ai::RefereeCommand::kHalt;
-    case Referee_Command_STOP:
-      return centralised_ai::RefereeCommand::kStop;
-    case Referee_Command_NORMAL_START:
-      return centralised_ai::RefereeCommand::kNormalStart;
-    case Referee_Command_PREPARE_KICKOFF_YELLOW:
-      return centralised_ai::RefereeCommand::kPrepareKickoffYellow;
-    case Referee_Command_PREPARE_KICKOFF_BLUE:
-      return centralised_ai::RefereeCommand::kPrepareKickoffBlue;
-    case Referee_Command_FORCE_START:
-      return centralised_ai::RefereeCommand::kForceStart;
-    case Referee_Command_PREPARE_PENALTY_YELLOW:
-      return centralised_ai::RefereeCommand::kPreparePenaltyYellow;
-    case Referee_Command_PREPARE_PENALTY_BLUE:
-      return centralised_ai::RefereeCommand::kPreparePenaltyBlue;
-    case Referee_Command_DIRECT_FREE_YELLOW:
-      return centralised_ai::RefereeCommand::kDirectFreeYellow;
-    case Referee_Command_INDIRECT_FREE_BLUE:
-      return centralised_ai::RefereeCommand::kDirectFreeBlue;
-    case Referee_Command_TIMEOUT_YELLOW:
-      return centralised_ai::RefereeCommand::kTimeoutYellow;
-    case Referee_Command_DIRECT_FREE_BLUE:
-      return centralised_ai::RefereeCommand::kDirectFreeBlue;
-    case Referee_Command_BALL_PLACEMENT_YELLOW:
-      return centralised_ai::RefereeCommand::kBallPlacementYellow;
-    case Referee_Command_BALL_PLACEMENT_BLUE:
-      return centralised_ai::RefereeCommand::kBallPlacementBlue;
-    default:
-      return centralised_ai::RefereeCommand::kUnknownCommand;
-  }
-}
-
 /* Test Fixture: Set up the test environment and mock client */
 class GameControllerClientTest : public ::testing::Test {
  protected:
