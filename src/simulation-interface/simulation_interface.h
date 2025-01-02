@@ -14,11 +14,15 @@
 
 /* C system headers */
 #include "arpa/inet.h"
+#include "netinet/in.h"
+#include "sys/socket.h"
 
 /* C++ standard library headers */
+#include "memory"
 #include "string"
 
 /* Project .h files */
+#include "../simulation-interface/generated/grsim_commands.pb.h"
 #include "../simulation-interface/generated/grsim_packet.pb.h"
 #include "../common_types.h"
 
@@ -38,7 +42,7 @@ namespace simulation_interface
  */
 class SimulationInterface
 {
-public:
+ public:
   /*!
    * @brief Constructor that sets up connection to grSim for one robot.
    *
@@ -146,7 +150,7 @@ public:
    */
   virtual void SendPacket();
 
-protected:
+ protected:
   /*********************/
   /* Network variables */
   /*********************/
