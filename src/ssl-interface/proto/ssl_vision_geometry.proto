@@ -12,7 +12,7 @@ message Vector2f
  * and end point p2, and a line thickness. The start and end points are along
  * the center of the line, so the thickness of the line extends by thickness / 2
  * on either side of the line. */
-message SSLFieldLineSegment
+message SslFieldLineSegment
 {
   /* Name of this field marking. */
   required string name = 1;
@@ -23,12 +23,12 @@ message SSLFieldLineSegment
   /* Thickness of the line segment. */
   required float thickness = 4;
   /* The type of this shape */
-  optional SSLFieldShapeType type = 5;
+  optional SslFieldShapeType type = 5;
 }
 
 /* Represents a field marking as a circular arc segment represented by center
  * point, a start angle, an end angle, and an arc thickness. */
-message SSLFieldCircularArc
+message SslFieldCircularArc
 {
   /* Name of this field marking. */
   required string name = 1;
@@ -43,10 +43,10 @@ message SSLFieldCircularArc
   /* Thickness of the arc. */
   required float thickness = 6;
   /* The type of this shape */
-  optional SSLFieldShapeType type = 7;
+  optional SslFieldShapeType type = 7;
 }
 
-message SSLGeometryFieldSize
+message SslGeometryFieldSize
 {
   /* Field length (distance between goal lines) in mm */
   required int32 field_length = 1;
@@ -60,9 +60,9 @@ message SSLGeometryFieldSize
    * mm */
   required int32 boundary_width = 5;
   /* Generated line segments based on the other parameters */
-  repeated SSLFieldLineSegment field_lines = 6;
+  repeated SslFieldLineSegment field_lines = 6;
   /* Generated circular arcs based on the other parameters */
-  repeated SSLFieldCircularArc field_arcs = 7;
+  repeated SslFieldCircularArc field_arcs = 7;
   /* Depth of the penalty/defense area (measured between line centers) in mm */
   optional int32 penalty_area_depth = 8;
   /* Width of the penalty/defense area (measured between line centers) in mm */
@@ -84,8 +84,9 @@ message SSLGeometryFieldSize
   optional float max_robot_radius = 15;
 }
 
-message SSLGeometryCameraCalibration{
-  required uint32 camera_id     = 1;
+message SslGeometryCameraCalibration
+{
+  required uint32 camera_id = 1;
   required float focal_length = 2;
   required float principal_point_x = 3;
   required float principal_point_y = 4;
@@ -111,7 +112,7 @@ message SSLGeometryCameraCalibration{
  * The full model is described in the TDP of ER-Force from 2016, which can be
  * found here:
  * https://ssl.robocup.org/wp-content/uploads/2019/01/2016_ETDP_ER-Force.pdf */
-message SSLBallModelStraightTwoPhase
+message SslBallModelStraightTwoPhase
 {
   /* Ball sliding acceleration [m/s^2] (should be negative) */
   required double acc_slide = 1;
@@ -123,7 +124,7 @@ message SSLBallModelStraightTwoPhase
 
 /* Fixed-Loss model for chipped balls.
  * Uses fixed damping factors for xy and z direction per hop. */
-message SSLBallModelChipFixedLoss
+message SslBallModelChipFixedLoss
 {
   /* Chip kick velocity damping factor in XY direction for the first hop */
   required double damping_xy_first_hop = 1;
@@ -133,20 +134,20 @@ message SSLBallModelChipFixedLoss
   required double damping_z = 3;
 }
 
-message SSLGeometryModels
+message SslGeometryModels
 {
-  optional SSLBallModelStraightTwoPhase straight_two_phase = 1;
-  optional SSLBallModelChipFixedLoss chip_fixed_loss = 2;
+  optional SslBallModelStraightTwoPhase straight_two_phase = 1;
+  optional SslBallModelChipFixedLoss chip_fixed_loss = 2;
 }
 
 message SslGeometryData
 {
-  required SSLGeometryFieldSize field = 1;
-  repeated SSLGeometryCameraCalibration calib = 2;
-  optional SSLGeometryModels models = 3;
+  required SslGeometryFieldSize field = 1;
+  repeated SslGeometryCameraCalibration calib = 2;
+  optional SslGeometryModels models = 3;
 }
 
-enum SSLFieldShapeType
+enum SslFieldShapeType
 {
   Undefined = 0;
   CenterCircle = 1;
